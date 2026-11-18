@@ -9,9 +9,21 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum Role { USER ADMIN }
-enum ChatType { PRIVATE GROUP }
-enum MessageType { TEXT IMAGE VIDEO VOICE FILE }
+enum Role {
+  USER
+  ADMIN
+}
+enum ChatType {
+  PRIVATE
+  GROUP
+}
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  VOICE
+  FILE
+}
 
 model User {
   id           String   @id @default(cuid())
