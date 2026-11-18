@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard</title>
+<style>
+  :root{--bg:#0f1720;--card:#17212b;--line:#243447;--text:#e8eef4;--mute:#8ea3b5;--blue:#3390ec;--red:#e5484d;--green:#3fb950}
+  *{box-sizing:border-box} body{margin:0;font:14px system-ui,sans-serif;background:var(--bg);color:var(--text)}
+  header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+  main{padding:16px;max-width:1100px;margin:auto}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+  .stat b{display:block;font-size:22px} .stat span{color:var(--mute);font-size:12px}
+  nav{display:flex;gap:8px;margin-bottom:12px}
+  button,input{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 12px}
+  button{cursor:pointer} button.on,button.primary{background:var(--blue);border-color:var(--blue)}
+  button.danger{color:var(--red)} button.sm{padding:4px 8px;font-size:12px}
+  .wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  table{width:100%;border-collapse:collapse} th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
+  th{color:var(--mute);font-weight:500;font-size:12px}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-right:6px}.dot.on{background:var(--green)}
+  .tag{font-size:11px;padding:2px 6px;border-radius:6px;background:var(--line)} .tag.red{background:var(--red)}
+  #login{max-width:320px;margin:15vh auto;display:flex;flex-direction:column;gap:10px}
+  .bar{display:flex;gap:8px;margin-bottom:10px} .bar input{flex:1}
+  .hide{display:none!important} .err{color:var(--red)}
+</style>
+</head>
+<body>
+<div id="login">
+  <h2>Admin Login</h2>
+  <input id="u" placeholder="Username" autocomplete="username">
+  <input id="p" type="password" placeholder="Password" autocomplete="current-password">
+  <button class="primary" id="go">Login</button>
+  <div class="err" id="lerr"></div>
+</div>
+
+<div id="app" class="hide">
+  <header><b>Admin Dashboard</b><button id="out" class="sm">Logout</button></header>
+  <main>
+    <div class="grid" id="stats"></div>
+    <nav>
+      <button data-tab="users" class="on">Users</button>
+      <button data-tab="chats">Chats</button>
+      <button data-tab="messages">Messages</button>
+    </nav>
+    <div class="bar" id="bar"><input id="q" placeholder="Search…"><button id="search">Search</button></div>
+    <div class="wrap"><table id="tbl"></table></div>
+  </main>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let token = localStorage.getItem('adminToken');
+let tab = 'users';
+
+async function api(path, opts = {}) {
+  const r = await fetch('/api/admin' + path, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+  });
+  if (r.status === 401 || r.status === 403) { logout(); throw new Error('auth'); }
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { alert(d.error || 'Request failed'); throw new Error(d.error || 'Request failed'); }
+  return d;
+}
+function logout() { localStorage.removeItem('adminToken'); token = null; $('#app').classList.add('hide'); $('#login').classList.remove('hide'); }
+
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  Object.assign(n, props);
+  kids.flat().forEach((k) => n.append(k));
+  return n;
+}
+
+$('#go').onclick = async () => {
+  $('#lerr').textContent = '';
+  let r, d;
+  try {
+    r = await fetch('/api/auth/login', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: $('#u').value, password: $('#p').value }),
+    });
+    d = await r.json();
+  } catch { return ($('#lerr').textContent = 'Network error'); }
+  if (!r.ok) return ($('#lerr').textContent = d.error);
+  if (d.user.role !== 'ADMIN') return ($('#lerr').textContent = 'Not an admin account');
+  token = d.token; localStorage.setItem('adminToken', token); start();
+};
+$('#out').onclick = logout;
+document.querySelectorAll('nav button').forEach((b) => (b.onclick = () => {
+  document.querySelectorAll('nav button').forEach((x) => x.classList.remove('on'));
+  b.classList.add('on'); tab = b.dataset.tab; $('#bar').classList.toggle('hide', tab === 'chats'); load();
+}));
+$('#search').onclick = () => load();
+$('#q').onkeydown = (e) => e.key === 'Enter' && load();
+
+async function loadStats() {
+  const s = await api('/stats');
+  const items = [['Online now', s.onlineNow], ['Users', s.users], ['New (24h)', s.newUsers], ['Banned', s.banned],
+    ['Chats', s.chats], ['Groups', s.groups], ['Messages', s.messages], ['Msgs (24h)', s.messagesToday], ['Media', s.media]];
+  $('#stats').replaceChildren(...items.map(([l, v]) => el('div', { className: 'stat' }, el('b', { textContent: v }), el('span', { textContent: l }))));
+}
+
+function render(head, rows) {
+  $('#tbl').replaceChildren(
+    el('thead', {}, el('tr', {}, head.map((h) => el('th', { textContent: h })))),
+    el('tbody', {}, rows.map((r) => el('tr', {}, r.map((c) => el('td', {}, c instanceof Node ? c : String(c ?? '')))))),
+  );
+}
+
+async function load() {
+  const q = encodeURIComponent($('#q').value);
+  if (tab === 'users') {
+    const { users } = await api('/users?q=' + q);
+    render(['', 'Name', 'Username', 'Role', 'Joined', 'Actions'], users.map((u) => [
+      el('span', { className: 'dot' + (u.online ? ' on' : '') }),
+      u.displayName + (u.isBanned ? ' 🚫' : ''),
+      '@' + u.username,
+      el('span', { className: 'tag' + (u.isBanned ? ' red' : ''), textContent: u.isBanned ? 'BANNED' : u.role }),
+      new Date(u.createdAt).toLocaleDateString(),
+      el('span', {},
+        el('button', { className: 'sm', textContent: u.isBanned ? 'Unban' : 'Ban', onclick: async () => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ isBanned: !u.isBanned }) }); load(); } }), ' ',
+        el('button', { className: 'sm', textContent: u.role === 'ADMIN' ? 'Remove admin' : 'Make admin', onclick: async () => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ role: u.role === 'ADMIN' ? 'USER' : 'ADMIN' }) }); load(); } }), ' ',
+        el('button', { className: 'sm', textContent: 'Log out', onclick: async () => { if (confirm('Log @' + u.username + ' out of all devices?')) { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ revokeSessions: true }) }); alert('Done'); } } }), ' ',
+        el('button', { className: 'sm danger', textContent: 'Delete', onclick: async () => { if (confirm('Delete @' + u.username + ' and all their messages?')) { await api('/users/' + u.id, { method: 'DELETE' }); load(); loadStats(); } } }),
+      ),
+    ]));
+  } else if (tab === 'chats') {
+    const { chats } = await api('/chats');
+    render(['Title', 'Type', 'Members', 'Messages', 'Created'], chats.map((c) => [c.title || '(private)', c.type, c._count.members, c._count.messages, new Date(c.createdAt).toLocaleDateString()]));
+  } else {
+    const { messages } = await api('/messages?q=' + q);
+    render(['Time', 'From', 'Type', 'Content', ''], messages.map((m) => [
+      new Date(m.createdAt).toLocaleString(), m.sender.displayName, m.type, (m.text || m.fileName || '').slice(0, 60),
+      el('button', { className: 'sm danger', textContent: 'Delete', onclick: async () => { await api('/messages/' + m.id, { method: 'DELETE' }); load(); } }),
+    ]));
+  }
+}
+
+function start() { $('#login').classList.add('hide'); $('#app').classList.remove('hide'); loadStats(); load(); }
+if (token) start();
+</script>
+</body>
+</html>

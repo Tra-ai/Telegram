@@ -1,0 +1,26 @@
+{
+  "name": "telegram-clone-server",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "dev": "node --watch src/local.js",
+    "start": "node src/local.js",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "seed:admin": "node src/seed-admin.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "@vercel/blob": "^1.0.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.0"
+  },
+  "devDependencies": { "prisma": "^6.0.0" }
+}
