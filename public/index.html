@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#3390ec">
-<title>Chat</title>
+<title>Layzzchat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -535,14 +535,14 @@ function authView() {
   }
   [u, d, p].forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
   draw();
-  root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Chat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
+  root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Layzzchat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
     tabs, u, d, h('div', { class: 'pw' }, p, eye), err, go);
   return h('div', { class: 'authwrap' }, root);
 }
 
 /* ---------- shell (side pane with bottom tabs + main pane) ---------- */
 let shell = null, sideList = null, contactList = null, main = null, sideBody = null, sideTitle = null, navEl = null, navSig = '', sideTab = 'chats', contactQ = '';
-const TAB_TITLES = { chats: 'Chat', contacts: 'ទំនាក់ទំនង', settings: 'ការកំណត់', profile: 'ប្រវត្តិរូប' };
+const TAB_TITLES = { chats: 'Layzzchat', contacts: 'ទំនាក់ទំនង', settings: 'ការកំណត់', profile: 'ប្រវត្តិរូប' };
 function ensureShell() {
   if (shell && shell.isConnected) return;
   sideTitle = h('b', { class: 'title' });
