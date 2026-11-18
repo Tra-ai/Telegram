@@ -90,6 +90,19 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .sidebody .list{padding-bottom:110px}
 .sidebody .pad{padding-bottom:120px}
 
+
+/* ---- profile tab ---- */
+.pfhead{text-align:center;padding:18px 0 6px}
+.pfhead h2{margin:14px 0 0;font-size:24px;line-height:1.3}
+.pfhead .status{display:block;margin-top:2px;font-size:15px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.tile{background:var(--surface);border-radius:18px;padding:14px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);color:var(--fg)}
+.tile .ic{color:var(--pri)}
+.kv{padding:10px 14px;cursor:pointer;border-radius:12px}
+.kv:hover{background:var(--hover)}
+.kv div{font-size:17px;overflow-wrap:anywhere}
+.kv small{display:block;margin-top:1px}
+
 /* ---- avatar ---- */
 .avw{position:relative;flex:none;line-height:0}
 .av{border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;line-height:1}
@@ -1120,17 +1133,33 @@ function memberMenu(m, redraw) {
 
 /* ---------- profile + settings (tabs of the side pane) ---------- */
 function profileNode() {
-  const name = h('input', { value: me.displayName, placeholder: 'ឈ្មោះបង្ហាញ', maxlength: 60 });
-  const bio = h('textarea', { rows: 2, placeholder: 'ប្រវត្តិរូប (bio)', maxlength: 200 }); bio.value = me.bio || '';
-  const avSlot = h('div', { class: 'center' });
-  const drawAv = () => avSlot.replaceChildren(h('div', { class: 'avedit', onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 96), h('span', { class: 'cam' }, ic('camera', 16))),
-    h('h3', { style: 'margin:10px 0 0' }, me.displayName), h('small', {}, '@' + me.username));
+  const head = h('div', { class: 'pfhead' });
+  const info = h('div', { class: 'card' });
   const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    if (f.size > 4 * 1024 * 1024) return toast('រូបធំពេក (អតិបរមា 4MB)');
     const fd = new FormData(); fd.append('file', f, f.name);
-    me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; drawAv(); drawNav();
+    me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; draw(); drawNav(); toast('បានប្ដូររូប');
   }) });
-  drawAv();
+  const copy = (v) => async () => { try { await navigator.clipboard.writeText(v); toast('បានចម្លង'); } catch { toast(v); } };
+  function draw() {
+    head.replaceChildren(h('div', { class: 'avedit', onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 124)),
+      h('h2', {}, me.displayName), h('small', { class: 'status online' }, 'កំពុងអនឡាញ'));
+    info.replaceChildren(
+      h('div', { class: 'kv', onclick: copy('@' + me.username) }, h('div', {}, '@' + me.username), h('small', {}, 'ឈ្មោះអ្នកប្រើ')),
+      ...(me.bio ? [h('div', { class: 'kv', onclick: copy(me.bio) }, h('div', { style: 'white-space:pre-wrap' }, me.bio), h('small', {}, 'ប្រវត្តិរូប (bio)'))] : []));
+  }
+  function editInfo() {
+    const name = h('input', { value: me.displayName, placeholder: 'ឈ្មោះបង្ហាញ', maxlength: 60 });
+    const bio = h('textarea', { rows: 3, placeholder: 'ប្រវត្តិរូប (bio)', maxlength: 200 }); bio.value = me.bio || '';
+    const close = modal('កែព័ត៌មាន', h('div', {}, name, bio, h('button', { class: 'primary', onclick: safe(async () => {
+      if (!name.value.trim()) return toast('សូមដាក់ឈ្មោះ');
+      me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user;
+      close(); draw(); drawNav(); toast('បានរក្សាទុក');
+    }) }, 'រក្សាទុក')));
+    setTimeout(() => name.focus(), 80);
+  }
+  draw();
   const blocked = h('div', {});
   const loadBlocked = safe(async () => {
     const d = await api('/users/blocked');
@@ -1139,9 +1168,10 @@ function profileNode() {
       : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'គ្មាន')]));
   });
   loadBlocked();
-  return h('div', { class: 'pad' },
-    h('div', { class: 'card p' }, avSlot, fileIn, h('div', { style: 'margin-top:12px' }, name, bio),
-      h('button', { class: 'primary', onclick: safe(async () => { me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user; drawAv(); drawNav(); toast('បានរក្សាទុក'); }) }, 'រក្សាទុក')),
+  const tile = (icon, label, fn) => h('button', { class: 'tile', onclick: fn }, ic(icon, 26), label);
+  return h('div', { class: 'pad' }, head, fileIn,
+    h('div', { class: 'tiles' }, tile('camera', 'ដាក់រូប', () => fileIn.click()), tile('pencil', 'កែព័ត៌មាន', editInfo), tile('settings', 'ការកំណត់', () => setTab('settings'))),
+    info,
     h('div', { class: 'card' }, h('h4', {}, 'អ្នកដែលបាន block'), blocked));
 }
 function settingsNode() {
