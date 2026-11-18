@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>Chat</title>
+<style>
+:root{--bg:#fff;--fg:#111827;--mut:#6b7280;--card:#f3f4f6;--line:#e5e7eb;--pri:#2563eb;--mine:#dbeafe;--danger:#dc2626}
+@media (prefers-color-scheme:dark){:root{--bg:#0f172a;--fg:#e5e7eb;--mut:#94a3b8;--card:#1e293b;--line:#334155;--pri:#3b82f6;--mine:#1e3a8a}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,-apple-system,"Noto Sans Khmer",sans-serif}
+button,input,textarea{font:inherit;color:inherit}
+input,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);outline:none;margin:6px 0}
+input:focus,textarea:focus{border-color:var(--pri)}
+button{cursor:pointer;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:10px 14px}
+button.primary{background:var(--pri);border-color:var(--pri);color:#fff;width:100%;margin-top:8px}
+button.danger,.danger{color:var(--danger)}
+button.icon{border:0;background:transparent;font-size:20px;padding:6px 10px;line-height:1}
+.screen{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+.bar{display:flex;align-items:center;gap:6px;padding:8px 10px;border-bottom:1px solid var(--line);min-height:56px}
+.bar .title{flex:1;font-size:18px;min-width:0}
+.grow{flex:1;min-width:0}
+.grow b,.grow small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+small,.muted{color:var(--mut)}
+.list{flex:1;overflow-y:auto}
+.row{display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:pointer}
+.row:active{background:var(--card)}
+.av{border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600}
+.badge{background:var(--pri);color:#fff;border-radius:999px;font-size:12px;padding:1px 8px;min-width:22px;text-align:center}
+.tag{font-size:12px;border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--mut)}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12px;color:var(--mut)}
+.auth{max-width:380px;margin:0 auto;padding:max(32px,env(safe-area-inset-top)) 20px 20px}
+.auth h1{text-align:center}
+.tabs{display:flex;gap:8px;margin-bottom:10px}.tabs button{flex:1}.tabs .on{background:var(--pri);color:#fff;border-color:var(--pri)}
+.err{color:var(--danger);min-height:1.4em;font-size:14px}
+.msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:4px}
+.msg{display:flex}.msg.mine{justify-content:flex-end}
+.bub{max-width:82%;background:var(--card);border-radius:14px;padding:7px 10px;overflow-wrap:anywhere}
+.mine .bub{background:var(--mine)}
+.bub img,.bub video{max-width:100%;border-radius:10px;display:block}
+.bub audio{max-width:100%}
+.txt{white-space:pre-wrap}
+.who{font-size:12px;font-weight:600;color:var(--pri)}
+.quote{border-left:3px solid var(--pri);padding:0 8px;margin-bottom:4px;font-size:13px;color:var(--mut)}
+.meta{font-size:11px;color:var(--mut);text-align:right;margin-top:2px}
+.day{align-self:center;font-size:12px;color:var(--mut);margin:8px 0 4px}
+.older{align-self:center;font-size:13px}
+.typing{font-size:12px;color:var(--mut);padding:0 14px;min-height:0}
+.composer{display:flex;align-items:flex-end;gap:2px;padding:6px 6px calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+.composer textarea{margin:0;resize:none;max-height:120px;border-radius:18px}
+.composer .send{color:var(--pri)}
+.rec{color:var(--danger)!important}
+.replybar,.blockbar{display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--card);font-size:14px;border-top:1px solid var(--line)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.panel{background:var(--bg);width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;border-radius:16px 16px 0 0;padding:12px 14px calc(14px + env(safe-area-inset-bottom))}
+.panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sheet-i{display:block;width:100%;text-align:left;margin:6px 0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.chip{background:var(--card);border-radius:999px;padding:3px 10px;font-size:14px}
+.center{text-align:center}.center .av{margin:0 auto}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111;color:#fff;padding:9px 14px;border-radius:10px;z-index:30;max-width:90%;font-size:14px}
+.pad{padding:12px 14px;overflow-y:auto;flex:1}
+.pad button{margin:4px 0}
+hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+'use strict';
+/* ---------- helpers ---------- */
+const app = document.getElementById('app');
+const safeUrl = (u) => (typeof u === 'string' && u.startsWith('https://') ? u : '');
+function h(tag, props, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'style') n.style.cssText = v;
+    else if (k.startsWith('on')) { if (typeof v === 'function') n.addEventListener(k.slice(2), v); }
+    else if (k === 'value' || k === 'hidden' || k === 'disabled') n[k] = v;
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  kids.flat(Infinity).forEach((c) => { if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(String(c))); });
+  return n;
+}
+const mount = (node) => app.replaceChildren(node);
+const fmtTime = (x) => new Date(x).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const fmtDate = (x) => new Date(x).toLocaleDateString();
+const fmtFull = (x) => new Date(x).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+const back5 = (iso) => new Date(new Date(iso).getTime() - 5000).toISOString();
+let toastEl = null;
+function toast(msg, ms = 2600) {
+  if (toastEl) toastEl.remove();
+  const el = h('div', { class: 'toast' }, msg); toastEl = el; document.body.append(el);
+  setTimeout(() => el.remove(), ms);
+}
+const safe = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message || 'Error'); } };
+function avatar(url, name, size = 40) {
+  const s = `width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px`;
+  const u = safeUrl(url);
+  if (u) return h('img', { class: 'av', src: u, style: s, alt: '' });
+  const ch = ([...(name || '?')][0] || '?').toUpperCase();
+  const hue = [...(name || '')].reduce((a, c) => a + c.codePointAt(0), 0) % 360;
+  return h('div', { class: 'av', style: s + `;background:hsl(${hue} 55% 45%)` }, ch);
+}
+function modal(title, body) {
+  const close = () => ov.remove();
+  const ov = h('div', { class: 'overlay', onclick: (e) => { if (e.target === ov) close(); } },
+    h('div', { class: 'panel' }, h('div', { class: 'panel-h' }, h('b', {}, title), h('button', { class: 'icon', onclick: close }, '✕')), body));
+  document.body.append(ov);
+  return close;
+}
+function sheet(title, items) {
+  const list = items.filter(Boolean);
+  if (!list.length) return;
+  const close = modal(title, h('div', {}, list.map((i) => h('button', {
+    class: 'sheet-i' + (i.danger ? ' danger' : ''),
+    onclick: async () => { close(); try { await i.fn(); } catch (e) { toast(e.message || 'Error'); } },
+  }, i.label))));
+}
+
+/* ---------- api ---------- */
+let token = localStorage.getItem('token');
+let me = null;
+async function api(path, { method = 'GET', body, form } = {}) {
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  if (token) headers.Authorization = 'Bearer ' + token;
+  const res = await fetch('/api' + path, { method, headers, body: form || (body ? JSON.stringify(body) : undefined) });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && token && data.error === 'Unauthorized') { logout(); throw new Error('សម័យផុតកំណត់ សូមចូលម្ដងទៀត'); }
+  if (!res.ok) throw new Error(data.error || 'Error ' + res.status);
+  return data;
+}
+function saveAuth(r) { token = r.token; localStorage.setItem('token', token); if (r.user) me = r.user; return r; }
+function logout() {
+  token = null; localStorage.removeItem('token'); me = null; stopPolling();
+  document.querySelectorAll('.overlay').forEach((o) => o.remove());
+  mount(authView());
+}
+
+/* ---------- polling ---------- */
+let pollGen = 0, pollTimer = null;
+function stopPolling() { pollGen++; clearTimeout(pollTimer); }
+
+/* ---------- state ---------- */
+let view = 'auth';
+let chats = [];
+let cur = null, ui = null;
+let msgs = new Map(), reads = [], typingIds = [], hasMore = false, replyTo = null, after = '';
+let lastTyping = 0, rec = null;
+
+const isSelf = () => cur && cur.type === 'PRIVATE' && cur.peer && cur.peer.id === me.id;
+function preview(m) {
+  if (!m) return '';
+  if (m.type === 'IMAGE') return '📷 រូបភាព' + (m.text ? ' · ' + m.text : '');
+  if (m.type === 'VIDEO') return '🎬 វីដេអូ';
+  if (m.type === 'VOICE') return '🎤 សំឡេង';
+  if (m.type === 'FILE') return '📎 ឯកសារ';
+  return (m.text || '').slice(0, 80);
+}
+
+/* ---------- auth screen ---------- */
+function authView() {
+  view = 'auth';
+  let mode = 'login';
+  const root = h('div', { class: 'auth' });
+  const tab = (label, m) => h('button', { class: mode === m ? 'on' : '', onclick: () => { mode = m; draw(); } }, label);
+  function draw() {
+    const u = h('input', { placeholder: 'ឈ្មោះអ្នកប្រើ (a-z 0-9 _)', autocomplete: 'username', autocapitalize: 'none' });
+    const p = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ (8+ តួ)', autocomplete: mode === 'login' ? 'current-password' : 'new-password' });
+    const d = h('input', { placeholder: 'ឈ្មោះបង្ហាញ' });
+    const err = h('div', { class: 'err' });
+    const go = async () => {
+      err.textContent = '';
+      try {
+        const body = mode === 'login' ? { username: u.value, password: p.value } : { username: u.value, password: p.value, displayName: d.value };
+        saveAuth(await api(mode === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body }));
+        showList();
+      } catch (e) { err.textContent = e.message; }
+    };
+    p.addEventListener('keydown', (e) => { if (e.key === 'Enter') go(); });
+    root.replaceChildren(h('h1', {}, '💬 Chat'), h('div', { class: 'tabs' }, tab('ចូល', 'login'), tab('ចុះឈ្មោះ', 'register')),
+      u, mode === 'register' ? d : null, p, err, h('button', { class: 'primary', onclick: go }, mode === 'login' ? 'ចូល' : 'បង្កើតគណនី'));
+  }
+  draw();
+  return root;
+}
+
+/* ---------- chat list ---------- */
+function showList() {
+  stopPolling(); view = 'list'; cur = null; ui = null;
+  const listEl = h('div', { class: 'list' });
+  mount(h('div', { class: 'screen' },
+    h('div', { class: 'bar' }, h('b', { class: 'title' }, '💬 Chat'),
+      h('button', { class: 'icon', onclick: newChat }, '✎'),
+      h('button', { class: 'icon', onclick: () => showProfile() }, avatar(me.avatarUrl, me.displayName, 30))),
+    listEl));
+  drawList(listEl);
+  const gen = ++pollGen;
+  const tick = async () => {
+    if (gen !== pollGen) return;
+    try { const d = await api('/chats'); if (gen !== pollGen) return; chats = d.chats; drawList(listEl); } catch (e) { /* retry */ }
+    if (gen === pollGen) pollTimer = setTimeout(tick, document.hidden ? 15000 : 4000);
+  };
+  tick();
+}
+function drawList(el) {
+  if (!chats.length) { el.replaceChildren(h('p', { class: 'muted center', style: 'padding:40px 20px' }, 'មិនទាន់មាន chat ទេ។ ចុច ✎ ដើម្បីចាប់ផ្ដើម')); return; }
+  el.replaceChildren(...chats.map((c) => {
+    const lm = c.lastMessage;
+    const mine = lm && lm.senderId === me.id;
+    const pre = lm ? (mine ? 'អ្នក: ' : c.type === 'GROUP' && lm.sender ? lm.sender.displayName + ': ' : '') + preview(lm) : '';
+    const t = lm ? lm.createdAt : c.createdAt;
+    const today = fmtDate(t) === fmtDate(new Date());
+    return h('div', { class: 'row', onclick: () => openChat(c) },
+      avatar(c.avatarUrl, c.title, 48),
+      h('div', { class: 'grow' }, h('b', {}, (c.type === 'GROUP' ? '👥 ' : '') + c.title), h('small', {}, pre)),
+      h('div', { class: 'right' }, h('span', {}, today ? fmtTime(t) : fmtDate(t)), c.unread ? h('span', { class: 'badge' }, c.unread) : null));
+  }));
+}
+function newChat() {
+  sheet('ថ្មី', [
+    { label: '💬 សារថ្មី', fn: () => pickUsers({ title: 'ស្វែងរកអ្នកប្រើ', onDone: openPrivate }) },
+    { label: '👥 ក្រុមថ្មី', fn: () => pickUsers({ multi: true, withTitle: true, title: 'បង្កើតក្រុម', onDone: async (us, title) => {
+      const d = await api('/chats/group', { method: 'POST', body: { title, memberIds: us.map((u) => u.id) } });
+      openChat(d.chat);
+    } }) },
+  ]);
+}
+async function openPrivate([u]) {
+  const d = await api('/chats/private', { method: 'POST', body: { userId: u.id } });
+  openChat(d.chat);
+}
+function pickUsers({ multi = false, withTitle = false, title, onDone, exclude = [] }) {
+  const sel = new Map();
+  const res = h('div', {});
+  const chosen = h('div', { class: 'chips' });
+  const q = h('input', { placeholder: 'ស្វែងរកតាមឈ្មោះ (យ៉ាងតិច 2 តួ)' });
+  const gt = withTitle ? h('input', { placeholder: 'ឈ្មោះក្រុម' }) : null;
+  let timer;
+  const drawChips = () => chosen.replaceChildren(...[...sel.values()].map((u) => h('span', { class: 'chip', onclick: () => { sel.delete(u.id); drawChips(); } }, u.displayName + ' ✕')));
+  const finish = async (users) => {
+    if (withTitle && !gt.value.trim()) return toast('សូមដាក់ឈ្មោះក្រុម');
+    close();
+    try { await onDone(users, gt ? gt.value.trim() : undefined); } catch (e) { toast(e.message); }
+  };
+  const search = async () => {
+    const v = q.value.trim();
+    if (v.length < 2) return res.replaceChildren();
+    try {
+      const d = await api('/users/search?q=' + encodeURIComponent(v));
+      const us = d.users.filter((u) => !exclude.includes(u.id));
+      res.replaceChildren(...(us.length ? us.map((u) => h('div', { class: 'row', onclick: () => { if (multi) { sel.set(u.id, u); drawChips(); } else finish([u]); } },
+        avatar(u.avatarUrl, u.displayName, 40), h('div', { class: 'grow' }, h('b', {}, u.displayName), h('small', {}, '@' + u.username)))) : [h('p', { class: 'muted' }, 'រកមិនឃើញ')]));
+    } catch (e) { toast(e.message); }
+  };
+  q.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 350); });
+  const body = h('div', {}, gt, q, chosen, res,
+    multi ? h('button', { class: 'primary', onclick: () => { if (!sel.size) return toast('ជ្រើសរើសយ៉ាងតិច 1 នាក់'); finish([...sel.values()]); } }, 'រួចរាល់') : null);
+  const close = modal(title, body);
+  setTimeout(() => q.focus(), 60);
+}
+
+/* ---------- chat screen ---------- */
+function buildChat() {
+  const avSlot = h('div', {});
+  const titleEl = h('b', {});
+  const statusEl = h('small', {});
+  const head = h('div', { class: 'bar' },
+    h('button', { class: 'icon', onclick: () => history.back() }, '←'),
+    h('div', { class: 'row', style: 'padding:0;flex:1;min-width:0', onclick: () => { if (cur.type === 'GROUP') groupInfo(); } },
+      avatSlotWrap(avSlot), h('div', { class: 'grow' }, titleEl, statusEl)),
+    h('button', { class: 'icon', onclick: chatMenu }, '⋮'));
+  const box = h('div', { class: 'msgs' });
+  const replyBar = h('div', { class: 'replybar', hidden: true });
+  const blockBar = h('div', { class: 'blockbar', hidden: true }, h('span', { class: 'grow' }, 'អ្នកបាន block អ្នកប្រើនេះ'),
+    h('button', { onclick: safe(() => setBlock(false)) }, 'Unblock'));
+  const input = h('textarea', { rows: 1, placeholder: 'សរសេរសារ…' });
+  const fileIn = h('input', { type: 'file', accept: 'image/*,video/*,audio/*', style: 'display:none', onchange: onFile });
+  const attach = h('button', { class: 'icon', onclick: () => fileIn.click() }, '📎');
+  const mic = h('button', { class: 'icon', onclick: toggleRec }, '🎤');
+  const send = h('button', { class: 'icon send', onclick: sendText, hidden: true }, '➤');
+  const composer = h('div', { class: 'composer' }, attach, fileIn, input, mic, send);
+  input.addEventListener('input', () => {
+    input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+    const has = !!input.value.trim(); send.hidden = !has; mic.hidden = has;
+    sendTyping();
+  });
+  ui = { head, avSlot, titleEl, statusEl, box, replyBar, blockBar, input, mic, send, composer };
+  mount(h('div', { class: 'screen' }, head, box, h('div', { class: 'typing' }), replyBar, blockBar, composer));
+  updateHeader();
+}
+function avatSlotWrap(slot) { return slot; }
+function statusText() {
+  const names = typingIds.map((id) => (cur.members.find((m) => m.userId === id) || {}).user).filter(Boolean).map((u) => u.displayName);
+  if (names.length) return names.join(', ') + ' កំពុងវាយ…';
+  if (cur.type === 'GROUP') return cur.members.length + ' សមាជិក';
+  if (isSelf()) return '';
+  return cur.peer && cur.peer.online ? 'កំពុងអនឡាញ' : cur.peer ? 'ចុងក្រោយ ' + fmtFull(cur.peer.lastSeen) : '';
+}
+function updateHeader() {
+  if (!ui || !cur) return;
+  ui.titleEl.textContent = cur.title || '';
+  ui.statusEl.textContent = statusText();
+  ui.avSlot.replaceChildren(avatar(cur.avatarUrl, cur.title, 40));
+  ui.blockBar.hidden = !cur.blockedByMe;
+  ui.composer.hidden = !!cur.blockedByMe;
+}
+function applyChat(c) { cur = { ...c }; updateHeader(); }
+
+async function openChat(chat, push = true) {
+  stopPolling(); view = 'chat'; cur = chat;
+  msgs = new Map(); reads = []; typingIds = []; hasMore = false; replyTo = null;
+  if (push) history.pushState({ v: 'chat' }, '');
+  buildChat();
+  const id = chat.id;
+  try {
+    const d = await api(`/chats/${id}/messages`);
+    if (!cur || cur.id !== id) return;
+    d.messages.forEach((m) => msgs.set(m.id, m));
+    reads = d.reads; hasMore = d.hasMore; after = back5(d.serverTime);
+    drawMessages('bottom'); markRead(); startChatPoll(id);
+  } catch (e) { toast(e.message); }
+}
+function markRead() { if (cur) api(`/chats/${cur.id}/read`, { method: 'POST', body: {} }).catch(() => {}); }
+
+function startChatPoll(chatId) {
+  const gen = ++pollGen;
+  let n = 0;
+  const tick = async () => {
+    if (gen !== pollGen) return;
+    let more = false;
+    try {
+      const d = await api(`/chats/${chatId}/messages?after=${encodeURIComponent(after)}`);
+      if (gen !== pollGen) return;
+      let changed = false, incoming = false;
+      for (const m of d.messages) {
+        const old = msgs.get(m.id);
+        if (m.deleted) { if (old) { msgs.delete(m.id); changed = true; } continue; }
+        if (!old || old.updatedAt !== m.updatedAt) {
+          if (!old && m.senderId !== me.id) incoming = true;
+          msgs.set(m.id, m); changed = true;
+        }
+      }
+      const sig = JSON.stringify(reads);
+      reads = d.reads; typingIds = d.typing;
+      more = d.hasMore && d.messages.length > 0;
+      // continue a full page from its last row (no overlap → always advances)
+      after = more ? d.messages[d.messages.length - 1].updatedAt : back5(d.serverTime);
+      if (changed || sig !== JSON.stringify(reads)) drawMessages(nearBottom() ? 'bottom' : 'keep');
+      if (incoming) markRead();
+      if (++n % 5 === 0) { const c = await api(`/chats/${chatId}`); if (gen === pollGen) applyChat(c.chat); } else updateHeader();
+    } catch (e) { /* retry */ }
+    if (gen === pollGen) pollTimer = setTimeout(tick, more ? 0 : document.hidden ? 8000 : 2000);
+  };
+  pollTimer = setTimeout(tick, 1500);
+}
+const nearBottom = () => ui && ui.box.scrollHeight - ui.box.scrollTop - ui.box.clientHeight < 140;
+
+function drawMessages(mode) {
+  if (!ui || !cur) return;
+  const box = ui.box, prevH = box.scrollHeight, prevT = box.scrollTop;
+  const list = [...msgs.values()].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  const nodes = [];
+  if (hasMore) nodes.push(h('button', { class: 'older', onclick: safe(loadOlder) }, 'ផ្ទុកសារចាស់ៗ'));
+  if (!list.length) nodes.push(h('p', { class: 'muted center', style: 'margin:auto' }, 'មិនទាន់មានសារ។ សួស្ដីសិន 👋'));
+  let lastDay = '';
+  for (const m of list) {
+    const day = fmtDate(m.createdAt);
+    if (day !== lastDay) { lastDay = day; nodes.push(h('div', { class: 'day' }, day)); }
+    nodes.push(bubble(m));
+  }
+  box.replaceChildren(...nodes);
+  if (mode === 'bottom') box.scrollTop = box.scrollHeight;
+  else if (mode === 'older') box.scrollTop = prevT + (box.scrollHeight - prevH);
+  else box.scrollTop = prevT;
+}
+async function loadOlder() {
+  let oldest = null;
+  for (const m of msgs.values()) if (!oldest || new Date(m.createdAt) < new Date(oldest.createdAt)) oldest = m;
+  if (!oldest) return;
+  const d = await api(`/chats/${cur.id}/messages?before=${encodeURIComponent(oldest.createdAt)}`);
+  d.messages.forEach((m) => msgs.set(m.id, m)); hasMore = d.hasMore;
+  drawMessages('older');
+}
+function bubble(m) {
+  const mine = m.senderId === me.id;
+  const parts = [];
+  if (cur.type === 'GROUP' && !mine && m.sender) parts.push(h('div', { class: 'who' }, m.sender.displayName));
+  if (m.replyTo) parts.push(h('div', { class: 'quote' }, h('b', {}, (m.replyTo.sender && m.replyTo.sender.displayName) || ''),
+    h('div', {}, m.replyTo.deletedAt ? 'សារត្រូវបានលុប' : preview(m.replyTo))));
+  const url = safeUrl(m.fileUrl);
+  if (m.type === 'IMAGE' && url) parts.push(h('a', { href: url, target: '_blank', rel: 'noopener' }, h('img', { src: url, loading: 'lazy', alt: '' })));
+  else if (m.type === 'VIDEO' && url) parts.push(h('video', { src: url, controls: true, preload: 'metadata', playsinline: true }));
+  else if (m.type === 'VOICE' && url) parts.push(h('audio', { src: url, controls: true, preload: 'none' }));
+  else if (m.type === 'FILE' && url) parts.push(h('a', { href: url, target: '_blank', rel: 'noopener' }, '📎 ' + (m.fileName || 'ឯកសារ')));
+  if (m.text) parts.push(h('div', { class: 'txt' }, m.text));
+  const showTick = mine && !isSelf();
+  const read = showTick && reads.some((r) => r.userId !== me.id && new Date(r.lastReadAt) >= new Date(m.createdAt));
+  parts.push(h('div', { class: 'meta' }, (m.editedAt ? 'បានកែ · ' : '') + fmtTime(m.createdAt) + (showTick ? (read ? ' ✓✓' : ' ✓') : '')));
+  return h('div', { class: 'msg' + (mine ? ' mine' : '') }, h('div', { class: 'bub', onclick: (e) => { if (!e.target.closest('a,video,audio')) msgMenu(m); } }, parts));
+}
+function msgMenu(m) {
+  const mine = m.senderId === me.id;
+  const mem = cur.members.find((x) => x.userId === me.id);
+  const admin = cur.type === 'GROUP' && mem && mem.isAdmin;
+  const canEdit = mine && Date.now() - new Date(m.createdAt).getTime() < 48 * 3600 * 1000;
+  sheet('សារ', [
+    { label: '↩︎ ឆ្លើយតប', fn: () => setReply(m) },
+    m.text && { label: '📋 ចម្លង', fn: async () => { await navigator.clipboard.writeText(m.text); toast('បានចម្លង'); } },
+    canEdit && { label: '✏️ កែ', fn: async () => {
+      const v = prompt('កែសារ', m.text || ''); if (v == null) return;
+      const d = await api(`/chats/${cur.id}/messages/${m.id}`, { method: 'PATCH', body: { text: v } });
+      msgs.set(m.id, d.message); drawMessages('keep');
+    } },
+    (mine || admin) && { label: '🗑 លុប', danger: true, fn: async () => {
+      if (!confirm('លុបសារនេះ?')) return;
+      await api(`/chats/${cur.id}/messages/${m.id}`, { method: 'DELETE' });
+      msgs.delete(m.id); drawMessages('keep');
+    } },
+  ]);
+}
+function setReply(m) {
+  replyTo = m;
+  ui.replyBar.hidden = !m;
+  if (!m) return;
+  ui.replyBar.replaceChildren(h('span', { class: 'grow' }, '↩︎ ' + ((m.sender && m.sender.displayName) || '') + ': ' + preview(m)), h('button', { class: 'icon', onclick: () => setReply(null) }, '✕'));
+  ui.input.focus();
+}
+
+/* ---------- sending ---------- */
+async function sendMsg(chatId, body) {
+  const d = await api(`/chats/${chatId}/messages`, { method: 'POST', body: { ...body, replyToId: replyTo ? replyTo.id : undefined } });
+  if (cur && cur.id === chatId) {
+    setReply(null);
+    msgs.set(d.message.id, d.message); drawMessages('bottom');
+    api(`/chats/${chatId}/typing`, { method: 'POST', body: { isTyping: false } }).catch(() => {});
+  }
+}
+async function sendText() {
+  const text = ui.input.value.trim();
+  if (!text) return;
+  const id = cur.id;
+  ui.input.value = ''; ui.input.style.height = 'auto'; ui.send.hidden = true; ui.mic.hidden = false;
+  try { await sendMsg(id, { type: 'TEXT', text }); }
+  catch (e) { ui.input.value = text; ui.send.hidden = false; ui.mic.hidden = true; toast(e.message); }
+}
+function sendTyping() {
+  const now = Date.now();
+  if (now - lastTyping > 3000 && ui.input.value) { lastTyping = now; api(`/chats/${cur.id}/typing`, { method: 'POST', body: { isTyping: true } }).catch(() => {}); }
+}
+async function uploadAndSend(chatId, blob, name, extra) {
+  const fd = new FormData(); fd.append('file', blob, name);
+  const up = await api('/upload', { method: 'POST', form: fd });
+  await sendMsg(chatId, { type: extra && extra.type || up.type, fileUrl: up.fileUrl, fileName: up.fileName, fileSize: up.fileSize, duration: extra && extra.duration });
+}
+async function onFile(e) {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (f.size > 4 * 1024 * 1024) return toast('ឯកសារធំពេក (អតិបរមា 4MB)');
+  toast('កំពុង upload…', 8000);
+  try { await uploadAndSend(cur.id, f, f.name); if (toastEl) toastEl.remove(); } catch (err) { toast(err.message); }
+}
+async function toggleRec() {
+  if (rec) { rec.stop(); return; }
+  if (!navigator.mediaDevices || !window.MediaRecorder) return toast('Browser មិនគាំទ្រការថតសំឡេង');
+  const cid = cur.id;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mr = new MediaRecorder(stream);
+    const chunks = []; const t0 = Date.now();
+    mr.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    mr.onstop = async () => {
+      stream.getTracks().forEach((t) => t.stop()); rec = null;
+      if (ui) { ui.mic.classList.remove('rec'); ui.mic.textContent = '🎤'; }
+      const type = mr.mimeType || 'audio/webm';
+      const blob = new Blob(chunks, { type });
+      if (blob.size > 4 * 1024 * 1024) return toast('សំឡេងវែងពេក (អតិបរមា 4MB)');
+      const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+      try { await uploadAndSend(cid, blob, 'voice.' + ext, { type: 'VOICE', duration: Math.max(1, Math.round((Date.now() - t0) / 1000)) }); }
+      catch (err) { toast(err.message); }
+    };
+    mr.start(); rec = mr; ui.mic.classList.add('rec'); ui.mic.textContent = '⏹';
+  } catch (err) { toast('មិនអាចប្រើមីក្រូហ្វូន'); }
+}
+
+/* ---------- chat menu / block / group ---------- */
+function chatMenu() {
+  if (cur.type === 'GROUP') return groupInfo();
+  if (isSelf() || !cur.peer) return;
+  sheet(cur.title, [cur.blockedByMe
+    ? { label: '🔓 Unblock', fn: () => setBlock(false) }
+    : { label: '🚫 Block', danger: true, fn: async () => { if (confirm('Block អ្នកប្រើនេះ?')) await setBlock(true); } }]);
+}
+async function setBlock(on) {
+  await api(`/users/${cur.peer.id}/block`, { method: on ? 'POST' : 'DELETE', body: on ? {} : undefined });
+  cur.blockedByMe = on; updateHeader();
+}
+function groupInfo() {
+  const body = h('div', {});
+  const closeM = modal('ព័ត៌មានក្រុម', body);
+  const redraw = () => {
+    const mem = cur.members.find((m) => m.userId === me.id);
+    const admin = !!(mem && mem.isAdmin);
+    const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => {
+      const f = e.target.files[0]; e.target.value=''; if (!f) return;
+      const fd = new FormData(); fd.append('file', f, f.name);
+      const d = await api(`/chats/${cur.id}/avatar`, { method: 'POST', form: fd });
+      applyChat(d.chat); redraw();
+    }) });
+    body.replaceChildren(
+      h('div', { class: 'center' }, h('div', { onclick: admin ? () => fileIn.click() : null }, avatar(cur.avatarUrl, cur.title, 80)), fileIn, h('h3', {}, cur.title)),
+      admin ? h('button', { onclick: safe(async () => {
+        const v = prompt('ឈ្មោះក្រុមថ្មី', cur.title); if (!v || !v.trim()) return;
+        const d = await api(`/chats/${cur.id}`, { method: 'PATCH', body: { title: v } }); applyChat(d.chat); redraw();
+      }) }, '✏️ ប្ដូរឈ្មោះ') : null,
+      admin ? h('button', { onclick: () => pickUsers({ multi: true, title: 'បន្ថែមសមាជិក', exclude: cur.members.map((m) => m.userId), onDone: async (us) => {
+        const d = await api(`/chats/${cur.id}/members`, { method: 'POST', body: { userIds: us.map((u) => u.id) } }); applyChat(d.chat); redraw();
+      } }) }, '➕ បន្ថែមសមាជិក') : null,
+      h('p', { class: 'muted' }, cur.members.length + ' សមាជិក'),
+      ...cur.members.map((m) => h('div', { class: 'row', onclick: () => memberMenu(m, redraw) },
+        avatar(m.user.avatarUrl, m.user.displayName, 40),
+        h('div', { class: 'grow' }, h('b', {}, m.user.displayName + (m.userId === me.id ? ' (អ្នក)' : '')), h('small', {}, '@' + m.user.username)),
+        m.userId === cur.ownerId ? h('span', { class: 'tag' }, 'owner') : m.isAdmin ? h('span', { class: 'tag' }, 'admin') : null)),
+      h('button', { class: 'danger sheet-i', onclick: safe(async () => {
+        if (!confirm('ចាកចេញពីក្រុម?')) return;
+        await api(`/chats/${cur.id}/members/me`, { method: 'DELETE' }); closeM(); history.back();
+      }) }, 'ចាកចេញពីក្រុម'));
+  };
+  redraw();
+}
+function memberMenu(m, redraw) {
+  if (m.userId === me.id) return;
+  const owner = cur.ownerId === me.id;
+  const mem = cur.members.find((x) => x.userId === me.id);
+  const admin = !!(mem && mem.isAdmin);
+  const targetOwner = m.userId === cur.ownerId;
+  const act = (fn) => async () => { const d = await fn(); if (d && d.chat) { applyChat(d.chat); redraw(); } };
+  sheet(m.user.displayName, [
+    owner && !targetOwner && { label: m.isAdmin ? 'ដកសិទ្ធិ admin' : 'តែងតាំងជា admin',
+      fn: act(() => api(`/chats/${cur.id}/members/${m.userId}`, { method: 'PATCH', body: { isAdmin: !m.isAdmin } })) },
+    owner && !targetOwner && { label: '👑 ផ្ទេរភាពជាម្ចាស់',
+      fn: act(async () => { if (!confirm('ផ្ទេរភាពជាម្ចាស់ក្រុម?')) return null; return api(`/chats/${cur.id}/transfer`, { method: 'POST', body: { userId: m.userId } }); }) },
+    admin && !targetOwner && (owner || !m.isAdmin) && { label: '🚫 ដកចេញពីក្រុម', danger: true,
+      fn: act(async () => { if (!confirm('ដក ' + m.user.displayName + ' ចេញ?')) return null; return api(`/chats/${cur.id}/members/${m.userId}`, { method: 'DELETE' }); }) },
+  ]);
+}
+
+/* ---------- profile ---------- */
+function showProfile(push = true) {
+  stopPolling(); view = 'profile'; cur = null; ui = null;
+  if (push) history.pushState({ v: 'profile' }, '');
+  const name = h('input', { value: me.displayName, placeholder: 'ឈ្មោះបង្ហាញ' });
+  const bio = h('textarea', { rows: 2, placeholder: 'ប្រវត្តិរូប (bio)' }); bio.value = me.bio || '';
+  const avSlot = h('div', { class: 'center' });
+  const drawAv = () => avSlot.replaceChildren(h('div', { onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 90)), h('small', {}, 'ចុចដើម្បីប្ដូររូប'));
+  const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    const fd = new FormData(); fd.append('file', f, f.name);
+    me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; drawAv();
+  }) });
+  drawAv();
+  const blocked = h('div', {});
+  const loadBlocked = safe(async () => {
+    const d = await api('/users/blocked');
+    blocked.replaceChildren(...(d.users.length ? d.users.map((u) => h('div', { class: 'row', style: 'padding:6px 0' }, avatar(u.avatarUrl, u.displayName, 34),
+      h('div', { class: 'grow' }, h('b', {}, u.displayName)), h('button', { onclick: safe(async () => { await api(`/users/${u.id}/block`, { method: 'DELETE' }); loadBlocked(); }) }, 'Unblock')))
+      : [h('small', {}, 'គ្មាន')]));
+  });
+  loadBlocked();
+  mount(h('div', { class: 'screen' },
+    h('div', { class: 'bar' }, h('button', { class: 'icon', onclick: () => history.back() }, '←'), h('b', { class: 'title' }, 'ប្រវត្តិរូប')),
+    h('div', { class: 'pad' }, avSlot, fileIn, name, bio,
+      h('button', { class: 'primary', onclick: safe(async () => { me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user; toast('បានរក្សាទុក'); }) }, 'រក្សាទុក'),
+      h('small', {}, '@' + me.username),
+      h('hr', {}),
+      h('b', {}, 'អ្នកដែលបាន block'), blocked,
+      h('hr', {}),
+      h('button', { class: 'sheet-i', onclick: changePassword }, '🔑 ប្ដូរពាក្យសម្ងាត់'),
+      h('button', { class: 'sheet-i', onclick: safe(async () => { if (!confirm('ចាកចេញពីឧបករណ៍ទាំងអស់?')) return; saveAuth(await api('/auth/logout-all', { method: 'POST', body: {} })); toast('រួចរាល់'); }) }, '📱 ចាកចេញពីឧបករណ៍ទាំងអស់'),
+      me.role === 'ADMIN' ? h('a', { href: '/admin/' }, h('button', { class: 'sheet-i' }, '🛠 Admin Dashboard')) : null,
+      h('button', { class: 'sheet-i danger', onclick: logout }, 'ចាកចេញ'))));
+}
+function changePassword() {
+  const cp = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន', autocomplete: 'current-password' });
+  const np = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ថ្មី (8+ តួ)', autocomplete: 'new-password' });
+  const close = modal('ប្ដូរពាក្យសម្ងាត់', h('div', {}, cp, np, h('button', { class: 'primary', onclick: safe(async () => {
+    saveAuth(await api('/auth/password', { method: 'POST', body: { currentPassword: cp.value, newPassword: np.value } }));
+    close(); toast('បានប្ដូរ · ឧបករណ៍ផ្សេងត្រូវចូលម្ដងទៀត');
+  }) }, 'រក្សាទុក')));
+}
+
+/* ---------- navigation + boot ---------- */
+window.addEventListener('popstate', () => {
+  document.querySelectorAll('.overlay').forEach((o) => o.remove());
+  if (me && view !== 'list') showList();
+});
+(async function boot() {
+  if (!token) return mount(authView());
+  try { me = (await api('/auth/me')).user; showList(); }
+  catch (e) { if (token) mount(h('div', { class: 'auth center' }, h('p', {}, 'មិនអាចភ្ជាប់ server: ' + e.message), h('button', { class: 'primary', onclick: () => location.reload() }, 'ព្យាយាមម្ដងទៀត'))); else mount(authView()); }
+})();
+</script>
+</body>
+</html>

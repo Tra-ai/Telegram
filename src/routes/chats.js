@@ -32,7 +32,7 @@ function shape(chat, me, lastMessage = null, unread = 0, blocked = null) {
     title = peer.id === me ? 'Saved Messages' : peer.displayName;
     avatarUrl = peer.avatarUrl;
   }
-  return { id: chat.id, type: chat.type, title, avatarUrl, peer, members, lastMessage, unread, blockedByMe: !!(peer && blocked?.has(peer.id)), createdAt: chat.createdAt };
+  return { id: chat.id, type: chat.type, ownerId: chat.ownerId, title, avatarUrl, peer, members, lastMessage, unread, blockedByMe: !!(peer && blocked?.has(peer.id)), createdAt: chat.createdAt };
 }
 
 const loadChat = (id) => prisma.chat.findUnique({ where: { id }, include: chatMembersInclude });
