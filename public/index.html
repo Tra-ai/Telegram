@@ -77,18 +77,18 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 
 /* ---- bottom navigation (floating pill) ---- */
 .sidebody{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
-.nav{position:absolute;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:2px;padding:6px;background:var(--surface);border-radius:34px;box-shadow:0 6px 28px rgba(16,24,40,.28),0 0 0 1px var(--line);z-index:6}
+.nav{position:absolute;left:12px;right:12px;bottom:calc(24px + env(safe-area-inset-bottom));display:flex;gap:2px;padding:6px;background:var(--surface);border-radius:34px;box-shadow:0 6px 28px rgba(16,24,40,.28),0 0 0 1px var(--line);z-index:6}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}}
 :root[data-theme="dark"] .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}
-.tab{flex:1;background:transparent;border-radius:28px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--fg);font-size:12px;font-weight:600;min-width:0}
+.tab{flex:1;background:transparent;border-radius:28px;padding:7px 2px 9px;line-height:1.5;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--fg);font-size:12px;font-weight:600;min-width:0}
 .tab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
 .tab.on{background:var(--pri-soft);color:var(--pri)}
 .tabic{position:relative;display:inline-flex;height:28px;align-items:center}
 .tabic .av{box-shadow:0 0 0 2px transparent}
 .tab.on .tabic .av{box-shadow:0 0 0 2px var(--pri)}
 .tabic .badge{position:absolute;top:-4px;left:14px;font-size:11px;height:19px;line-height:19px;min-width:19px;padding:0 5px;border:2px solid var(--surface);box-sizing:content-box}
-.sidebody .list{padding-bottom:110px}
-.sidebody .pad{padding-bottom:120px}
+.sidebody .list{padding-bottom:130px}
+.sidebody .pad{padding-bottom:140px}
 
 
 /* ---- profile tab ---- */
@@ -144,7 +144,7 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .row.active .tick{color:#fff}
 .badge{background:var(--pri);color:var(--on-pri);border-radius:999px;font-size:12px;font-weight:600;padding:0 7px;min-width:22px;height:22px;line-height:22px;text-align:center;flex:none}
 .tag{font-size:12px;border-radius:6px;padding:0 7px;color:var(--pri);background:var(--pri-soft);flex:none}
-.fab{position:absolute;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-lg);z-index:5}
+.fab{position:absolute;right:18px;bottom:calc(108px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-lg);z-index:5}
 .sk{border-radius:10px;background:linear-gradient(90deg,var(--field) 25%,var(--hover) 37%,var(--field) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
 @keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 .row-sk{display:flex;gap:12px;padding:10px 18px;align-items:center}
