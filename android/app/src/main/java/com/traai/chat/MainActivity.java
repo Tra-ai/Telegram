@@ -28,7 +28,12 @@ public class MainActivity extends Activity {
         // Screenshots, screen recording and the recent-apps thumbnail all come out black
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
+        // Match the app's dark header so there is no white flash / mismatched bars
+        getWindow().setStatusBarColor(0xFF17212B);
+        getWindow().setNavigationBarColor(0xFF17212B);
+
         web = new WebView(this);
+        web.setBackgroundColor(0xFF0E1621);
         setContentView(web);
         final String siteHost = Uri.parse(BuildConfig.SITE_URL).getHost();
 
