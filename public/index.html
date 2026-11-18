@@ -74,6 +74,22 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .typing-dots::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:dots 1.2s steps(4,end) infinite}
 @keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
+
+/* ---- bottom navigation (floating pill) ---- */
+.sidebody{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+.nav{position:absolute;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:2px;padding:6px;background:var(--surface);border-radius:34px;box-shadow:0 6px 28px rgba(16,24,40,.28),0 0 0 1px var(--line);z-index:6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}}
+:root[data-theme="dark"] .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}
+.tab{flex:1;background:transparent;border-radius:28px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--fg);font-size:12px;font-weight:600;min-width:0}
+.tab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tab.on{background:var(--pri-soft);color:var(--pri)}
+.tabic{position:relative;display:inline-flex;height:28px;align-items:center}
+.tabic .av{box-shadow:0 0 0 2px transparent}
+.tab.on .tabic .av{box-shadow:0 0 0 2px var(--pri)}
+.tabic .badge{position:absolute;top:-4px;left:14px;font-size:11px;height:19px;line-height:19px;min-width:19px;padding:0 5px;border:2px solid var(--surface);box-sizing:content-box}
+.sidebody .list{padding-bottom:110px}
+.sidebody .pad{padding-bottom:120px}
+
 /* ---- avatar ---- */
 .avw{position:relative;flex:none;line-height:0}
 .av{border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;line-height:1}
@@ -101,7 +117,7 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .row.active .tick{color:#fff}
 .badge{background:var(--pri);color:var(--on-pri);border-radius:999px;font-size:12px;font-weight:600;padding:0 7px;min-width:22px;height:22px;line-height:22px;text-align:center;flex:none}
 .tag{font-size:12px;border-radius:6px;padding:0 7px;color:var(--pri);background:var(--pri-soft);flex:none}
-.fab{position:absolute;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-lg);z-index:5}
+.fab{position:absolute;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-lg);z-index:5}
 .sk{border-radius:10px;background:linear-gradient(90deg,var(--field) 25%,var(--hover) 37%,var(--field) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
 @keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
 .row-sk{display:flex;gap:12px;padding:10px 18px;align-items:center}
@@ -297,6 +313,8 @@ const ICONS = {
   camera: '<path d="M14.500 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3"/>',
   eye: '<path d="M2 12s3.600-7 10-7 10 7 10 7-3.600 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
   eyeoff: '<path d="M9.900 4.200A10 10 0 0 1 12 5c6.400 0 10 7 10 7a17 17 0 0 1-2.200 3.200M6.600 6.600A17 17 0 0 0 2 12s3.600 7 10 7a9.700 9.700 0 0 0 5.400-1.600"/><path d="m2 2 20 20"/><path d="M9.900 9.900a3 3 0 0 0 4.200 4.200"/>',
+  contacts: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a5 5 0 0 1 10 0"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
 };
 function ic(name, size = 22) {
@@ -494,26 +512,70 @@ function authView() {
   return h('div', { class: 'authwrap' }, root);
 }
 
-/* ---------- shell (list pane + main pane) ---------- */
-let shell = null, sideList = null, main = null;
+/* ---------- shell (side pane with bottom tabs + main pane) ---------- */
+let shell = null, sideList = null, contactList = null, main = null, sideBody = null, sideTitle = null, navEl = null, navSig = '', sideTab = 'chats', contactQ = '';
+const TAB_TITLES = { chats: 'Chat', contacts: 'ទំនាក់ទំនង', settings: 'ការកំណត់', profile: 'ប្រវត្តិរូប' };
 function ensureShell() {
   if (shell && shell.isConnected) return;
-  sideList = h('div', { class: 'list' });
-  const q = h('input', { type: 'search', placeholder: 'ស្វែងរក chat…', 'aria-label': 'Search', value: sideQ, oninput: (e) => { sideQ = e.target.value; drawList(); } });
-  const side = h('aside', { class: 'side' },
-    h('div', { class: 'bar' }, h('button', { class: 'icon', 'aria-label': 'Profile', onclick: () => showProfile(), style: 'width:44px' }, avatar(me.avatarUrl, me.displayName, 34)),
-      h('b', { class: 'title' }, 'Chat')),
-    h('div', { class: 'searchrow' }, ic('search', 18), q),
-    sideList,
-    h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
+  sideTitle = h('b', { class: 'title' });
+  sideBody = h('div', { class: 'sidebody' });
+  navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
+  const side = h('aside', { class: 'side' }, h('div', { class: 'bar' }, sideTitle), sideBody, navEl);
   main = h('main', { class: 'main' });
   shell = h('div', { class: 'shell', 'data-view': 'list' }, side, main);
+  navSig = '';
   mount(shell);
+  renderSide();
+}
+function setTab(t) { sideTab = t; renderSide(); }
+function searchRow(get, set, redraw) {
+  return h('div', { class: 'searchrow' }, ic('search', 18),
+    h('input', { type: 'search', placeholder: 'ស្វែងរក…', 'aria-label': 'Search', value: get(), oninput: (e) => { set(e.target.value); redraw(); } }));
+}
+function renderSide() {
+  sideTitle.textContent = TAB_TITLES[sideTab];
+  sideList = null; contactList = null;
+  if (sideTab === 'chats') {
+    sideList = h('div', { class: 'list' });
+    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList), sideList,
+      h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
+  } else if (sideTab === 'contacts') {
+    contactList = h('div', { class: 'list' });
+    sideBody.replaceChildren(searchRow(() => contactQ, (v) => { contactQ = v; }, drawList), contactList);
+  } else if (sideTab === 'settings') sideBody.replaceChildren(settingsNode());
+  else sideBody.replaceChildren(profileNode());
   drawList();
+}
+function drawNav() {
+  if (!navEl || !me) return;
+  const unread = chats.filter((c) => c.unread > 0).length;
+  const sig = [sideTab, unread, me.avatarUrl, me.displayName].join('|');
+  if (sig === navSig) return;
+  navSig = sig;
+  const tab = (k, icon, label) => h('button', { class: 'tab' + (sideTab === k ? ' on' : ''), 'aria-label': label, 'aria-current': sideTab === k ? 'page' : null, onclick: () => setTab(k) },
+    h('span', { class: 'tabic' }, icon, k === 'chats' && unread ? h('span', { class: 'badge' }, unread > 99 ? '99+' : unread) : null), h('span', {}, label));
+  navEl.replaceChildren(tab('chats', ic('message', 25), 'សារ'), tab('contacts', ic('contacts', 25), 'ទំនាក់ទំនង'),
+    tab('settings', ic('settings', 25), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 26), 'ខ្ញុំ'));
 }
 function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildren(node); drawList(); }
 function emptyMain() {
   return h('div', { class: 'empty-main' }, ic('message', 40), h('p', {}, 'ជ្រើសរើស chat ដើម្បីចាប់ផ្ដើមសន្ទនា'));
+}
+function drawList() { drawNav(); if (sideList) drawChatRows(); else if (contactList) drawContacts(); }
+function drawContacts() {
+  const el = contactList;
+  const seen = new Set();
+  let people = chats.filter((c) => c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && !seen.has(c.peer.id) && seen.add(c.peer.id))
+    .sort((a, b) => a.peer.displayName.localeCompare(b.peer.displayName));
+  const needle = contactQ.trim().toLowerCase();
+  if (needle) people = people.filter((c) => c.peer.displayName.toLowerCase().includes(needle) || c.peer.username.toLowerCase().includes(needle));
+  el.replaceChildren(
+    h('div', { class: 'row', role: 'button', onclick: () => pickUsers({ title: 'ស្វែងរកអ្នកប្រើ', onDone: openPrivate }) },
+      h('span', { class: 'av', style: 'width:46px;height:46px;background:var(--pri-soft);color:var(--pri)' }, ic('userplus', 22)), h('div', { class: 'grow' }, h('b', { style: 'color:var(--pri)' }, 'ស្វែងរកអ្នកប្រើថ្មី'))),
+    ...(people.length ? people.map((c) => h('div', { class: 'row', role: 'button', onclick: () => openChat(c) },
+      avatarOnline(c.peer.avatarUrl, c.peer.displayName, 46, c.peer.online),
+      h('div', { class: 'grow' }, h('b', {}, c.peer.displayName), h('small', { style: c.peer.online ? 'color:var(--pri)' : '' }, c.peer.online ? 'កំពុងអនឡាញ' : 'ចុងក្រោយ ' + fmtFull(c.peer.lastSeen)))))
+      : [h('p', { class: 'muted center', style: 'padding:24px' }, needle ? 'រកមិនឃើញ' : 'មិនទាន់មានទំនាក់ទំនង។ ស្វែងរកអ្នកប្រើដើម្បីចាប់ផ្ដើម')]));
 }
 
 /* ---------- chat list ---------- */
@@ -523,7 +585,7 @@ function showList() {
   setMain(emptyMain(), 'list');
   startListPoll();
 }
-function drawList() {
+function drawChatRows() {
   if (!sideList) return;
   const el = sideList;
   if (!chatsLoaded) {
@@ -1056,11 +1118,8 @@ function memberMenu(m, redraw) {
   ]);
 }
 
-/* ---------- profile ---------- */
-function showProfile(push = true) {
-  stopChatPoll(); stopAudio(); cancelRecSilently(); cur = null; ui = null;
-  ensureShell();
-  if (push) history.pushState({ v: 'profile' }, '');
+/* ---------- profile + settings (tabs of the side pane) ---------- */
+function profileNode() {
   const name = h('input', { value: me.displayName, placeholder: 'ឈ្មោះបង្ហាញ', maxlength: 60 });
   const bio = h('textarea', { rows: 2, placeholder: 'ប្រវត្តិរូប (bio)', maxlength: 200 }); bio.value = me.bio || '';
   const avSlot = h('div', { class: 'center' });
@@ -1069,7 +1128,7 @@ function showProfile(push = true) {
   const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => {
     const f = e.target.files[0]; e.target.value = ''; if (!f) return;
     const fd = new FormData(); fd.append('file', f, f.name);
-    me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; drawAv();
+    me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; drawAv(); drawNav();
   }) });
   drawAv();
   const blocked = h('div', {});
@@ -1080,28 +1139,27 @@ function showProfile(push = true) {
       : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'គ្មាន')]));
   });
   loadBlocked();
+  return h('div', { class: 'pad' },
+    h('div', { class: 'card p' }, avSlot, fileIn, h('div', { style: 'margin-top:12px' }, name, bio),
+      h('button', { class: 'primary', onclick: safe(async () => { me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user; drawAv(); drawNav(); toast('បានរក្សាទុក'); }) }, 'រក្សាទុក')),
+    h('div', { class: 'card' }, h('h4', {}, 'អ្នកដែលបាន block'), blocked));
+}
+function settingsNode() {
   const themeSeg = h('div', { class: 'seg', style: 'margin:6px 10px 10px' });
   const drawTheme = () => { const t = store.get('theme') || 'auto'; themeSeg.replaceChildren(...[['auto', 'ស្វ័យប្រវត្តិ'], ['light', 'ភ្លឺ'], ['dark', 'ងងឹត']].map(([k, l]) =>
     h('button', { class: t === k ? 'on' : '', onclick: () => { store.set('theme', k); applyTheme(); drawTheme(); } }, l))); };
   drawTheme();
-  const node = h('div', { class: 'screen' },
-    h('div', { class: 'bar' }, ibtn('back', 'Back', () => history.back(), 'back'), h('b', { class: 'title' }, 'ប្រវត្តិរូប')),
-    h('div', { class: 'pad' },
-      h('div', { class: 'card p' }, avSlot, fileIn, h('div', { style: 'margin-top:12px' }, name, bio),
-        h('button', { class: 'primary', onclick: safe(async () => { me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user; drawAv(); toast('បានរក្សាទុក'); }) }, 'រក្សាទុក')),
-      h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), themeSeg),
-      h('div', { class: 'card' },
-        h('label', { class: 'row', style: 'cursor:pointer' }, h('span', { style: 'color:var(--pri)' }, ic('lock', 22)),
-          h('div', { class: 'grow' }, h('b', {}, 'មុខងារការពារ chat'), h('small', { style: 'white-space:normal' }, 'Watermark ឈ្មោះអ្នក · បិទការចម្លង · បាំងអេក្រង់ពេលចេញ។ មិនអាចធ្វើឱ្យ screenshot ខ្មៅបានលើ browser ទេ')),
-          h('input', { type: 'checkbox', class: 'sw', checked: secure, onchange: (e) => { secure = e.target.checked; store.set('secure', secure ? '1' : '0'); } }))),
-      h('div', { class: 'card' }, h('h4', {}, 'អ្នកដែលបាន block'), blocked),
-      h('div', { class: 'card' },
-        h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់'),
-        h('button', { class: 'sheet-i', onclick: safe(async () => { if (!(await confirmDialog({ title: 'ចាកចេញពីឧបករណ៍ទាំងអស់?', text: 'ឧបករណ៍ផ្សេងទៀតនឹងត្រូវចូលម្ដងទៀត។', ok: 'ចាកចេញ' }))) return; saveAuth(await api('/auth/logout-all', { method: 'POST', body: {} })); toast('រួចរាល់'); }) }, ic('devices'), 'ចាកចេញពីឧបករណ៍ទាំងអស់'),
-        me.role === 'ADMIN' ? h('a', { href: '/admin/', style: 'text-decoration:none;color:inherit' }, h('button', { class: 'sheet-i' }, ic('shield'), 'Admin Dashboard')) : null,
-        h('button', { class: 'sheet-i danger', onclick: logout }, ic('logout'), 'ចាកចេញ')),
-      h('div', { style: 'height:24px' })));
-  setMain(node, 'profile');
+  return h('div', { class: 'pad' },
+    h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), themeSeg),
+    h('div', { class: 'card' },
+      h('label', { class: 'row', style: 'cursor:pointer' }, h('span', { style: 'color:var(--pri)' }, ic('lock', 22)),
+        h('div', { class: 'grow' }, h('b', {}, 'មុខងារការពារ chat'), h('small', { style: 'white-space:normal' }, 'Watermark ឈ្មោះអ្នក · បិទការចម្លង · បាំងអេក្រង់ពេលចេញ។ មិនអាចធ្វើឱ្យ screenshot ខ្មៅបានលើ browser ទេ')),
+        h('input', { type: 'checkbox', class: 'sw', checked: secure, onchange: (e) => { secure = e.target.checked; store.set('secure', secure ? '1' : '0'); } }))),
+    h('div', { class: 'card' },
+      h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់'),
+      h('button', { class: 'sheet-i', onclick: safe(async () => { if (!(await confirmDialog({ title: 'ចាកចេញពីឧបករណ៍ទាំងអស់?', text: 'ឧបករណ៍ផ្សេងទៀតនឹងត្រូវចូលម្ដងទៀត។', ok: 'ចាកចេញ' }))) return; saveAuth(await api('/auth/logout-all', { method: 'POST', body: {} })); toast('រួចរាល់'); }) }, ic('devices'), 'ចាកចេញពីឧបករណ៍ទាំងអស់'),
+      me.role === 'ADMIN' ? h('a', { href: '/admin/', style: 'text-decoration:none;color:inherit' }, h('button', { class: 'sheet-i' }, ic('shield'), 'Admin Dashboard')) : null,
+      h('button', { class: 'sheet-i danger', onclick: logout }, ic('logout'), 'ចាកចេញ')));
 }
 function changePassword() {
   const cp = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន', autocomplete: 'current-password' });
