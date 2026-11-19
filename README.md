@@ -57,16 +57,3 @@ Create bots in the app: **Settings → Bots → Create**. Username must end with
 | `setMyCommands` / `getMyCommands` | `commands: [{command, description}]` — shown as chips in the bot's chat |
 
 A bot receives every message in chats it is a member of (private chats with users, or groups it was added to). No webhooks yet — use `getUpdates`. Rate limit: 100 requests / 10 s per bot. Deploy runs `prisma db push`, which adds the `Bot` and `BotUpdate` tables (nothing existing is changed).
-
-## Phone (SMS code) sign-in
-
-Optional. The "Continue with phone number" button only appears when these Vercel env vars are set (Twilio Verify):
-
-| Variable | Value |
-|---|---|
-| `TWILIO_ACCOUNT_SID` | Account SID (starts with `AC`) |
-| `TWILIO_AUTH_TOKEN` | Auth token |
-| `TWILIO_VERIFY_SID` | Verify Service SID (starts with `VA`) |
-| `DEFAULT_COUNTRY_CODE` | optional, default `855` (so `012 345 678` → `+85512345678`) |
-
-Flow: `POST /api/auth/phone/start {phone}` → SMS → `POST /api/auth/phone/verify {phone, code, displayName?}`. First verified login creates the account (`user12345678` username, changeable in Settings → Account); later logins sign in to it. Rate-limited per IP and per phone. Phone numbers are stored in `User.phone` (unique) and are never returned to other users. Accounts created by SMS have no password.
