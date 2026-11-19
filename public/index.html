@@ -124,9 +124,11 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .row.active .dot{border-color:var(--pri)}
 
 /* ---- chat list ---- */
-.searchrow{padding:8px 12px;position:relative;flex:none}
-.searchrow input{margin:0;padding:10px 14px 10px 40px;border-radius:22px}
-.searchrow .ic{position:absolute;left:25px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.searchrow{padding:2px 14px 12px;position:relative;flex:none;background:var(--surface)}
+.searchrow input{margin:0;padding:12px 18px 12px 50px;border-radius:26px;font-size:17px;background:var(--field);border:0}
+.searchrow input::-webkit-search-cancel-button{display:none}
+.searchrow .ic{position:absolute;left:30px;top:calc(50% - 5px);transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.bar.flat{box-shadow:none}
 .list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:90px}
 .row{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;margin:0 6px;border-radius:14px;transition:background .12s}
 .row:hover{background:var(--hover)}
@@ -541,6 +543,7 @@ function authView() {
 }
 
 /* ---------- shell (side pane with bottom tabs + main pane) ---------- */
+let sideBar = null, sideMenu = null;
 let shell = null, sideList = null, contactList = null, main = null, sideBody = null, sideTitle = null, navEl = null, navSig = '', sideTab = 'chats', contactQ = '';
 const TAB_TITLES = { chats: 'Layzzchat', contacts: 'ទំនាក់ទំនង', settings: 'ការកំណត់', profile: 'ប្រវត្តិរូប' };
 function ensureShell() {
@@ -548,7 +551,9 @@ function ensureShell() {
   sideTitle = h('b', { class: 'title' });
   sideBody = h('div', { class: 'sidebody' });
   navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
-  const side = h('aside', { class: 'side' }, h('div', { class: 'bar' }, sideTitle), sideBody, navEl);
+  sideMenu = ibtn('more', 'ថ្មី', newChat);
+  sideBar = h('div', { class: 'bar' }, sideTitle, sideMenu);
+  const side = h('aside', { class: 'side' }, sideBar, sideBody, navEl);
   main = h('main', { class: 'main' });
   shell = h('div', { class: 'shell', 'data-view': 'list' }, side, main);
   navSig = '';
@@ -556,20 +561,22 @@ function ensureShell() {
   renderSide();
 }
 function setTab(t) { if (t !== sideTab && t !== 'settings') settingsPage = null; sideTab = t; renderSide(); }
-function searchRow(get, set, redraw) {
-  return h('div', { class: 'searchrow' }, ic('search', 18),
-    h('input', { type: 'search', placeholder: 'ស្វែងរក…', 'aria-label': 'Search', value: get(), oninput: (e) => { set(e.target.value); redraw(); } }));
+function searchRow(get, set, redraw, placeholder) {
+  return h('div', { class: 'searchrow' }, ic('search', 22),
+    h('input', { type: 'search', placeholder, 'aria-label': 'Search', value: get(), oninput: (e) => { set(e.target.value); redraw(); } }));
 }
 function renderSide() {
   sideTitle.textContent = TAB_TITLES[sideTab];
+  sideBar.classList.toggle('flat', sideTab === 'chats' || sideTab === 'contacts');
+  sideMenu.hidden = sideTab !== 'chats';
   sideList = null; contactList = null;
   if (sideTab === 'chats') {
     sideList = h('div', { class: 'list' });
-    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList), sideList,
+    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList, 'ស្វែងរក chat…'), sideList,
       h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
   } else if (sideTab === 'contacts') {
     contactList = h('div', { class: 'list' });
-    sideBody.replaceChildren(searchRow(() => contactQ, (v) => { contactQ = v; }, drawList), contactList);
+    sideBody.replaceChildren(searchRow(() => contactQ, (v) => { contactQ = v; }, drawList, 'ស្វែងរកទំនាក់ទំនង…'), contactList);
   } else if (sideTab === 'settings') sideBody.replaceChildren(settingsNode());
   else sideBody.replaceChildren(profileNode());
   drawList();
