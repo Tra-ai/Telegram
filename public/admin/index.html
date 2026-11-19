@@ -3,142 +3,288 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Admin Dashboard</title>
+<meta name="theme-color" content="#3390ec">
+<title>Layzzchat Admin</title>
 <style>
-  :root{--bg:#0f1720;--card:#17212b;--line:#243447;--text:#e8eef4;--mute:#8ea3b5;--blue:#3390ec;--red:#e5484d;--green:#3fb950}
-  *{box-sizing:border-box} body{margin:0;font:14px system-ui,sans-serif;background:var(--bg);color:var(--text)}
-  header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
-  main{padding:16px;max-width:1100px;margin:auto}
-  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:20px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
-  .stat b{display:block;font-size:22px} .stat span{color:var(--mute);font-size:12px}
-  nav{display:flex;gap:8px;margin-bottom:12px}
-  button,input{font:inherit;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text);padding:8px 12px}
-  button{cursor:pointer} button.on,button.primary{background:var(--blue);border-color:var(--blue)}
-  button.danger{color:var(--red)} button.sm{padding:4px 8px;font-size:12px}
-  .wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
-  table{width:100%;border-collapse:collapse} th,td{text-align:left;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}
-  th{color:var(--mute);font-weight:500;font-size:12px}
-  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mute);margin-right:6px}.dot.on{background:var(--green)}
-  .tag{font-size:11px;padding:2px 6px;border-radius:6px;background:var(--line)} .tag.red{background:var(--red)}
-  #login{max-width:320px;margin:15vh auto;display:flex;flex-direction:column;gap:10px}
-  .bar{display:flex;gap:8px;margin-bottom:10px} .bar input{flex:1}
-  .hide{display:none!important} .err{color:var(--red)}
+  :root{--bg:#f4f6f9;--card:#fff;--field:#eef1f5;--fg:#0f1419;--mut:#6b7885;--line:#e4e8ed;--pri:#3390ec;--pri-soft:rgba(51,144,236,.12);
+    --red:#e5484d;--red-soft:rgba(229,72,77,.12);--green:#2fb457;--green-soft:rgba(47,180,87,.14);--shadow:0 1px 2px rgba(15,25,40,.06),0 4px 14px rgba(15,25,40,.05)}
+  @media (prefers-color-scheme:dark){:root{--bg:#0e1621;--card:#17212b;--field:#223040;--fg:#f1f4f7;--mut:#8196a9;--line:#243447;--pri:#4ea4f6;--pri-soft:rgba(78,164,246,.16);
+    --red:#ff6b70;--red-soft:rgba(255,107,112,.14);--green:#4cd27a;--green-soft:rgba(76,210,122,.14);--shadow:0 1px 2px rgba(0,0,0,.3)}}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Khmer",sans-serif;background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%}
+  button,input{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+  input{cursor:text}
+  .ic{display:inline-flex;vertical-align:middle}
+  .ic svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .hide{display:none!important}
+
+  /* login */
+  #login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 60% at 50% 0%,var(--pri-soft),transparent 70%),var(--bg)}
+  .lbox{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
+  .lbox .logo{width:76px;height:76px;border-radius:24px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;background:linear-gradient(145deg,#59b3ff,var(--pri));box-shadow:0 10px 28px var(--pri-soft)}
+  .lbox h1{margin:6px 0 0;text-align:center;font-size:26px;font-weight:800;letter-spacing:-.4px}
+  .lbox p{margin:0 0 10px;text-align:center;color:var(--mut)}
+  .lbox label{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:4px 4px -6px}
+  .lbox input{height:52px;border-radius:999px;padding:0 22px;background:var(--field);border:1.5px solid transparent;outline:0;width:100%}
+  .lbox input:focus{border-color:var(--pri);background:var(--card)}
+  .btn{height:52px;border-radius:999px;background:var(--pri);color:#fff;font-weight:700;padding:0 24px;box-shadow:0 8px 20px var(--pri-soft)}
+  .btn:disabled{opacity:.6}
+  .err{color:var(--red);text-align:center;min-height:1.4em;font-size:14px}
+
+  /* shell */
+  header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .hin{max-width:1100px;margin:auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;flex:1;min-width:0}
+  .brand i{flex:none;width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#59b3ff,var(--pri));color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:18px}
+  .brand small{color:var(--mut);font-weight:500;margin-left:4px}
+  .iconbtn{color:inherit;text-decoration:none;flex:none;height:38px;padding:0 14px;border-radius:999px;background:var(--field);display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+  .tabs{max-width:1100px;margin:auto;display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:none;height:38px;padding:0 16px;border-radius:999px;color:var(--mut);font-weight:600;display:flex;align-items:center;gap:7px}
+  .tabs button.on{background:var(--pri);color:#fff}
+  main{max-width:1100px;margin:auto;padding:16px}
+  h2{margin:0 0 12px;font-size:18px}
+
+  /* overview */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+  .stat{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+  .stat .top{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px}
+  .stat .bub{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--pri-soft);color:var(--pri)}
+  .stat .bub.g{background:var(--green-soft);color:var(--green)} .stat .bub.r{background:var(--red-soft);color:var(--red)}
+  .stat b{font-size:28px;line-height:1;letter-spacing:-.5px}
+  .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .panel{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+  .panel h3{margin:0 0 14px;font-size:15px}
+  .chart{display:flex;align-items:flex-end;gap:8px;height:150px}
+  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;min-width:0}
+  .col .v{font-size:12px;font-weight:700}
+  .col .bar{width:100%;max-width:38px;border-radius:8px 8px 4px 4px;background:var(--pri);min-height:4px;opacity:.9}
+  .col .d{font-size:11px;color:var(--mut)}
+
+  /* lists */
+  .bar2{display:flex;gap:8px;margin-bottom:12px}
+  .bar2 input{flex:1;height:46px;border-radius:999px;padding:0 20px;background:var(--card);box-shadow:var(--shadow);outline:0;border:1.5px solid transparent;min-width:0}
+  .bar2 input:focus{border-color:var(--pri)}
+  .bar2 .go{height:46px;width:46px;border-radius:50%;background:var(--pri);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .item{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .av{width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;background:linear-gradient(145deg,#59b3ff,var(--pri));position:relative;background-size:cover;background-position:center}
+  .av .on{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--green);border:2.5px solid var(--card)}
+  .main{flex:1;min-width:170px}
+  .main b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .main small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--pri-soft);color:var(--pri);margin-left:6px;vertical-align:1px}
+  .tag.red{background:var(--red-soft);color:var(--red)} .tag.gray{background:var(--field);color:var(--mut)}
+  .acts{display:flex;gap:6px;flex-wrap:wrap}
+  .acts button{height:34px;padding:0 13px;border-radius:999px;background:var(--field);font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
+  .acts .danger{color:var(--red);background:var(--red-soft)}
+  .meta{color:var(--mut);font-size:13px;white-space:nowrap}
+  .msgtxt{width:100%;background:var(--field);border-radius:12px;padding:8px 12px;word-break:break-word;font-size:14px}
+  .pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;color:var(--mut)}
+  .pager button{height:38px;padding:0 16px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:600}
+  .pager button:disabled{opacity:.4}
+  .empty{text-align:center;color:var(--mut);padding:36px 0}
+  .skel{height:68px;border-radius:18px;background:linear-gradient(90deg,var(--card),var(--field),var(--card));background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+
+  /* dialogs */
+  .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
+  .dlg{background:var(--card);border-radius:22px;padding:22px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .dlg b{font-size:18px} .dlg p{color:var(--mut);margin:8px 0 18px}
+  .dlg .row{display:flex;gap:10px} .dlg .row button{flex:1;height:46px;border-radius:999px;background:var(--field);font-weight:700}
+  .dlg .row .ok{background:var(--pri);color:#fff} .dlg .row .ok.danger{background:var(--red)}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111c27;color:#fff;padding:11px 18px;border-radius:999px;z-index:60;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.35);max-width:90vw}
 </style>
 </head>
 <body>
 <div id="login">
-  <h2>Admin Login</h2>
-  <input id="u" placeholder="Username" autocomplete="username">
-  <input id="p" type="password" placeholder="Password" autocomplete="current-password">
-  <button class="primary" id="go">Login</button>
-  <div class="err" id="lerr"></div>
+  <form class="lbox" id="lform">
+    <div class="logo"><span class="ic" id="llogo"></span></div>
+    <h1>Layzzchat Admin</h1>
+    <p>ចូលដោយគណនី Admin របស់អ្នក</p>
+    <label for="u">ឈ្មោះអ្នកប្រើ</label>
+    <input id="u" autocomplete="username" autocapitalize="none" spellcheck="false">
+    <label for="p">ពាក្យសម្ងាត់</label>
+    <input id="p" type="password" autocomplete="current-password">
+    <div class="err" id="lerr" role="alert"></div>
+    <button class="btn" id="go" type="submit">ចូល</button>
+  </form>
 </div>
 
 <div id="app" class="hide">
-  <header><b>Admin Dashboard</b><button id="out" class="sm">Logout</button></header>
-  <main>
-    <div class="grid" id="stats"></div>
-    <nav>
-      <button data-tab="users" class="on">Users</button>
-      <button data-tab="chats">Chats</button>
-      <button data-tab="messages">Messages</button>
-    </nav>
-    <div class="bar" id="bar"><input id="q" placeholder="Search…"><button id="search">Search</button></div>
-    <div class="wrap"><table id="tbl"></table></div>
-  </main>
+  <header>
+    <div class="hin">
+      <div class="brand"><i><span class="ic" id="hlogo"></span></i><span>Layzzchat<small>Admin</small></span></div>
+      <a class="iconbtn" href="/" id="toapp"></a>
+      <button class="iconbtn" id="out"></button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </header>
+  <main id="view"></main>
 </div>
 
 <script>
 const $ = (s) => document.querySelector(s);
+const ICON = {
+  chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  home: '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+  userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.5" r="1"/><path d="M9 13.5h.01M15 13.5h.01M9.5 17h5"/>',
+  msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>',
+  group: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/><circle cx="5" cy="9" r="2.3"/><circle cx="19" cy="9" r="2.3"/>',
+  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
+  ban: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1Z"/>',
+  logoff: '<path d="M18.4 6.6a9 9 0 1 1-12.8 0"/><path d="M12 2v10"/>',
+  ext: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+};
+const ic = (n) => { const s = document.createElement('span'); s.className = 'ic'; s.innerHTML = `<svg viewBox="0 0 24 24">${ICON[n] || ''}</svg>`; return s; };
+function el(tag, props = {}, ...kids) {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) { if (v == null) continue; if (k === 'class') n.className = v; else if (k.startsWith('on')) n[k] = v; else n.setAttribute(k, v); }
+  kids.flat().forEach((k) => k != null && n.append(k));
+  return n;
+}
+const T = (s) => document.createTextNode(String(s));
+
 let token = localStorage.getItem('adminToken');
-let tab = 'users';
+let tab = 'overview', page = 1, query = '';
+let gen = 0; // ignore responses of an older tab/search
 
 async function api(path, opts = {}) {
-  const r = await fetch('/api/admin' + path, {
-    ...opts,
-    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-  });
+  const r = await fetch('/api/admin' + path, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token } });
   if (r.status === 401 || r.status === 403) { logout(); throw new Error('auth'); }
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) { alert(d.error || 'Request failed'); throw new Error(d.error || 'Request failed'); }
+  if (!r.ok) { toast(d.error || 'មានបញ្ហា'); throw new Error(d.error || 'Request failed'); }
   return d;
 }
 function logout() { localStorage.removeItem('adminToken'); token = null; $('#app').classList.add('hide'); $('#login').classList.remove('hide'); }
-
-function el(tag, props = {}, ...kids) {
-  const n = document.createElement(tag);
-  Object.assign(n, props);
-  kids.flat().forEach((k) => n.append(k));
-  return n;
+function toast(text) { const t = el('div', { class: 'toast', role: 'status' }, text); document.body.append(t); setTimeout(() => t.remove(), 2600); }
+function confirmBox(title, text, ok, danger) {
+  return new Promise((res) => {
+    const done = (v) => { ov.remove(); res(v); };
+    const ov = el('div', { class: 'ov', onclick: (e) => { if (e.target === ov) done(false); } },
+      el('div', { class: 'dlg', role: 'dialog' }, el('b', {}, title), el('p', {}, text),
+        el('div', { class: 'row' }, el('button', { onclick: () => done(false) }, 'បោះបង់'), el('button', { class: 'ok' + (danger ? ' danger' : ''), onclick: () => done(true) }, ok))));
+    document.body.append(ov);
+  });
 }
+const initial = (s) => (String(s || '?').trim()[0] || '?').toUpperCase();
+const avatar = (url, name, online) => { const a = el('div', { class: 'av' }, url ? null : initial(name), online ? el('span', { class: 'on' }) : null); if (url) a.style.backgroundImage = `url("${url.replace(/"/g, '%22')}")`; return a; };
+const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const act = (icon, text, fn, cls = '') => el('button', { class: cls, onclick: fn }, ic(icon), text);
 
-$('#go').onclick = async () => {
-  $('#lerr').textContent = '';
-  let r, d;
+/* ---------- login ---------- */
+$('#llogo').replaceWith(ic('chat')); $('#hlogo').replaceWith(ic('chat'));
+$('#toapp').append(ic('ext'), ' app'); $('#out').append(ic('out'), 'ចាកចេញ');
+$('#lform').onsubmit = async (e) => {
+  e.preventDefault(); $('#lerr').textContent = ''; $('#go').disabled = true;
   try {
-    r = await fetch('/api/auth/login', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: $('#u').value, password: $('#p').value }),
-    });
-    d = await r.json();
-  } catch { return ($('#lerr').textContent = 'Network error'); }
-  if (!r.ok) return ($('#lerr').textContent = d.error);
-  if (d.user.role !== 'ADMIN') return ($('#lerr').textContent = 'Not an admin account');
-  token = d.token; localStorage.setItem('adminToken', token); start();
+    const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: $('#u').value, password: $('#p').value }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'ចូលមិនបាន');
+    if (d.user.role !== 'ADMIN') throw new Error('នេះមិនមែនគណនី Admin ទេ');
+    token = d.token; localStorage.setItem('adminToken', token); $('#p').value = ''; start();
+  } catch (er) { $('#lerr').textContent = er.message === 'Failed to fetch' ? 'មិនមានអ៊ីនធឺណិត' : er.message; }
+  $('#go').disabled = false;
 };
 $('#out').onclick = logout;
-document.querySelectorAll('nav button').forEach((b) => (b.onclick = () => {
-  document.querySelectorAll('nav button').forEach((x) => x.classList.remove('on'));
-  b.classList.add('on'); tab = b.dataset.tab; $('#bar').classList.toggle('hide', tab === 'chats'); load();
-}));
-$('#search').onclick = () => load();
-$('#q').onkeydown = (e) => e.key === 'Enter' && load();
 
-async function loadStats() {
-  const s = await api('/stats');
-  const items = [['Online now', s.onlineNow], ['Users', s.users], ['New (24h)', s.newUsers], ['Banned', s.banned],
-    ['Chats', s.chats], ['Groups', s.groups], ['Messages', s.messages], ['Msgs (24h)', s.messagesToday], ['Media', s.media]];
-  $('#stats').replaceChildren(...items.map(([l, v]) => el('div', { className: 'stat' }, el('b', { textContent: v }), el('span', { textContent: l }))));
+/* ---------- tabs ---------- */
+const TABS = [['overview', 'home', 'ទិដ្ឋភាពទូទៅ'], ['users', 'users', 'អ្នកប្រើ'], ['chats', 'group', 'Chat'], ['messages', 'msg', 'សារ'], ['bots', 'bot', 'Bots']];
+function drawTabs() {
+  $('#tabs').replaceChildren(...TABS.map(([id, icon, label]) => el('button', { class: id === tab ? 'on' : '', onclick: () => { tab = id; page = 1; query = ''; drawTabs(); load(); } }, ic(icon), label)));
 }
 
-function render(head, rows) {
-  $('#tbl').replaceChildren(
-    el('thead', {}, el('tr', {}, head.map((h) => el('th', { textContent: h })))),
-    el('tbody', {}, rows.map((r) => el('tr', {}, r.map((c) => el('td', {}, c instanceof Node ? c : String(c ?? '')))))),
-  );
+/* ---------- views ---------- */
+const view = () => $('#view');
+const skeleton = () => view().replaceChildren(el('div', { class: 'list' }, [1, 2, 3, 4].map(() => el('div', { class: 'skel' }))));
+const empty = (t) => el('div', { class: 'empty' }, t);
+function searchBar(placeholder) {
+  const q = el('input', { type: 'search', placeholder, value: query, enterkeyhint: 'search' });
+  const go = () => { query = q.value.trim(); page = 1; load(); };
+  q.onkeydown = (e) => e.key === 'Enter' && go();
+  return el('div', { class: 'bar2' }, q, el('button', { class: 'go', 'aria-label': 'ស្វែងរក', onclick: go }, ic('search')));
+}
+function pager(p, pages) {
+  if (!pages || pages < 2) return null;
+  return el('div', { class: 'pager' },
+    el('button', { disabled: p <= 1 ? '' : null, onclick: () => { page--; load(); window.scrollTo(0, 0); } }, '‹'), T(`${p} / ${pages}`),
+    el('button', { disabled: p >= pages ? '' : null, onclick: () => { page++; load(); window.scrollTo(0, 0); } }, '›'));
+}
+const stat = (icon, label, value, tone = '') => el('div', { class: 'stat' }, el('div', { class: 'top' }, el('span', { class: 'bub ' + tone }, ic(icon)), label), el('b', {}, value.toLocaleString('en-US')));
+function chart(title, days, key) {
+  const max = Math.max(1, ...days.map((d) => d[key]));
+  return el('div', { class: 'panel' }, el('h3', {}, title),
+    el('div', { class: 'chart' }, days.map((d) => el('div', { class: 'col' }, el('span', { class: 'v' }, d[key]),
+      el('div', { class: 'bar', style: `height:${Math.max(3, (d[key] / max) * 100)}px` }),
+      el('span', { class: 'd' }, new Date(d.to).toLocaleDateString('en-GB', { weekday: 'short' }))))));
 }
 
 async function load() {
-  const q = encodeURIComponent($('#q').value);
-  if (tab === 'users') {
-    const { users } = await api('/users?q=' + q);
-    render(['', 'Name', 'Username', 'Role', 'Joined', 'Actions'], users.map((u) => [
-      el('span', { className: 'dot' + (u.online ? ' on' : '') }),
-      u.displayName + (u.isBanned ? ' 🚫' : ''),
-      '@' + u.username,
-      el('span', { className: 'tag' + (u.isBanned ? ' red' : ''), textContent: u.isBanned ? 'BANNED' : u.role }),
-      new Date(u.createdAt).toLocaleDateString(),
-      el('span', {},
-        el('button', { className: 'sm', textContent: u.isBanned ? 'Unban' : 'Ban', onclick: async () => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ isBanned: !u.isBanned }) }); load(); } }), ' ',
-        el('button', { className: 'sm', textContent: u.role === 'ADMIN' ? 'Remove admin' : 'Make admin', onclick: async () => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ role: u.role === 'ADMIN' ? 'USER' : 'ADMIN' }) }); load(); } }), ' ',
-        el('button', { className: 'sm', textContent: 'Log out', onclick: async () => { if (confirm('Log @' + u.username + ' out of all devices?')) { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify({ revokeSessions: true }) }); alert('Done'); } } }), ' ',
-        el('button', { className: 'sm danger', textContent: 'Delete', onclick: async () => { if (confirm('Delete @' + u.username + ' and all their messages?')) { await api('/users/' + u.id, { method: 'DELETE' }); load(); loadStats(); } } }),
-      ),
-    ]));
-  } else if (tab === 'chats') {
-    const { chats } = await api('/chats');
-    render(['Title', 'Type', 'Members', 'Messages', 'Created'], chats.map((c) => [c.title || '(private)', c.type, c._count.members, c._count.messages, new Date(c.createdAt).toLocaleDateString()]));
-  } else {
-    const { messages } = await api('/messages?q=' + q);
-    render(['Time', 'From', 'Type', 'Content', ''], messages.map((m) => [
-      new Date(m.createdAt).toLocaleString(), m.sender.displayName, m.type, (m.text || m.fileName || '').slice(0, 60),
-      el('button', { className: 'sm danger', textContent: 'Delete', onclick: async () => { await api('/messages/' + m.id, { method: 'DELETE' }); load(); } }),
-    ]));
-  }
+  const my = ++gen;
+  skeleton();
+  const q = encodeURIComponent(query);
+  try {
+    if (tab === 'overview') {
+      const [s, ser] = await Promise.all([api('/stats'), api('/series')]);
+      if (my !== gen) return;
+      view().replaceChildren(
+        el('div', { class: 'stats' },
+          stat('pulse', 'កំពុងអនឡាញ', s.onlineNow, 'g'), stat('users', 'អ្នកប្រើសរុប', s.users), stat('userplus', 'ថ្មី (24 ម៉ោង)', s.newUsers, 'g'), stat('ban', 'ត្រូវបាន ban', s.banned, 'r'),
+          stat('group', 'Chat សរុប', s.chats), stat('users', 'ក្រុម', s.groups), stat('msg', 'សារសរុប', s.messages), stat('msg', 'សារ (24 ម៉ោង)', s.messagesToday, 'g'), stat('image', 'Media', s.media)),
+        el('div', { class: 'panels' }, chart('អ្នកប្រើថ្មី 7 ថ្ងៃចុងក្រោយ', ser.days, 'users'), chart('សារ 7 ថ្ងៃចុងក្រោយ', ser.days, 'messages')));
+    } else if (tab === 'users') {
+      const d = await api(`/users?q=${q}&page=${page}`);
+      if (my !== gen) return;
+      view().replaceChildren(searchBar('ស្វែងរកអ្នកប្រើ…'), el('div', { class: 'meta', style: 'margin:0 4px 10px' }, `${d.total} នាក់`),
+        d.users.length ? el('div', { class: 'list' }, d.users.map(userItem)) : empty('រកមិនឃើញ'), pager(d.page, d.pages));
+    } else if (tab === 'chats') {
+      const { chats } = await api('/chats');
+      if (my !== gen) return;
+      view().replaceChildren(chats.length ? el('div', { class: 'list' }, chats.map((c) => el('div', { class: 'item' },
+        el('div', { class: 'av' }, ic(c.type === 'GROUP' ? 'group' : 'users')),
+        el('div', { class: 'main' }, el('b', {}, c.title || '(chat ឯកជន)', el('span', { class: 'tag gray' }, c.type === 'GROUP' ? 'ក្រុម' : 'ឯកជន')), el('small', {}, `${c._count.members} សមាជិក · ${c._count.messages} សារ`)),
+        el('span', { class: 'meta' }, fmtDate(c.createdAt))))) : empty('មិនទាន់មាន chat'));
+    } else if (tab === 'messages') {
+      const { messages } = await api('/messages?q=' + q);
+      if (my !== gen) return;
+      view().replaceChildren(searchBar('ស្វែងរកក្នុងសារ…'), messages.length ? el('div', { class: 'list' }, messages.map((m) => el('div', { class: 'item' },
+        avatar(m.sender.avatarUrl, m.sender.displayName),
+        el('div', { class: 'main' }, el('b', {}, m.sender.displayName, el('span', { class: 'tag gray' }, m.type)), el('small', {}, new Date(m.createdAt).toLocaleString('en-GB'))),
+        act('trash', 'លុប', async () => { if (await confirmBox('លុបសារនេះ?', 'សារនឹងបាត់ពី chat របស់អ្នកទាំងពីរ។', 'លុប', true)) { await api('/messages/' + m.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger'),
+        el('div', { class: 'msgtxt' }, m.text || m.fileName || `[${m.type}]`)))) : empty('រកមិនឃើញសារ'));
+    } else {
+      const { bots } = await api('/bots');
+      if (my !== gen) return;
+      view().replaceChildren(bots.length ? el('div', { class: 'list' }, bots.map((b) => el('div', { class: 'item' },
+        avatar(b.avatarUrl, b.displayName, b.online),
+        el('div', { class: 'main' }, el('b', {}, b.displayName, el('span', { class: 'tag' }, 'BOT')), el('small', {}, `@${b.username} · ម្ចាស់៖ @${b.owner.username}`)),
+        el('span', { class: 'meta' }, fmtDate(b.createdAt)),
+        act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${b.username}?`, 'Bot និងសារទាំងអស់របស់វានឹងបាត់។', 'លុប', true)) { await api('/users/' + b.userId, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')))) : empty('មិនទាន់មាន Bot'));
+    }
+  } catch (e) { if (e.message !== 'auth' && my === gen) view().replaceChildren(empty('ផ្ទុកមិនបាន — សូមព្យាយាមម្ដងទៀត')); }
 }
 
-function start() { $('#login').classList.add('hide'); $('#app').classList.remove('hide'); loadStats(); load(); }
+function userItem(u) {
+  const patch = async (body, msg) => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify(body) }); toast(msg); load(); };
+  return el('div', { class: 'item' },
+    avatar(u.avatarUrl, u.displayName, u.online),
+    el('div', { class: 'main' }, el('b', {}, u.displayName, u.isBanned ? el('span', { class: 'tag red' }, 'BANNED') : u.role === 'ADMIN' ? el('span', { class: 'tag' }, 'ADMIN') : null),
+      el('small', {}, `@${u.username} · ចូលរួម ${fmtDate(u.createdAt)}`)),
+    el('div', { class: 'acts' },
+      act('ban', u.isBanned ? 'ដោះ ban' : 'Ban', async () => { if (u.isBanned || await confirmBox(`Ban @${u.username}?`, 'គាត់នឹងចូលប្រើមិនបានទៀតទេ។', 'Ban', true)) patch({ isBanned: !u.isBanned }, u.isBanned ? 'បានដោះ ban' : 'បាន ban'); }),
+      act('shield', u.role === 'ADMIN' ? 'ដក Admin' : 'ធ្វើជា Admin', async () => { if (await confirmBox(u.role === 'ADMIN' ? 'ដកសិទ្ធិ Admin?' : 'ផ្ដល់សិទ្ធិ Admin?', `@${u.username}`, 'យល់ព្រម')) patch({ role: u.role === 'ADMIN' ? 'USER' : 'ADMIN' }, 'រួចរាល់'); }),
+      act('logoff', 'Log out', async () => { if (await confirmBox('Log out ពីគ្រប់ឧបករណ៍?', `@${u.username}`, 'Log out')) patch({ revokeSessions: true }, 'បាន log out'); }),
+      act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${u.username}?`, 'គណនី និងសារទាំងអស់របស់គាត់នឹងបាត់ជារៀងរហូត។', 'លុប', true)) { await api('/users/' + u.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')));
+}
+
+function start() { $('#login').classList.add('hide'); $('#app').classList.remove('hide'); drawTabs(); load(); }
 if (token) start();
 </script>
 </body>

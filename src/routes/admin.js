@@ -27,6 +27,24 @@ router.get('/stats', async (_req, res) => {
   res.json({ users, banned, chats, groups, messages, messagesToday, media, newUsers, onlineNow });
 });
 
+// Last 7 rolling 24h buckets (oldest first): new users + messages per bucket
+router.get('/series', async (_req, res) => {
+  const DAY = 24 * 3600 * 1000, end = Date.now();
+  const days = await Promise.all([6, 5, 4, 3, 2, 1, 0].map(async (i) => {
+    const from = new Date(end - (i + 1) * DAY), to = new Date(end - i * DAY);
+    const range = { gt: from, lte: to };
+    const [users, messages] = await Promise.all([prisma.user.count({ where: { createdAt: range } }), prisma.message.count({ where: { ...live, createdAt: range } })]);
+    return { to, users, messages };
+  }));
+  res.json({ days });
+});
+
+router.get('/bots', async (_req, res) => {
+  const bots = await prisma.bot.findMany({ orderBy: { createdAt: 'desc' }, take: 100, include: { user: true, owner: true } });
+  res.json({ bots: bots.map((b) => ({ id: b.id, userId: b.userId, username: b.user.username, displayName: b.user.displayName, avatarUrl: b.user.avatarUrl,
+    owner: { username: b.owner.username, displayName: b.owner.displayName }, createdAt: b.createdAt, online: isOnline(b.user.lastSeen) })) });
+});
+
 router.get('/users', async (req, res) => {
   const q = String(req.query.q || '').trim();
   const page = Math.max(Number(req.query.page) || 1, 1);
