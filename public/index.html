@@ -1215,9 +1215,7 @@ function settingsNode() {
   }
   if (settingsPage === 'privacy') {
     return subPage('ឯកជនភាព និងសុវត្ថិភាព',
-      h('div', { class: 'card' }, h('label', { class: 'row', style: 'cursor:pointer' }, h('span', { style: 'color:var(--pri)' }, ic('lock', 22)),
-        h('div', { class: 'grow' }, h('b', {}, 'មុខងារការពារ chat'), h('small', { style: 'white-space:normal' }, 'Watermark ឈ្មោះអ្នក · បិទការចម្លង · បាំងអេក្រង់ពេលចេញ។ មិនអាចធ្វើឱ្យ screenshot ខ្មៅបានលើ browser ទេ')),
-        h('input', { type: 'checkbox', class: 'sw', checked: secure, onchange: (e) => { secure = e.target.checked; store.set('secure', secure ? '1' : '0'); } }))),
+      privacyCard(),
       h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់')),
       blockedCard());
   }
@@ -1251,6 +1249,26 @@ function changePassword() {
   }) }, 'រក្សាទុក')));
 }
 
+
+/* Public / Private mode. Private = watermark, no copy, blur on app switch, and inside the Android app
+   screenshots + screen recording come out black (FLAG_SECURE, toggled through the LayzzAndroid bridge). */
+function applyPrivacy() { try { if (window.LayzzAndroid) window.LayzzAndroid.setSecure(!!secure); } catch { /* not in the app */ } }
+function privacyCard() {
+  const seg = h('div', { class: 'seg', style: 'margin:6px 10px 6px' });
+  const note = h('p', { class: 'note', style: 'margin:2px 14px 12px' });
+  const native = !!window.LayzzAndroid;
+  const set = (v) => { secure = v; store.set('secure', v ? '1' : '0'); applyPrivacy(); draw(); };
+  function draw() {
+    seg.replaceChildren(h('button', { class: secure ? '' : 'on', onclick: () => set(false) }, 'សាធារណៈ'), h('button', { class: secure ? 'on' : '', onclick: () => set(true) }, 'ឯកជន'));
+    note.textContent = secure
+      ? (native ? 'Screenshot និងការថតអេក្រង់ នឹងចេញខ្មៅ · មាន watermark ឈ្មោះអ្នក · បិទការចម្លងសារ · បាំងអេក្រង់ពេលចេញពី app'
+        : 'មាន watermark ឈ្មោះអ្នក · បិទការចម្លងសារ · បាំងអេក្រង់ពេលចេញ។ លើ browser មិនអាចធ្វើឱ្យ screenshot ខ្មៅបានទេ ត្រូវប្រើ app APK')
+      : 'គ្មានការការពារ។ អាចថត screenshot និងថតអេក្រង់បាន ហើយអាចចម្លងសារបាន។';
+  }
+  draw();
+  return h('div', { class: 'card' }, h('h4', {}, 'ទម្រង់ chat'), seg, note);
+}
+
 /* ---------- privacy shield ---------- */
 const shield = h('div', { class: 'shield', hidden: true, onclick: () => { shield.hidden = true; } }, ic('lock', 64));
 document.body.append(shield);
@@ -1266,6 +1284,7 @@ window.addEventListener('popstate', () => {
   if (overlays.length) closeAllOverlays();
   if (me && view !== 'list') showList();
 });
+applyPrivacy();
 (async function boot() {
   if (!token) return mount(authView());
   try { me = (await api('/auth/me')).user; showList(); }

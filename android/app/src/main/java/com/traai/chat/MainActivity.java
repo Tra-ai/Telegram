@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.WindowManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -43,6 +44,18 @@ public class MainActivity extends Activity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
+
+        // Lets the web UI's Public / Private setting switch screenshot + screen-recording blocking on or off.
+        // Starts secure (see FLAG_SECURE above) until the page says otherwise.
+        web.addJavascriptInterface(new Object() {
+            @JavascriptInterface
+            public void setSecure(final boolean on) {
+                runOnUiThread(() -> {
+                    if (on) getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                    else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                });
+            }
+        }, "LayzzAndroid");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
