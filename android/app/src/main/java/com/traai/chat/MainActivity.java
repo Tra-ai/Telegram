@@ -27,7 +27,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Screenshots, screen recording and the recent-apps thumbnail all come out black
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        // Screenshot blocking is off for now; the page can still switch it on via LayzzAndroid.setSecure(true)
 
         // Match the app's dark header so there is no white flash / mismatched bars
         getWindow().setStatusBarColor(0xFF17212B);

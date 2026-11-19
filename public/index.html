@@ -543,7 +543,7 @@ let chats = [], chatsLoaded = false, sideQ = '';
 let cur = null, ui = null;
 let msgs = new Map(), reads = [], typingIds = [], hasMore = false, replyTo = null, editing = null, after = '';
 let loadingMsgs = false, stick = true, newBelow = 0, lastTyping = 0, rec = null;
-let secure = store.get('secure') !== '0'; // privacy mode (default ON)
+let secure = false; // Public/Private mode removed for now (kept dormant; set true to bring it back)
 const mediaCache = new Map();
 const wide = () => matchMedia('(min-width:860px)').matches;
 
@@ -1324,7 +1324,7 @@ function settingsNode() {
       h('div', { class: 'card' }, switchRow('send', 'Enter ដើម្បីផ្ញើ', 'លើកុំព្យូទ័រ៖ Enter ផ្ញើ · Shift+Enter ចុះបន្ទាត់', 'enterSend')));
   }
   if (settingsPage === 'privacy') {
-    return subPage('ឯកជនភាព និងសុវត្ថិភាព', privacyCard(),
+    return subPage('ឯកជនភាព និងសុវត្ថិភាព',
       h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់')), blockedCard());
   }
   if (settingsPage === 'notif') {
