@@ -152,7 +152,7 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 .searchrow{padding:2px 14px 12px;position:relative;flex:none;background:var(--surface)}
 .searchrow input{margin:0;padding:12px 18px 12px 50px;border-radius:26px;font-size:17px;background:var(--field);border:0}
 .searchrow input::-webkit-search-cancel-button{display:none}
-.searchrow .ic{position:absolute;left:30px;top:calc(50% - 5px);transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.searchrow > .ic{position:absolute;left:30px;top:calc(50% - 5px);transform:translateY(-50%);color:var(--mut);pointer-events:none}
 .bar.flat{box-shadow:none}
 .list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:90px}
 .row{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;margin:0 6px;border-radius:14px;transition:background .12s}
@@ -328,6 +328,18 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 .shield{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;align-items:center;justify-content:center;color:var(--mut)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+/* search screen (Telegram-style): tabs, recent people, recent list */
+.searchrow .sx{position:absolute;right:26px;top:calc(50% - 5px);transform:translateY(-50%);width:32px;height:32px;padding:0;background:transparent;color:var(--mut);display:flex;align-items:center;justify-content:center;border-radius:50%}
+.searchrow .sx[hidden]{display:none}
+.searchrow:has(.sx:not([hidden])) input{padding-right:46px}
+.sidebody.searching .fab{display:none}
+.people{display:flex;gap:14px;padding:8px 16px 14px;overflow-x:auto;flex:none;scrollbar-width:none}
+.people::-webkit-scrollbar{display:none}
+.person{flex:none;width:70px;background:transparent;padding:0;color:var(--fg);display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px}
+.person .nm{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shead{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--field);color:var(--mut);font-weight:600;font-size:14px}
+.shead button{background:transparent;color:var(--pri);padding:0;font-weight:600;font-size:14px}
+
 /* ===== Apple / iOS style (switchable in Settings → chat settings). Pure overrides on top of the base theme ===== */
 html[data-ios]{
   --bg:#f2f2f7;--surface:#fff;--field:rgba(118,118,128,.12);--fg:#000;--mut:#8e8e93;--line:rgba(60,60,67,.18);
@@ -354,7 +366,7 @@ html[data-ios] .grow b{font-weight:600}
 /* search */
 html[data-ios] .searchrow{background:var(--surface);padding:4px 16px 10px}
 html[data-ios] .searchrow input{border-radius:10px;padding:8px 14px 8px 40px;font-size:17px;height:36px;background:var(--field)}
-html[data-ios] .searchrow .ic{left:28px}
+html[data-ios] .searchrow > .ic{left:28px}
 /* tab bar: full width, translucent, no pill */
 html[data-ios] .nav{left:0;right:0;bottom:0;border-radius:0;padding:6px 4px calc(4px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 -.5px 0 var(--line);gap:0}
 html[data-ios] .tab{border-radius:0;font-size:10px;font-weight:500;color:var(--mut);gap:2px;padding:2px}
@@ -372,6 +384,8 @@ html[data-ios] .row.active,html[data-ios] .row.active:hover{background:var(--pri
 html[data-ios] .card .row,html[data-ios] .mi{border-radius:0}
 html[data-ios] .badge{background:var(--pri);font-weight:600}
 html[data-ios] .folders{padding:0 16px 8px}
+html[data-ios] .searchrow .sx{right:24px;top:calc(50% - 2px)}
+html[data-ios] .shead{background:var(--bg)}
 html[data-ios] .fchip{background:var(--field);color:var(--fg);font-weight:500;font-size:14px}
 html[data-ios] .fchip.on{background:var(--pri);color:#fff}
 /* settings: inset grouped lists */
@@ -580,6 +594,12 @@ function beep() {
 function notifyIncoming() { if (prefs.sound) beep(); if (prefs.vibrate) navigator.vibrate?.(40); }
 let lastUnread = null, folder = 'all', folderBar = null;
 const shownImgs = new Set();
+/* search screen state */
+let searchMode = false, searchTab = 'all', userHits = [], hitSeq = 0, hitTimer = null, searchInput = null, searchSx = null, ignorePop = false;
+const RK = 'recents';
+let recents = [];
+try { recents = JSON.parse(store.get(RK) || '[]'); if (!Array.isArray(recents)) recents = []; } catch { recents = []; }
+function addRecent(r) { recents = [r, ...recents.filter((x) => !(x.t === r.t && x.id === r.id))].slice(0, 15); store.set(RK, JSON.stringify(recents)); }
 
 /* ---------- time ---------- */
 const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
@@ -666,7 +686,10 @@ function lightbox(url) {
   const lb = h('div', { class: 'lb', onclick: close }, h('img', { src: url, alt: '' }), h('button', { class: 'icon', 'aria-label': 'Close', onclick: close }, ic('x', 26)));
   lb._close = close; overlays.push(lb); document.body.append(lb);
 }
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlays.length) overlays[overlays.length - 1]._close(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape') return;
+  if (overlays.length) overlays[overlays.length - 1]._close(); else if (searchMode) exitSearch();
+});
 
 /* ---------- api ---------- */
 let token = store.get('token');
@@ -684,6 +707,7 @@ async function api(path, { method = 'GET', body, form } = {}) {
 function saveAuth(r) { token = r.token; store.set('token', token); if (r.user) me = r.user; return r; }
 function logout() {
   token = null; store.del('token'); me = null; stopChatPoll(); stopListPoll(); stopAudio();
+  searchMode = false; recents = []; store.del(RK);
   closeAllOverlays(); shell = null; cur = null; ui = null;
   mount(authView());
 }
@@ -776,20 +800,21 @@ function ensureShell() {
   mount(shell);
   renderSide();
 }
-function setTab(t) { if (t !== sideTab && t !== 'settings') settingsPage = null; sideTab = t; renderSide(); }
+function setTab(t) { if (searchMode) exitSearch(); if (t !== sideTab && t !== 'settings') settingsPage = null; sideTab = t; renderSide(); }
 function searchRow(get, set, redraw, placeholder) {
   return h('div', { class: 'searchrow' }, ic('search', 22),
     h('input', { type: 'search', placeholder, 'aria-label': 'Search', value: get(), oninput: (e) => { set(e.target.value); redraw(); } }));
 }
 function renderSide() {
   sideTitle.textContent = TAB_TITLES[sideTab];
+  sideBody.classList.toggle('searching', sideTab === 'chats' && searchMode);
   sideBar.classList.toggle('flat', sideTab === 'chats' || sideTab === 'contacts');
   sideMenu.hidden = sideTab !== 'chats';
   sideList = null; contactList = null;
   if (sideTab === 'chats') {
     sideList = h('div', { class: 'list' });
     folderBar = h('div', { class: 'folders' });
-    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList, 'ស្វែងរក chat…'), folderBar, sideList,
+    sideBody.replaceChildren(chatSearchRow(), folderBar, sideList,
       h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
   } else if (sideTab === 'contacts') {
     contactList = h('div', { class: 'list' });
@@ -815,6 +840,12 @@ function emptyMain() {
 }
 function drawFolders() {
   if (!folderBar) return;
+  if (searchMode) {
+    folderBar.hidden = false;
+    const tabs = [['all', 'ទាំងអស់'], ['chats', 'ឯកជន'], ['groups', 'ក្រុម'], ['users', 'អ្នកប្រើ']];
+    folderBar.replaceChildren(...tabs.map(([k, l]) => h('button', { class: 'fchip' + (searchTab === k ? ' on' : ''), onclick: () => { searchTab = k; drawList(); } }, l)));
+    return;
+  }
   folderBar.hidden = !prefs.folders;
   if (!prefs.folders) { folder = 'all'; return; }
   const un = chats.filter((c) => c.unread > 0).length;
@@ -847,6 +878,7 @@ function showList() {
 }
 function drawChatRows() {
   if (!sideList) return;
+  if (searchMode) return drawSearch();
   const el = sideList;
   if (!chatsLoaded) {
     el.replaceChildren(...Array.from({ length: 7 }, (_, i) => h('div', { class: 'row-sk' }, h('div', { class: 'sk', style: 'width:50px;height:50px;border-radius:50%' }),
@@ -877,6 +909,98 @@ function drawChatRows() {
           h('span', { class: 'when' }, showTick ? h('span', { class: 'tick' }, ic(peerRead ? 'checks' : 'check', 16)) : null, sameDay(t, new Date()) ? fmtTime(t) : fmtShortDate(t))),
         h('div', { class: 'line2' }, h('small', {}, pre), c.unread ? h('span', { class: 'badge' }, c.unread > 99 ? '99+' : c.unread) : null)));
   }));
+}
+/* ---------- search screen ---------- */
+function chatSearchRow() {
+  const input = h('input', { type: 'search', placeholder: 'ស្វែងរក chat…', 'aria-label': 'Search', value: sideQ, autocomplete: 'off',
+    onfocus: enterSearch, oninput: (e) => { sideQ = e.target.value; queueUserSearch(); drawList(); } });
+  searchInput = input;
+  searchSx = h('button', { class: 'sx', type: 'button', 'aria-label': 'Cancel', onclick: () => exitSearch() }, ic('x', 20));
+  searchSx.hidden = !searchMode;
+  return h('div', { class: 'searchrow' }, ic('search', 22), input, searchSx);
+}
+function enterSearch() {
+  if (searchMode) return;
+  searchMode = true; searchTab = 'all'; userHits = [];
+  if (!(history.state && history.state.v === 'search')) history.pushState({ v: 'search' }, '');
+  if (sideBody) sideBody.classList.add('searching');
+  if (searchSx) searchSx.hidden = false;
+  drawList();
+}
+// silent = the history entry is already handled by the caller (back button / opening a chat)
+function exitSearch(silent) {
+  if (!searchMode) return;
+  searchMode = false; sideQ = ''; userHits = []; hitSeq++; clearTimeout(hitTimer);
+  if (searchInput) { searchInput.value = ''; searchInput.blur(); }
+  if (sideBody) sideBody.classList.remove('searching');
+  if (searchSx) searchSx.hidden = true;
+  if (!silent && history.state && history.state.v === 'search') { ignorePop = true; history.back(); }
+  drawList();
+}
+function queueUserSearch() {
+  clearTimeout(hitTimer);
+  const q = sideQ.trim();
+  if (q.length < 2) { userHits = []; hitSeq++; return; }
+  const seq = ++hitSeq;
+  hitTimer = setTimeout(async () => {
+    try {
+      const d = await api('/users/search?q=' + encodeURIComponent(q));
+      if (seq !== hitSeq || !searchMode) return;
+      userHits = d.users; drawList();
+    } catch { /* ignore */ }
+  }, 350);
+}
+const subOfChat = (c) => (c.type === 'GROUP' ? c.members.length + ' សមាជិក' : c.peer && c.peer.id === me.id ? 'Saved Messages'
+  : c.peer && c.peer.online ? 'កំពុងអនឡាញ' : c.peer ? 'ចុងក្រោយ ' + fmtFull(c.peer.lastSeen) : '');
+function srow(o) {
+  return h('div', { class: 'row', role: 'button', tabindex: '0', onclick: o.onclick, onkeydown: (e) => { if (e.key === 'Enter') o.onclick(); } },
+    avatarOnline(o.avatarUrl, o.name, 52, o.online),
+    h('div', { class: 'grow' }, h('div', { class: 'line1' }, o.group ? h('span', { class: 'ic', style: 'opacity:.7' }, ic('users', 16)) : null, h('b', {}, o.name)), h('small', {}, o.sub || '')));
+}
+function openFromSearch(c) {
+  if (c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id) addRecent({ t: 'user', id: c.peer.id, name: c.peer.displayName, avatarUrl: c.peer.avatarUrl, username: c.peer.username });
+  else addRecent({ t: 'chat', id: c.id, name: c.title, avatarUrl: c.avatarUrl, group: c.type === 'GROUP' });
+  openChat(c);
+}
+const chatRowOf = (c) => srow({ avatarUrl: c.avatarUrl, name: c.title, sub: subOfChat(c), group: c.type === 'GROUP',
+  online: c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online, onclick: () => openFromSearch(c) });
+const userRowOf = (u) => srow({ avatarUrl: u.avatarUrl, name: u.displayName, sub: u.username ? '@' + u.username : '', online: u.online,
+  onclick: () => { addRecent({ t: 'user', id: u.id, name: u.displayName, avatarUrl: u.avatarUrl, username: u.username }); openPrivate([u]).catch((e) => toast(e.message)); } });
+const recentChat = (r) => (r.t === 'chat' ? chats.find((c) => c.id === r.id) : chats.find((c) => c.type === 'PRIVATE' && c.peer && c.peer.id === r.id)) || null;
+const recentRow = (r) => { const c = recentChat(r); return c ? chatRowOf(c) : r.t === 'user' ? userRowOf({ id: r.id, displayName: r.name, avatarUrl: r.avatarUrl, username: r.username }) : null; };
+const shead = (t, btn) => h('div', { class: 'shead' }, h('span', {}, t), btn || null);
+function drawSearch() {
+  const el = sideList;
+  const q = sideQ.trim().toLowerCase();
+  const out = [];
+  const match = (c) => ((c.title || '') + ' ' + (c.peer ? c.peer.username : '')).toLowerCase().includes(q);
+  const byTab = (c) => searchTab === 'all' || (searchTab === 'chats' && c.type === 'PRIVATE') || (searchTab === 'groups' && c.type === 'GROUP');
+  if (!q) {
+    if (searchTab === 'all') {
+      const people = recents.filter((r) => r.t === 'user').slice(0, 10);
+      if (people.length) out.push(h('div', { class: 'people' }, people.map((r) => h('button', { class: 'person', onclick: () => {
+        const c = recentChat(r);
+        if (c) openFromSearch(c); else userRowOf({ id: r.id, displayName: r.name, avatarUrl: r.avatarUrl, username: r.username }).click();
+      } }, avatar(r.avatarUrl, r.name, 62), h('span', { class: 'nm' }, (r.name || '').split(' ')[0])))));
+      const rows = recents.map(recentRow).filter(Boolean);
+      if (rows.length) {
+        out.push(shead('ថ្មីៗ', h('button', { onclick: () => { recents = []; store.set(RK, '[]'); drawSearch(); } }, 'លុបទាំងអស់')), ...rows);
+      } else out.push(h('div', { class: 'empty-main' }, ic('search', 36), h('p', {}, 'វាយឈ្មោះ ឬ username ដើម្បីស្វែងរក')));
+    } else if (searchTab === 'users') {
+      out.push(h('div', { class: 'empty-main' }, ic('search', 36), h('p', {}, 'វាយយ៉ាងតិច 2 តួ ដើម្បីស្វែងរកអ្នកប្រើ')));
+    } else {
+      const rows = chats.filter(byTab).map(chatRowOf);
+      out.push(...(rows.length ? rows : [h('div', { class: 'empty-main' }, h('p', {}, 'មិនទាន់មាន'))]));
+    }
+  } else {
+    const local = searchTab === 'users' ? [] : chats.filter((c) => byTab(c) && match(c));
+    const have = new Set(local.filter((c) => c.peer).map((c) => c.peer.id));
+    const global = searchTab === 'all' || searchTab === 'users' ? userHits.filter((u) => searchTab === 'users' || !have.has(u.id)) : [];
+    if (local.length) { if (searchTab === 'all' && global.length) out.push(shead('Chats')); out.push(...local.map(chatRowOf)); }
+    if (global.length) { if (searchTab === 'all') out.push(shead('អ្នកប្រើទូទាំង')); out.push(...global.map(userRowOf)); }
+    if (!out.length) out.push(h('div', { class: 'empty-main' }, ic('search', 36), h('p', {}, q.length < 2 && searchTab === 'users' ? 'វាយយ៉ាងតិច 2 តួ' : 'រកមិនឃើញ')));
+  }
+  el.replaceChildren(...out);
 }
 function newChat() {
   sheet('ថ្មី', [
@@ -1007,9 +1131,10 @@ function applyChat(c) { cur = { ...c }; updateHeader(); }
 
 async function openChat(chat, push = true) {
   stopChatPoll(); stopAudio(); cancelRecSilently();
+  const fromSearch = searchMode; if (fromSearch) exitSearch(true);
   cur = chat; replyTo = null; editing = null;
   msgs = new Map(); reads = []; typingIds = []; hasMore = false; mediaCache.clear();
-  if (push) { if (view === 'list') history.pushState({ v: 'chat' }, ''); else history.replaceState({ v: 'chat' }, ''); }
+  if (push) { if (view === 'list' && !fromSearch) history.pushState({ v: 'chat' }, ''); else history.replaceState({ v: 'chat' }, ''); }
   buildChat();
   const id = chat.id;
   try {
@@ -1660,7 +1785,9 @@ document.addEventListener('contextmenu', (e) => { if (secure && view === 'chat' 
 
 /* ---------- navigation + boot ---------- */
 window.addEventListener('popstate', () => {
+  if (ignorePop) { ignorePop = false; return; }
   if (overlays.length) closeAllOverlays();
+  if (searchMode) { exitSearch(true); return; }
   if (me && view !== 'list') showList();
 });
 applyPrivacy();
