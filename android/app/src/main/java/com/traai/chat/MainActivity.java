@@ -28,8 +28,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Screenshots, screen recording and the recent-apps thumbnail all come out black
-        // Screenshot blocking is off for now; the page can still switch it on via LayzzAndroid.setSecure(true)
+        // Screenshot blocking is OFF: screenshots, screen recording and the recent-apps thumbnail work normally.
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
 
         // Match the app's dark header so there is no white flash / mismatched bars
         getWindow().setStatusBarColor(0xFF17212B);
@@ -47,14 +47,12 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(false);
 
-        // Lets the web UI's Public / Private setting switch screenshot + screen-recording blocking on or off.
-        // Starts secure (see FLAG_SECURE above) until the page says otherwise.
+        // setSecure is kept so the web page can still call it, but it never blocks screenshots any more.
         web.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void setSecure(final boolean on) {
                 runOnUiThread(() -> {
-                    if (on) getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
-                    else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE); // always allow screenshots
                 });
             }
             // The page passes its header colour (#rrggbb) so the system bars match the theme / iOS style
