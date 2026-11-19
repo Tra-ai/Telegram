@@ -327,6 +327,126 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 .secure img,.secure video{-webkit-user-drag:none}
 .shield{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;align-items:center;justify-content:center;color:var(--mut)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== Apple / iOS style (switchable in Settings → chat settings). Pure overrides on top of the base theme ===== */
+html[data-ios]{
+  --bg:#f2f2f7;--surface:#fff;--field:rgba(118,118,128,.12);--fg:#000;--mut:#8e8e93;--line:rgba(60,60,67,.18);
+  --pri:#007aff;--pri-soft:rgba(0,122,255,.12);--on-pri:#fff;--in:#e9e9eb;--out:#007aff;--chat-bg:#fff;--danger:#ff3b30;--ok:#34c759;
+  --hover:rgba(60,60,67,.08);--shadow:none;--shadow-lg:0 16px 48px rgba(0,0,0,.25);--ease:cubic-bezier(.32,.72,0,1);
+}
+@media (prefers-color-scheme:dark){html[data-ios]:not([data-theme="light"]){
+  --bg:#000;--surface:#1c1c1e;--field:rgba(118,118,128,.24);--fg:#fff;--mut:#98989f;--line:rgba(84,84,88,.55);
+  --pri:#0a84ff;--pri-soft:rgba(10,132,255,.18);--on-pri:#fff;--in:#26262a;--out:#0a84ff;--chat-bg:#000;--danger:#ff453a;--ok:#30d158;--hover:rgba(255,255,255,.08);}}
+html[data-ios][data-theme="dark"]{
+  --bg:#000;--surface:#1c1c1e;--field:rgba(118,118,128,.24);--fg:#fff;--mut:#98989f;--line:rgba(84,84,88,.55);
+  --pri:#0a84ff;--pri-soft:rgba(10,132,255,.18);--on-pri:#fff;--in:#26262a;--out:#0a84ff;--chat-bg:#000;--danger:#ff453a;--ok:#30d158;--hover:rgba(255,255,255,.08);}
+html[data-ios] body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Kantumruy Pro","Noto Sans Khmer",system-ui,sans-serif;letter-spacing:-.01em}
+html[data-ios] button:active{transform:none;opacity:.55}
+html[data-ios] button.primary{border-radius:14px;padding:15px;font-weight:600}
+html[data-ios] input,html[data-ios] textarea{border-radius:10px}
+/* bars: translucent + hairline */
+html[data-ios] .bar{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 .5px 0 var(--line)}
+html[data-ios] .bar .title{font-size:17px;font-weight:600;text-align:center;letter-spacing:-.02em}
+html[data-ios] .side .bar{justify-content:space-between}
+html[data-ios] .peer{padding:2px 0}
+html[data-ios] .status{font-size:12px}
+html[data-ios] .grow b{font-weight:600}
+/* search */
+html[data-ios] .searchrow{background:var(--surface);padding:4px 16px 10px}
+html[data-ios] .searchrow input{border-radius:10px;padding:8px 14px 8px 40px;font-size:17px;height:36px;background:var(--field)}
+html[data-ios] .searchrow .ic{left:28px}
+/* tab bar: full width, translucent, no pill */
+html[data-ios] .nav{left:0;right:0;bottom:0;border-radius:0;padding:6px 4px calc(4px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 -.5px 0 var(--line);gap:0}
+html[data-ios] .tab{border-radius:0;font-size:10px;font-weight:500;color:var(--mut);gap:2px;padding:2px}
+html[data-ios] .tab.on{background:transparent;color:var(--pri)}
+html[data-ios] .tabic .badge{border-color:var(--surface)}
+html[data-ios] .sidebody .list{padding-bottom:84px}
+html[data-ios] .fab{bottom:calc(76px + env(safe-area-inset-bottom));box-shadow:0 4px 14px rgba(0,122,255,.4)}
+/* chat list: hairline-separated rows */
+html[data-ios] .side{background:var(--surface)}
+html[data-ios] .row{margin:0;border-radius:0;padding:10px 16px;position:relative}
+html[data-ios] .row::after{content:"";position:absolute;left:78px;right:0;bottom:0;height:.5px;background:var(--line)}
+html[data-ios] .row:hover{background:transparent}
+html[data-ios] .row:active{background:var(--hover)}
+html[data-ios] .row.active,html[data-ios] .row.active:hover{background:var(--pri)}
+html[data-ios] .card .row,html[data-ios] .mi{border-radius:0}
+html[data-ios] .badge{background:var(--pri);font-weight:600}
+html[data-ios] .folders{padding:0 16px 8px}
+html[data-ios] .fchip{background:var(--field);color:var(--fg);font-weight:500;font-size:14px}
+html[data-ios] .fchip.on{background:var(--pri);color:#fff}
+/* settings: inset grouped lists */
+html[data-ios] .pad{background:var(--bg)}
+html[data-ios] .sidebody:has(.pad){background:var(--bg)}
+html[data-ios] .card{border-radius:12px;padding:0;overflow:hidden;box-shadow:none;margin:16px 0}
+html[data-ios] .card h4{margin:0;padding:12px 16px 4px;font-size:13px;font-weight:400;text-transform:uppercase;letter-spacing:.2px}
+html[data-ios] .mi{padding:9px 16px;gap:12px;position:relative}
+html[data-ios] .mi::after{content:"";position:absolute;left:58px;right:0;bottom:0;height:.5px;background:var(--line)}
+html[data-ios] .mi:last-child::after{display:none}
+html[data-ios] .mi .sq{width:30px;height:30px;border-radius:7px}
+html[data-ios] .mi .sq .ic svg{width:18px;height:18px}
+html[data-ios] .mi .grow b{font-weight:400;font-size:17px}
+html[data-ios] .mi .grow small{display:none}
+html[data-ios] .sheet-i{border-radius:0;padding:12px 16px;margin:0}
+html[data-ios] .sethead h3{font-size:22px;font-weight:700}
+html[data-ios] .tile{border-radius:12px;box-shadow:none}
+html[data-ios] .note{margin:6px 16px 4px;font-size:13px}
+html[data-ios] .subhead b{font-size:17px;font-weight:600}
+html[data-ios] .seg{border-radius:9px;padding:2px}
+html[data-ios] .seg button{border-radius:7px;padding:6px;font-size:13px;font-weight:500}
+html[data-ios] .seg button.on{background:var(--surface);box-shadow:0 1px 3px rgba(0,0,0,.18),0 0 0 .5px rgba(0,0,0,.04);color:var(--fg)}
+html[data-ios] .sw{width:51px!important;height:31px;border-radius:16px;background:rgba(120,120,128,.32)!important}
+html[data-ios] .sw::after{width:27px;height:27px;left:2px;top:2px;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .25s var(--ease)}
+html[data-ios] .sw:checked{background:var(--ok)!important}
+html[data-ios] .sw:checked::after{transform:translateX(20px)}
+/* messages */
+html[data-ios] .msgs{background:var(--chat-bg)}
+html[data-ios] .bub{border-radius:18px;padding:7px 12px;box-shadow:none}
+html[data-ios] .msg:not(.mine) .bub{border-bottom-left-radius:5px}
+html[data-ios] .msg.mine .bub{color:#fff;border-bottom-right-radius:5px}
+html[data-ios] .msg.mine .meta,html[data-ios] .msg.mine small{color:rgba(255,255,255,.72)}
+html[data-ios] .msg.mine .tick{color:#fff}
+html[data-ios] .msg.mine .quote{background:rgba(255,255,255,.18);border-left-color:#fff}
+html[data-ios] .msg.mine .quote b{color:#fff}
+html[data-ios] .msg.mine .quote div{color:rgba(255,255,255,.85)}
+html[data-ios] .msg.mine .file .fi,html[data-ios] .msg.mine .voice .pp{background:#fff;color:var(--pri)}
+html[data-ios] .msg.mine .wave i{background:#fff}
+html[data-ios] .msg.mine .wave i.on{background:#fff;opacity:1}
+html[data-ios] .msg.mine a{color:#fff}
+html[data-ios] .who{color:var(--pri)}
+html[data-ios] .day{background:transparent;color:var(--mut);backdrop-filter:none;-webkit-backdrop-filter:none;font-weight:500}
+html[data-ios] .hello,html[data-ios] .older{box-shadow:none;background:var(--field)}
+html[data-ios] .jump{box-shadow:0 2px 10px rgba(0,0,0,.2)}
+/* composer */
+html[data-ios] .composer{background:color-mix(in srgb,var(--surface) 80%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);box-shadow:0 -.5px 0 var(--line);align-items:flex-end}
+html[data-ios] .cwrap{background:var(--surface);border:.5px solid var(--line);border-radius:19px;box-shadow:none;padding:0 2px}
+html[data-ios] .cwrap textarea{min-height:36px;padding:8px 4px}
+html[data-ios] .cwrap button.icon{height:36px;width:36px;color:var(--mut)}
+html[data-ios] .act{width:34px;height:34px;margin-bottom:1px;box-shadow:none}
+html[data-ios] .recbar{box-shadow:none;border:.5px solid var(--line);border-radius:19px}
+html[data-ios] .startbtn{border-radius:14px}
+html[data-ios] .cmds button{background:var(--field);color:var(--pri)}
+/* sheets & dialogs */
+html[data-ios] .overlay{background:rgba(0,0,0,.4)}
+html[data-ios] .panel{border-radius:14px 14px 0 0;animation:up .38s var(--ease);background:var(--surface)}
+@media (min-width:600px){html[data-ios] .panel{border-radius:14px}}
+html[data-ios] .overlay.dlg .panel{border-radius:14px;max-width:290px;text-align:center;padding:18px 0 0}
+html[data-ios] .overlay.dlg .panel>div>b,html[data-ios] .overlay.dlg .panel>div>p,html[data-ios] .overlay.dlg .panel>div>input{margin-left:18px;margin-right:18px;display:block}
+html[data-ios] .overlay.dlg .panel>div>input{width:calc(100% - 36px);text-align:left}
+html[data-ios] .dlg .btns{border-top:.5px solid var(--line);margin-top:14px;gap:0;justify-content:stretch}
+html[data-ios] .dlg .btns button{flex:1;border-radius:0;padding:13px 8px;font-size:17px}
+html[data-ios] .dlg .btns button+button{border-left:.5px solid var(--line);font-weight:600}
+html[data-ios] .toast{border-radius:14px;background:rgba(40,40,44,.92);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+@keyframes slidein{from{transform:translateX(100%)}to{transform:none}}
+html[data-ios] .main>.screen{animation-duration:.38s;animation-timing-function:var(--ease)}
+/* login */
+html[data-ios] .authwrap{background:var(--bg)}
+html[data-ios] .auth input{background:var(--surface);border-radius:12px;height:50px}
+html[data-ios] .auth .primary,html[data-ios] .auth .ghost{border-radius:14px;box-shadow:none}
+html[data-ios] .auth .seg{border-radius:10px;background:var(--field)}
+html[data-ios] .auth .seg button{border-radius:8px;padding:8px 6px;font-size:15px}
+html[data-ios] .auth input{border-radius:12px}
+html[data-ios] .logo{border-radius:22%;box-shadow:0 8px 24px rgba(0,122,255,.3)}
+html[data-ios] .authwrap::before,html[data-ios] .authwrap::after{display:none}
 </style>
 </head>
 <body>
@@ -426,7 +546,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyThe
 
 
 /* ---------- preferences (kept on this device) ---------- */
-const PREF_DEFAULTS = { fontSize: 'm', wall: 'default', enterSend: true, sound: true, vibrate: true, autoImages: true, folders: true, power: 'off' };
+const PREF_DEFAULTS = { fontSize: 'm', wall: 'default', enterSend: true, sound: true, vibrate: true, autoImages: true, folders: true, power: 'off', ios: true };
 let prefs = { ...PREF_DEFAULTS };
 try { prefs = { ...PREF_DEFAULTS, ...JSON.parse(store.get('prefs') || '{}') }; } catch { /* ignore */ }
 let batteryLow = false;
@@ -434,7 +554,7 @@ const powerOn = () => prefs.power === 'on' || (prefs.power === 'auto' && battery
 const pm = () => (powerOn() ? 3 : 1); // polling slows down 3x in power saving
 function applyPrefs() {
   const r = document.documentElement;
-  r.dataset.fs = prefs.fontSize; r.dataset.wall = prefs.wall; r.classList.toggle('lowpower', powerOn());
+  r.toggleAttribute('data-ios', !!prefs.ios); r.dataset.fs = prefs.fontSize; r.dataset.wall = prefs.wall; r.classList.toggle('lowpower', powerOn());
 }
 function setPref(k, v) { prefs[k] = v; store.set('prefs', JSON.stringify(prefs)); applyPrefs(); }
 applyPrefs();
@@ -1348,6 +1468,7 @@ function settingsNode() {
     return subPage('ការកំណត់ chat',
       h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), seg),
       h('div', { class: 'card' }, h('h4', {}, 'ផ្ទាំងខាងក្រោយ chat'), sw),
+      h('div', { class: 'card' }, switchRow('phone', 'រចនាប័ទ្ម Apple (iOS)', 'ធ្វើអោយ app មើលទៅដូច iPhone', 'ios')),
       h('div', { class: 'card' }, h('h4', {}, 'ទំហំអក្សរ'), segPref('fontSize', [['s', 'តូច'], ['m', 'ធម្មតា'], ['l', 'ធំ']])),
       h('div', { class: 'card' }, switchRow('send', 'Enter ដើម្បីផ្ញើ', 'លើកុំព្យូទ័រ៖ Enter ផ្ញើ · Shift+Enter ចុះបន្ទាត់', 'enterSend')));
   }
