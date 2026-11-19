@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import rateLimit from 'express-rate-limit';
 import { prisma } from '../db.js';
 import { signToken, requireAuth, publicUser, invalidateUser } from '../auth.js';
+import { makeVerifier, normalizePhone, userForPhone, PhoneError } from '../services/sms.js';
 
 const router = Router();
 // Separate buckets; successful logins don't count (users behind one NAT won't lock each other out)
@@ -36,6 +37,38 @@ router.post('/login', loginLimiter, async (req, res) => {
     return res.status(401).json({ error: 'Wrong username or password' });
   if (user.isBanned) return res.status(403).json({ error: 'This account is banned' });
   res.json({ token: signToken(user), user: publicUser(user) });
+});
+
+// ---- Phone (SMS code) sign-in / sign-up ----
+const sms = makeVerifier();
+const CC = process.env.DEFAULT_COUNTRY_CODE || '855';
+const phoneKey = (req) => normalizePhone(req.body?.phone, CC) || 'x';
+const startIpLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 15, standardHeaders: true, legacyHeaders: false });
+const startPhoneLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 3, keyGenerator: phoneKey, validate: false, standardHeaders: true, legacyHeaders: false });
+const checkLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 10, keyGenerator: phoneKey, validate: false, standardHeaders: true, legacyHeaders: false });
+const phoneFail = (res, e) => {
+  if (e instanceof PhoneError) return res.status(e.status).json({ error: e.message });
+  console.error(e); return res.status(500).json({ error: 'Server error' });
+};
+
+router.get('/config', (_req, res) => res.json({ phone: sms.configured }));
+
+router.post('/phone/start', startIpLimiter, startPhoneLimiter, async (req, res) => {
+  const phone = normalizePhone(req.body?.phone, CC);
+  if (!phone) return res.status(400).json({ error: 'Invalid phone number' });
+  try { await sms.start(phone); res.json({ ok: true, phone }); } catch (e) { phoneFail(res, e); }
+});
+
+router.post('/phone/verify', checkLimiter, async (req, res) => {
+  const phone = normalizePhone(req.body?.phone, CC);
+  const code = String(req.body?.code || '').trim();
+  if (!phone || !/^\d{4,8}$/.test(code)) return res.status(400).json({ error: 'Invalid phone number or code' });
+  try {
+    if (!(await sms.check(phone, code))) return res.status(401).json({ error: 'Wrong or expired code' });
+    const { user, created } = await userForPhone(prisma, phone, req.body?.displayName);
+    if (user.isBanned) return res.status(403).json({ error: 'This account is banned' });
+    res.status(created ? 201 : 200).json({ token: signToken(user), user: publicUser(user), created });
+  } catch (e) { phoneFail(res, e); }
 });
 
 const passwordLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, keyGenerator: (req) => req.user.id, standardHeaders: true, legacyHeaders: false });

@@ -300,6 +300,14 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 .auth .primary{height:56px;border-radius:999px;font-size:17px;font-weight:700;margin-top:18px;width:100%;box-shadow:0 8px 22px var(--pri-soft)}
 .auth .err{text-align:center;margin-top:10px}
 
+.auth .or{display:flex;align-items:center;gap:12px;color:var(--mut);font-size:13px;margin:22px 0 14px}
+.auth .or::before,.auth .or::after{content:"";flex:1;height:1px;background:var(--line)}
+.auth .ghost{width:100%;height:54px;border-radius:999px;background:var(--field);color:var(--fg);font-weight:600;font-size:16px;display:flex;align-items:center;justify-content:center;gap:10px}
+.auth .link{background:transparent;color:var(--pri);font-weight:600;padding:8px 6px}
+.auth .link:disabled{color:var(--mut)}
+.auth .row2{display:flex;justify-content:space-between;margin-top:10px}
+.auth .center{text-align:center}
+
 /* ---- profile / forms ---- */
 .pad{padding:14px;overflow-y:auto;flex:1;width:100%;max-width:640px;margin:0 auto}
 .card{background:var(--surface);border-radius:16px;padding:6px;margin:12px 0;box-shadow:var(--shadow)}
@@ -388,6 +396,7 @@ const ICONS = {
   contacts: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a5 5 0 0 1 10 0"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
   chev: '<path d="m9 18 6-6-6-6"/>',
+  phone: '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
   bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.5" r="1"/><path d="M9 13.5h.01M15 13.5h.01M9.5 17h5"/>',
   bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/>',
@@ -601,6 +610,7 @@ function authView() {
   const eye = h('button', { type: 'button', 'aria-label': 'បង្ហាញពាក្យសម្ងាត់', onclick: () => { showPw = !showPw; p.type = showPw ? 'text' : 'password'; eye.replaceChildren(ic(showPw ? 'eyeoff' : 'eye', 20)); } }, ic('eye', 20));
   const go = h('button', { class: 'primary', onclick: submit });
   const tabs = h('div', { class: 'seg' });
+  const phoneSlot = h('div', {});
   const lu = h('label', { class: 'fl' }, 'ឈ្មោះអ្នកប្រើ'), ld = h('label', { class: 'fl' }, 'ឈ្មោះបង្ហាញ'), lp = h('label', { class: 'fl' }, 'ពាក្យសម្ងាត់');
   async function submit() {
     err.textContent = ''; go.disabled = true; const label = go.textContent; go.textContent = '…';
@@ -621,7 +631,53 @@ function authView() {
   [u, d, p].forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
   draw();
   root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Layzzchat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
-    tabs, lu, u, ld, d, lp, h('div', { class: 'pw' }, p, eye), err, go);
+    tabs, lu, u, ld, d, lp, h('div', { class: 'pw' }, p, eye), err, go, phoneSlot);
+  api('/auth/config').then((c) => { if (c.phone) phoneSlot.replaceChildren(h('div', { class: 'or' }, h('span', {}, 'ឬ')), h('button', { class: 'ghost', onclick: () => mount(phoneAuthView()) }, ic('phone', 20), 'បន្តជាមួយលេខទូរស័ព្ទ')); }).catch(() => {});
+  return h('div', { class: 'authwrap' }, root);
+}
+
+/* phone sign-in: SMS code, creates the account on first use */
+function phoneAuthView() {
+  view = 'auth';
+  let phone = '', timer = null;
+  const root = h('div', { class: 'auth' });
+  const err = h('div', { class: 'err', role: 'alert' });
+  const body = h('div', {});
+  const busy = async (btn, fn) => {
+    err.textContent = ''; btn.disabled = true; const t = btn.textContent;
+    try { await fn(); } catch (e) { err.textContent = e.message; } finally { btn.disabled = false; if (btn.isConnected) btn.textContent = t; }
+  };
+  function stepPhone() {
+    clearInterval(timer);
+    const inp = h('input', { type: 'tel', inputmode: 'tel', placeholder: '012 345 678', autocomplete: 'tel', value: phone });
+    const go = h('button', { class: 'primary', onclick: () => busy(go, async () => {
+      const d = await api('/auth/phone/start', { method: 'POST', body: { phone: inp.value } });
+      phone = d.phone; stepCode();
+    }) }, 'ផ្ញើកូដ');
+    inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') go.click(); });
+    body.replaceChildren(h('label', { class: 'fl' }, 'លេខទូរស័ព្ទ'), inp, h('p', { class: 'note', style: 'margin:8px 6px 0' }, 'យើងនឹងផ្ញើកូដ 6 ខ្ទង់តាម SMS។ បើមិនទាន់មានគណនី វានឹងត្រូវបានបង្កើតដោយស្វ័យប្រវត្តិ។'), err, go);
+    setTimeout(() => inp.focus(), 60);
+  }
+  function stepCode() {
+    const code = h('input', { inputmode: 'numeric', autocomplete: 'one-time-code', maxlength: 8, placeholder: '••••••', style: 'text-align:center;letter-spacing:6px;font-size:22px' });
+    const name = h('input', { placeholder: 'ឈ្មោះរបស់អ្នក', autocomplete: 'name', maxlength: 50 });
+    const go = h('button', { class: 'primary', onclick: () => busy(go, async () => {
+      saveAuth(await api('/auth/phone/verify', { method: 'POST', body: { phone, code: code.value, displayName: name.value } }));
+      showList();
+    }) }, 'បញ្ជាក់');
+    const resend = h('button', { class: 'link', disabled: true, onclick: () => busy(resend, async () => { await api('/auth/phone/start', { method: 'POST', body: { phone } }); toast('បានផ្ញើកូដម្ដងទៀត'); cool(); }) }, '');
+    let left = 0;
+    function cool() { left = 45; clearInterval(timer); tick(); timer = setInterval(tick, 1000); }
+    function tick() { resend.disabled = left > 0; resend.textContent = left > 0 ? `ផ្ញើកូដម្ដងទៀត (${left})` : 'ផ្ញើកូដម្ដងទៀត'; if (left-- <= 0) clearInterval(timer); }
+    code.addEventListener('keydown', (e) => { if (e.key === 'Enter') go.click(); });
+    body.replaceChildren(h('p', { class: 'center', style: 'margin:0 0 4px;color:var(--mut)' }, 'បានផ្ញើកូដទៅ ', h('b', { style: 'color:var(--fg)' }, phone)),
+      h('label', { class: 'fl' }, 'កូដ'), code, h('label', { class: 'fl' }, 'ឈ្មោះ (សម្រាប់អ្នកប្រើថ្មី)'), name, err, go,
+      h('div', { class: 'row2' }, resend, h('button', { class: 'link', onclick: stepPhone }, 'ប្ដូរលេខ')));
+    cool(); setTimeout(() => code.focus(), 60);
+  }
+  stepPhone();
+  root.append(h('div', { class: 'logo' }, ic('phone', 42)), h('h1', {}, 'ចូលតាមលេខទូរស័ព្ទ'), h('p', { class: 'sub' }, 'Layzzchat'), body,
+    h('button', { class: 'link', style: 'display:block;margin:22px auto 0', onclick: () => mount(authView()) }, '← ចូលដោយ username'));
   return h('div', { class: 'authwrap' }, root);
 }
 

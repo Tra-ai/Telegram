@@ -28,6 +28,8 @@ enum MessageType {
 model User {
   id           String   @id @default(cuid())
   username     String   @unique
+  // E.164 (+855...). Set only for accounts created/verified through SMS login. Never sent to other users.
+  phone        String?  @unique
   displayName  String
   passwordHash String
   // Bumped on password change / "log out everywhere" → invalidates all older JWTs
