@@ -539,7 +539,9 @@ function applyTheme() {
   if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = t;
   const dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
   const m = document.querySelector('meta[name="theme-color"]');
-  if (m) m.content = dark ? '#17212b' : '#3390ec';
+  // iOS style has a white / near-black header, so the browser bar must match it (not the Telegram blue)
+  const ios = document.documentElement.hasAttribute('data-ios');
+  if (m) m.content = dark ? (ios ? '#1c1c1e' : '#17212b') : (ios ? '#ffffff' : '#3390ec');
 }
 applyTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
@@ -555,6 +557,7 @@ const pm = () => (powerOn() ? 3 : 1); // polling slows down 3x in power saving
 function applyPrefs() {
   const r = document.documentElement;
   r.toggleAttribute('data-ios', !!prefs.ios); r.dataset.fs = prefs.fontSize; r.dataset.wall = prefs.wall; r.classList.toggle('lowpower', powerOn());
+  applyTheme(); // re-colour the browser bar when the iOS style is switched
 }
 function setPref(k, v) { prefs[k] = v; store.set('prefs', JSON.stringify(prefs)); applyPrefs(); }
 applyPrefs();
