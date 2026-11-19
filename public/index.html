@@ -117,6 +117,25 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .subhead b{font-size:19px}
 .note{margin:4px 14px 10px;font-size:13.5px;color:var(--mut)}
 
+
+/* ---- preferences ---- */
+html[data-fs="s"] .txt{font-size:14.5px}
+html[data-fs="l"] .txt{font-size:18.5px}
+html[data-wall="sky"]{--chat-bg:linear-gradient(160deg,#cfe8ff,#8ec5fc)}
+html[data-wall="mint"]{--chat-bg:linear-gradient(160deg,#d4fc79,#96e6a1)}
+html[data-wall="rose"]{--chat-bg:linear-gradient(160deg,#ffd1dc,#f8a5c2)}
+html[data-wall="sand"]{--chat-bg:linear-gradient(160deg,#f6e7c8,#e0c28f)}
+html[data-wall="night"]{--chat-bg:linear-gradient(160deg,#1b2a49,#0b1220)}
+html.lowpower *{animation:none!important;transition:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.swatches{display:flex;gap:12px;padding:8px 12px 14px;flex-wrap:wrap}
+.swatch{width:46px;height:46px;border-radius:50%;padding:0;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line)}
+.swatch.on{box-shadow:0 0 0 3px var(--pri)}
+.folders{display:flex;gap:8px;padding:0 14px 8px;overflow-x:auto;flex:none;scrollbar-width:none}
+.folders::-webkit-scrollbar{display:none}
+.fchip{background:var(--field);color:var(--mut);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600;white-space:nowrap}
+.fchip.on{background:var(--pri-soft);color:var(--pri)}
+.imgph{display:flex;align-items:center;gap:8px;line-height:1.4;background:var(--field);color:var(--fg);padding:26px 22px;border-radius:12px;width:100%;justify-content:center;font-size:14px}
+
 /* ---- avatar ---- */
 .avw{position:relative;flex:none;line-height:0}
 .av{border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;line-height:1}
@@ -345,6 +364,11 @@ const ICONS = {
   contacts: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a5 5 0 0 1 10 0"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
   chev: '<path d="m9 18 6-6-6-6"/>',
+  bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  battery: '<rect x="2" y="7" width="16" height="10" rx="2"/><path d="M22 11v2"/><path d="M6 12h4"/>',
+  globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
   user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
 };
 function ic(name, size = 22) {
@@ -365,6 +389,39 @@ function applyTheme() {
 }
 applyTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
+
+
+/* ---------- preferences (kept on this device) ---------- */
+const PREF_DEFAULTS = { fontSize: 'm', wall: 'default', enterSend: true, sound: true, vibrate: true, autoImages: true, folders: true, power: 'off' };
+let prefs = { ...PREF_DEFAULTS };
+try { prefs = { ...PREF_DEFAULTS, ...JSON.parse(store.get('prefs') || '{}') }; } catch { /* ignore */ }
+let batteryLow = false;
+const powerOn = () => prefs.power === 'on' || (prefs.power === 'auto' && batteryLow);
+const pm = () => (powerOn() ? 3 : 1); // polling slows down 3x in power saving
+function applyPrefs() {
+  const r = document.documentElement;
+  r.dataset.fs = prefs.fontSize; r.dataset.wall = prefs.wall; r.classList.toggle('lowpower', powerOn());
+}
+function setPref(k, v) { prefs[k] = v; store.set('prefs', JSON.stringify(prefs)); applyPrefs(); }
+applyPrefs();
+try {
+  navigator.getBattery && navigator.getBattery().then((b) => {
+    const upd = () => { batteryLow = !b.charging && b.level <= 0.2; applyPrefs(); };
+    b.addEventListener('levelchange', upd); b.addEventListener('chargingchange', upd); upd();
+  });
+} catch { /* not supported */ }
+let actx = null;
+function beep() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = 880; g.gain.value = 0.07; o.connect(g); g.connect(actx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(0.0001, actx.currentTime + 0.18); o.stop(actx.currentTime + 0.2);
+  } catch { /* ignore */ }
+}
+function notifyIncoming() { if (prefs.sound) beep(); if (prefs.vibrate) navigator.vibrate?.(40); }
+let lastUnread = null, folder = 'all', folderBar = null;
+const shownImgs = new Set();
 
 /* ---------- time ---------- */
 const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
@@ -501,8 +558,8 @@ function startListPoll() {
   const gen = ++listGen; clearTimeout(listTimer);
   const tick = async () => {
     if (gen !== listGen) return;
-    try { const d = await api('/chats'); if (gen !== listGen) return; chats = d.chats; chatsLoaded = true; drawList(); } catch { /* retry */ }
-    if (gen === listGen) listTimer = setTimeout(tick, document.hidden ? 15000 : view !== 'list' && !wide() ? 12000 : 4000);
+    try { const d = await api('/chats'); if (gen !== listGen) return; chats = d.chats; chatsLoaded = true; const tot = chats.reduce((a, c) => a + (c.unread || 0), 0); if (lastUnread !== null && tot > lastUnread) notifyIncoming(); lastUnread = tot; drawList(); } catch { /* retry */ }
+    if (gen === listGen) listTimer = setTimeout(tick, (document.hidden ? 15000 : view !== 'list' && !wide() ? 12000 : 4000) * pm());
   };
   tick();
 }
@@ -572,7 +629,8 @@ function renderSide() {
   sideList = null; contactList = null;
   if (sideTab === 'chats') {
     sideList = h('div', { class: 'list' });
-    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList, 'ស្វែងរក chat…'), sideList,
+    folderBar = h('div', { class: 'folders' });
+    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList, 'ស្វែងរក chat…'), folderBar, sideList,
       h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
   } else if (sideTab === 'contacts') {
     contactList = h('div', { class: 'list' });
@@ -596,7 +654,15 @@ function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildr
 function emptyMain() {
   return h('div', { class: 'empty-main' }, ic('message', 40), h('p', {}, 'ជ្រើសរើស chat ដើម្បីចាប់ផ្ដើមសន្ទនា'));
 }
-function drawList() { drawNav(); if (sideList) drawChatRows(); else if (contactList) drawContacts(); }
+function drawFolders() {
+  if (!folderBar) return;
+  folderBar.hidden = !prefs.folders;
+  if (!prefs.folders) { folder = 'all'; return; }
+  const un = chats.filter((c) => c.unread > 0).length;
+  const defs = [['all', 'ទាំងអស់'], ['private', 'ឯកជន'], ['group', 'ក្រុម'], ['unread', 'មិនទាន់អាន' + (un ? ' ' + un : '')]];
+  folderBar.replaceChildren(...defs.map(([k, l]) => h('button', { class: 'fchip' + (folder === k ? ' on' : ''), onclick: () => { folder = k; drawList(); } }, l)));
+}
+function drawList() { drawNav(); if (sideList) { drawFolders(); drawChatRows(); } else if (contactList) drawContacts(); }
 function drawContacts() {
   const el = contactList;
   const seen = new Set();
@@ -629,7 +695,9 @@ function drawChatRows() {
     return;
   }
   const needle = sideQ.trim().toLowerCase();
-  const list = needle ? chats.filter((c) => (c.title || '').toLowerCase().includes(needle) || (c.peer && c.peer.username.toLowerCase().includes(needle))) : chats;
+  const inFolder = (c) => folder === 'all' || (folder === 'private' && c.type === 'PRIVATE') || (folder === 'group' && c.type === 'GROUP') || (folder === 'unread' && c.unread > 0);
+  const base = chats.filter(inFolder);
+  const list = needle ? base.filter((c) => (c.title || '').toLowerCase().includes(needle) || (c.peer && c.peer.username.toLowerCase().includes(needle))) : base;
   if (!list.length) {
     el.replaceChildren(h('div', { class: 'empty-main' }, ic(needle ? 'search' : 'message', 36),
       h('p', {}, needle ? 'រកមិនឃើញ chat ត្រូវនឹងការស្វែងរក' : 'មិនទាន់មាន chat ទេ។ ចុចប៊ូតុងខាងក្រោមដើម្បីចាប់ផ្ដើម')));
@@ -731,7 +799,7 @@ function buildChat() {
 
   input.addEventListener('input', () => { autosize(); refreshAct(); sendTyping(); });
   input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer:fine)').matches) { e.preventDefault(); submit(); }
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && prefs.enterSend && matchMedia('(pointer:fine)').matches) { e.preventDefault(); submit(); }
     if (e.key === 'Escape') { if (editing) cancelEdit(); else if (replyTo) setReply(null); }
   });
   const autosize = () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 130) + 'px'; };
@@ -822,12 +890,12 @@ function startChatPoll(chatId) {
       after = more ? d.messages[d.messages.length - 1].updatedAt : back5(d.serverTime);
       if (changed || sig !== JSON.stringify(reads)) drawMessages(stick ? 'bottom' : 'keep');
       if (incoming) {
-        markRead();
+        markRead(); notifyIncoming();
         if (!stick && ui) { newBelow += incoming; ui.jumpBadge.textContent = newBelow; ui.jumpBadge.hidden = false; }
       }
       if (++n % 5 === 0) { const c = await api(`/chats/${chatId}`); if (gen === chatGen) applyChat(c.chat); } else if (tsig !== typingIds.join()) updateHeader();
     } catch { /* retry */ }
-    if (gen === chatGen) chatTimer = setTimeout(tick, more ? 0 : document.hidden ? 8000 : 2000);
+    if (gen === chatGen) chatTimer = setTimeout(tick, more ? 0 : (document.hidden ? 8000 : 2000) * pm());
   };
   chatTimer = setTimeout(tick, 1500);
 }
@@ -917,10 +985,13 @@ function bubble(m, g) {
   const url = safeUrl(m.fileUrl);
   let metaPlaced = false;
   if ((m.type === 'IMAGE' || m.type === 'VIDEO') && url) {
-    const media = m.type === 'IMAGE'
+    const hiddenImg = m.type === 'IMAGE' && !prefs.autoImages && !shownImgs.has(m.id);
+    const media = hiddenImg
+      ? h('button', { class: 'imgph', onclick: (e) => { e.stopPropagation(); shownImgs.add(m.id); drawMessages('keep'); } }, ic('camera', 22), 'ចុចដើម្បីមើលរូប')
+      : m.type === 'IMAGE'
       ? h('img', { src: url, loading: 'lazy', alt: '', onload: () => { if (stick && ui) ui.box.scrollTop = ui.box.scrollHeight; } })
       : cachedNode(m.id + url, () => h('video', { src: url, controls: true, preload: 'metadata', playsinline: true }));
-    const wrapEl = h('div', { class: 'media', onclick: (e) => { if (m.type === 'IMAGE') { e.stopPropagation(); lightbox(url); } else e.stopPropagation(); } }, media, m.text ? null : metaEl(m, mine));
+    const wrapEl = h('div', { class: 'media', onclick: (e) => { if (hiddenImg) return; if (m.type === 'IMAGE') { e.stopPropagation(); lightbox(url); } else e.stopPropagation(); } }, media, m.text ? null : metaEl(m, mine));
     metaPlaced = !m.text; parts.push(wrapEl);
   } else if (m.type === 'VOICE' && url) parts.push(cachedNode(m.id + url, () => voiceEl(m, url)));
   else if (m.type === 'FILE' && url) parts.push(h('a', { class: 'file', href: url, target: '_blank', rel: 'noopener', onclick: (e) => e.stopPropagation() },
@@ -1212,19 +1283,56 @@ function blockedCard() {
   load();
   return h('div', { class: 'card' }, h('h4', {}, 'អ្នកដែលបាន block'), blocked);
 }
+function switchRow(icon, title, sub, key) {
+  return h('label', { class: 'row', style: 'cursor:pointer;margin:0' }, h('span', { style: 'color:var(--pri)' }, ic(icon, 22)),
+    h('div', { class: 'grow' }, h('b', {}, title), sub ? h('small', { style: 'white-space:normal' }, sub) : null),
+    h('input', { type: 'checkbox', class: 'sw', checked: !!prefs[key], onchange: (e) => setPref(key, e.target.checked) }));
+}
+function segPref(key, opts) {
+  const seg = h('div', { class: 'seg', style: 'margin:6px 10px 10px' });
+  const draw = () => seg.replaceChildren(...opts.map(([v, l]) => h('button', { class: prefs[key] === v ? 'on' : '', onclick: () => { setPref(key, v); draw(); } }, l)));
+  draw(); return seg;
+}
+const WALLS = [['default', 'var(--chat-bg)'], ['sky', 'linear-gradient(160deg,#cfe8ff,#8ec5fc)'], ['mint', 'linear-gradient(160deg,#d4fc79,#96e6a1)'],
+  ['rose', 'linear-gradient(160deg,#ffd1dc,#f8a5c2)'], ['sand', 'linear-gradient(160deg,#f6e7c8,#e0c28f)'], ['night', 'linear-gradient(160deg,#1b2a49,#0b1220)']];
+const note = (t) => h('p', { class: 'note' }, t);
 function settingsNode() {
-  if (settingsPage === 'appearance') {
+  if (settingsPage === 'chat') {
     const seg = h('div', { class: 'seg', style: 'margin:6px 10px 10px' });
     const draw = () => { const t = store.get('theme') || 'auto'; seg.replaceChildren(...Object.entries(THEME_LABEL).map(([k, l]) =>
       h('button', { class: t === k ? 'on' : '', onclick: () => { store.set('theme', k); applyTheme(); draw(); } }, l))); };
     draw();
-    return subPage('ការកំណត់ chat', h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), seg));
+    const sw = h('div', { class: 'swatches' });
+    const drawSw = () => sw.replaceChildren(...WALLS.map(([k, bg]) => h('button', { class: 'swatch' + (prefs.wall === k ? ' on' : ''), 'aria-label': k, style: `background:${bg}`, onclick: () => { setPref('wall', k); drawSw(); } })));
+    drawSw();
+    return subPage('ការកំណត់ chat',
+      h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), seg),
+      h('div', { class: 'card' }, h('h4', {}, 'ផ្ទាំងខាងក្រោយ chat'), sw),
+      h('div', { class: 'card' }, h('h4', {}, 'ទំហំអក្សរ'), segPref('fontSize', [['s', 'តូច'], ['m', 'ធម្មតា'], ['l', 'ធំ']])),
+      h('div', { class: 'card' }, switchRow('send', 'Enter ដើម្បីផ្ញើ', 'លើកុំព្យូទ័រ៖ Enter ផ្ញើ · Shift+Enter ចុះបន្ទាត់', 'enterSend')));
   }
   if (settingsPage === 'privacy') {
-    return subPage('ឯកជនភាព និងសុវត្ថិភាព',
-      privacyCard(),
-      h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់')),
-      blockedCard());
+    return subPage('ឯកជនភាព និងសុវត្ថិភាព', privacyCard(),
+      h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់')), blockedCard());
+  }
+  if (settingsPage === 'notif') {
+    return subPage('ការជូនដំណឹង',
+      h('div', { class: 'card' }, switchRow('bell', 'សំឡេងសារថ្មី', null, 'sound'), switchRow('devices', 'ញ័រ', null, 'vibrate'),
+        h('button', { class: 'sheet-i', onclick: () => { beep(); navigator.vibrate?.(40); } }, ic('play', 20), 'សាកល្បងសំឡេង')),
+      note('ការជូនដំណឹងដំណើរការពេលបើក app ប៉ុណ្ណោះ។ មិនទាន់មាន push ពេល app ត្រូវបានបិទ។'));
+  }
+  if (settingsPage === 'data') {
+    return subPage('ទិន្នន័យ និងទំហំផ្ទុក',
+      h('div', { class: 'card' }, switchRow('camera', 'ផ្ទុករូបដោយស្វ័យប្រវត្តិ', 'បិទដើម្បីសន្សំទិន្នន័យ៖ ចុចលើរូបទើបផ្ទុក', 'autoImages')),
+      h('div', { class: 'card' }, h('button', { class: 'sheet-i danger', onclick: safe(async () => {
+        if (!(await confirmDialog({ title: 'កំណត់ការកំណត់ឡើងវិញ?', text: 'ការកំណត់ទាំងអស់ក្នុងឧបករណ៍នេះនឹងត្រឡប់ទៅលំនាំដើម។ សារមិនត្រូវលុបទេ។', ok: 'កំណត់ឡើងវិញ', danger: true }))) return;
+        prefs = { ...PREF_DEFAULTS }; store.set('prefs', JSON.stringify(prefs)); store.del('theme'); applyTheme(); applyPrefs(); renderSide(); toast('រួចរាល់');
+      }) }, ic('trash'), 'កំណត់ការកំណត់ឡើងវិញ')));
+  }
+  if (settingsPage === 'folders') {
+    return subPage('តម្រង chat',
+      h('div', { class: 'card' }, switchRow('folder', 'បង្ហាញតម្រង chat', 'ទាំងអស់ · ឯកជន · ក្រុម · មិនទាន់អាន', 'folders')),
+      note('តម្រងបង្ហាញខាងលើបញ្ជីសារ ដើម្បីជ្រើសបង្ហាញតែប្រភេទ chat ដែលអ្នកចង់បាន។'));
   }
   if (settingsPage === 'devices') {
     return subPage('ឧបករណ៍',
@@ -1232,18 +1340,34 @@ function settingsNode() {
         if (!(await confirmDialog({ title: 'ចាកចេញពីឧបករណ៍ទាំងអស់?', text: 'ឧបករណ៍ផ្សេងទៀតនឹងត្រូវចូលម្ដងទៀត។', ok: 'ចាកចេញ' }))) return;
         saveAuth(await api('/auth/logout-all', { method: 'POST', body: {} })); toast('រួចរាល់');
       }) }, ic('devices'), 'ចាកចេញពីឧបករណ៍ទាំងអស់')),
-      h('p', { class: 'note' }, 'ឧបករណ៍នេះនៅតែចូលបាន ប៉ុន្តែឧបករណ៍ផ្សេងទៀតទាំងអស់នឹងត្រូវចូលគណនីម្ដងទៀត។'));
+      note('ឧបករណ៍នេះនៅតែចូលបាន ប៉ុន្តែឧបករណ៍ផ្សេងទៀតទាំងអស់នឹងត្រូវចូលគណនីម្ដងទៀត។'));
+  }
+  if (settingsPage === 'power') {
+    return subPage('សន្សំថ្ម',
+      h('div', { class: 'card' }, h('h4', {}, 'មុខងារសន្សំថ្ម'), segPref('power', [['off', 'បិទ'], ['on', 'បើក'], ['auto', 'ស្វ័យប្រវត្តិ']])),
+      note('កាត់បន្ថយ animation ហើយពិនិត្យសារថ្មីឱ្យយឺតជាងមុន 3 ដង។ ស្វ័យប្រវត្តិ៖ បើកពេលថ្មនៅសល់ក្រោម 20% ហើយមិនកំពុងសាក (ប្រសិនបើឧបករណ៍គាំទ្រ)។'));
+  }
+  if (settingsPage === 'lang') {
+    return subPage('ភាសា',
+      h('div', { class: 'card' }, h('div', { class: 'row', style: 'margin:0;cursor:default' }, h('div', { class: 'grow' }, h('b', {}, 'ខ្មែរ'), h('small', {}, 'Khmer')), h('span', { class: 'tick' }, ic('check', 22)))),
+      note('ភាសាផ្សេងទៀតនឹងមានពេលក្រោយ។'));
   }
   const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => { const f = e.target.files[0]; e.target.value = ''; await changeAvatar(f, renderSide); }) });
+  const C = (a, b) => [a, b];
   return h('div', { class: 'pad' },
     h('div', { class: 'sethead' }, h('div', { class: 'avedit', onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 84), h('span', { class: 'cam' }, ic('camera', 16))), fileIn,
       h('h3', {}, me.displayName), h('small', {}, '@' + me.username)),
     h('div', { class: 'card' },
-      menuItem(['#4db6ff', '#1a7fe6'], 'contacts', 'គណនី', 'ឈ្មោះ, Username, Bio', () => editInfo(renderSide)),
-      menuItem(['#ffb74d', '#f57c00'], 'message', 'ការកំណត់ chat', 'រូបរាង · ' + THEME_LABEL[store.get('theme') || 'auto'], () => goSettings('appearance')),
-      menuItem(['#66d97a', '#2bab45'], 'key', 'ឯកជនភាព និងសុវត្ថិភាព', 'ការពារ chat, ពាក្យសម្ងាត់, Block', () => goSettings('privacy')),
-      menuItem(['#4dd0e1', '#0097a7'], 'devices', 'ឧបករណ៍', 'គ្រប់គ្រងឧបករណ៍ដែលបានចូល', () => goSettings('devices')),
-      me.role === 'ADMIN' ? menuItem(['#b983f5', '#7c3fe0'], 'shield', 'Admin Dashboard', 'គ្រប់គ្រងអ្នកប្រើ', '/admin/', 'a') : null),
+      menuItem(C('#4db6ff', '#1a7fe6'), 'contacts', 'គណនី', 'ឈ្មោះ, Username, Bio', () => editInfo(renderSide)),
+      menuItem(C('#ffb74d', '#f57c00'), 'message', 'ការកំណត់ chat', 'រូបរាង, ផ្ទាំងខាងក្រោយ, ទំហំអក្សរ', () => goSettings('chat')),
+      menuItem(C('#66d97a', '#2bab45'), 'key', 'ឯកជនភាព និងសុវត្ថិភាព', 'ឯកជន/សាធារណៈ, ពាក្យសម្ងាត់, Block', () => goSettings('privacy')),
+      menuItem(C('#ff7a85', '#e5384a'), 'bell', 'ការជូនដំណឹង', 'សំឡេង, ញ័រ', () => goSettings('notif')),
+      menuItem(C('#6d8dff', '#3b5bdb'), 'pie', 'ទិន្នន័យ និងទំហំផ្ទុក', 'ការផ្ទុករូបភាព', () => goSettings('data')),
+      menuItem(C('#4aa8ff', '#1c7ed6'), 'folder', 'តម្រង chat', 'ទាំងអស់, ឯកជន, ក្រុម, មិនទាន់អាន', () => goSettings('folders')),
+      menuItem(C('#4dd0e1', '#0097a7'), 'devices', 'ឧបករណ៍', 'គ្រប់គ្រងឧបករណ៍ដែលបានចូល', () => goSettings('devices')),
+      menuItem(C('#ffa94d', '#e8590c'), 'battery', 'សន្សំថ្ម', 'កាត់បន្ថយការប្រើថ្មពេលថ្មទាប', () => goSettings('power')),
+      menuItem(C('#b983f5', '#7c3fe0'), 'globe', 'ភាសា', 'ខ្មែរ', () => goSettings('lang')),
+      me.role === 'ADMIN' ? menuItem(C('#8d6cf0', '#5f3dc4'), 'shield', 'Admin Dashboard', 'គ្រប់គ្រងអ្នកប្រើ', '/admin/', 'a') : null),
     h('div', { class: 'card' }, h('button', { class: 'sheet-i danger', onclick: logout }, ic('logout'), 'ចាកចេញ')),
     h('div', { style: 'height:12px' }));
 }
