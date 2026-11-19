@@ -542,6 +542,7 @@ function applyTheme() {
   // iOS style has a white / near-black header, so the browser bar must match it (not the Telegram blue)
   const ios = document.documentElement.hasAttribute('data-ios');
   if (m) m.content = dark ? (ios ? '#1c1c1e' : '#17212b') : (ios ? '#ffffff' : '#3390ec');
+  try { if (window.LayzzAndroid && window.LayzzAndroid.setBars) window.LayzzAndroid.setBars(m ? m.content : '#17212b'); } catch { /* not in the app */ }
 }
 applyTheme();
 matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);

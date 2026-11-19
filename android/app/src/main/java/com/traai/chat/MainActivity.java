@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -53,6 +55,23 @@ public class MainActivity extends Activity {
                 runOnUiThread(() -> {
                     if (on) getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
                     else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE);
+                });
+            }
+            // The page passes its header colour (#rrggbb) so the system bars match the theme / iOS style
+            @JavascriptInterface
+            public void setBars(final String hex) {
+                runOnUiThread(() -> {
+                    try {
+                        int c = Color.parseColor(hex);
+                        getWindow().setStatusBarColor(c);
+                        getWindow().setNavigationBarColor(c);
+                        // dark icons on light bars, light icons on dark bars
+                        boolean light = (0.299 * Color.red(c) + 0.587 * Color.green(c) + 0.114 * Color.blue(c)) > 160;
+                        View d = getWindow().getDecorView();
+                        int f = d.getSystemUiVisibility();
+                        int mask = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | (android.os.Build.VERSION.SDK_INT >= 26 ? View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR : 0);
+                        d.setSystemUiVisibility(light ? (f | mask) : (f & ~mask));
+                    } catch (Exception ignored) { }
                 });
             }
         }, "LayzzAndroid");
