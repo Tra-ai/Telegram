@@ -282,6 +282,24 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 .pw button{position:absolute;right:2px;top:5px;height:46px;width:44px;background:transparent;color:var(--mut);padding:0;display:flex;align-items:center;justify-content:center}
 .err{color:var(--danger);min-height:1.5em;font-size:14px;margin:4px 2px 0}
 
+/* login: clean, roomy, pill-shaped */
+.authwrap{position:relative;background:radial-gradient(120% 60% at 50% 0%,var(--pri-soft),transparent 70%),var(--bg)}
+.authwrap::before,.authwrap::after{content:"";position:fixed;border-radius:50%;border:1.5px solid var(--pri-soft);pointer-events:none}
+.authwrap::before{width:520px;height:520px;left:50%;top:-250px;transform:translateX(-50%)}
+.authwrap::after{width:760px;height:760px;left:50%;top:-370px;transform:translateX(-50%)}
+.auth{position:relative;max-width:420px;padding:max(36px,env(safe-area-inset-top)) 24px 32px}
+.auth h1{font-size:30px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+.auth .sub{margin-bottom:28px;font-size:15px}
+.auth .seg{border-radius:999px;padding:5px;margin-bottom:22px;background:var(--field)}
+.auth .seg button{border-radius:999px;padding:12px 6px;font-size:16px}
+.auth .fl{display:block;font-size:12px;font-weight:700;letter-spacing:.9px;text-transform:uppercase;color:var(--mut);margin:14px 4px 7px}
+.auth input{height:54px;border-radius:999px;padding:0 22px;font-size:16px;background:var(--field);border:1.5px solid transparent;transition:border-color .15s,background .15s}
+.auth input:focus{border-color:var(--pri);background:var(--surface);outline:none}
+.auth .pw input{padding-right:54px}
+.auth .pw button{right:6px;top:4px}
+.auth .primary{height:56px;border-radius:999px;font-size:17px;font-weight:700;margin-top:18px;width:100%;box-shadow:0 8px 22px var(--pri-soft)}
+.auth .err{text-align:center;margin-top:10px}
+
 /* ---- profile / forms ---- */
 .pad{padding:14px;overflow-y:auto;flex:1;width:100%;max-width:640px;margin:0 auto}
 .card{background:var(--surface);border-radius:16px;padding:6px;margin:12px 0;box-shadow:var(--shadow)}
@@ -576,13 +594,14 @@ function authView() {
   view = 'auth';
   let mode = 'login', showPw = false;
   const root = h('div', { class: 'auth' });
-  const u = h('input', { placeholder: 'ឈ្មោះអ្នកប្រើ (a-z 0-9 _)', autocomplete: 'username', autocapitalize: 'none', autocorrect: 'off', spellcheck: 'false' });
-  const d = h('input', { placeholder: 'ឈ្មោះបង្ហាញ', autocomplete: 'name' });
-  const p = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ (8+ តួ)' });
+  const u = h('input', { placeholder: 'a-z 0-9 _', autocomplete: 'username', autocapitalize: 'none', autocorrect: 'off', spellcheck: 'false' });
+  const d = h('input', { placeholder: 'ឈ្មោះរបស់អ្នក', autocomplete: 'name' });
+  const p = h('input', { type: 'password', placeholder: '••••••••' });
   const err = h('div', { class: 'err', role: 'alert' });
   const eye = h('button', { type: 'button', 'aria-label': 'បង្ហាញពាក្យសម្ងាត់', onclick: () => { showPw = !showPw; p.type = showPw ? 'text' : 'password'; eye.replaceChildren(ic(showPw ? 'eyeoff' : 'eye', 20)); } }, ic('eye', 20));
   const go = h('button', { class: 'primary', onclick: submit });
   const tabs = h('div', { class: 'seg' });
+  const lu = h('label', { class: 'fl' }, 'ឈ្មោះអ្នកប្រើ'), ld = h('label', { class: 'fl' }, 'ឈ្មោះបង្ហាញ'), lp = h('label', { class: 'fl' }, 'ពាក្យសម្ងាត់');
   async function submit() {
     err.textContent = ''; go.disabled = true; const label = go.textContent; go.textContent = '…';
     try {
@@ -593,7 +612,7 @@ function authView() {
   }
   function draw() {
     p.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
-    d.hidden = mode === 'login';
+    d.hidden = ld.hidden = mode === 'login';
     go.textContent = mode === 'login' ? 'ចូល' : 'បង្កើតគណនី';
     tabs.replaceChildren(
       h('button', { class: mode === 'login' ? 'on' : '', onclick: () => { mode = 'login'; err.textContent = ''; draw(); } }, 'ចូល'),
@@ -602,7 +621,7 @@ function authView() {
   [u, d, p].forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
   draw();
   root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Layzzchat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
-    tabs, u, d, h('div', { class: 'pw' }, p, eye), err, go);
+    tabs, lu, u, ld, d, lp, h('div', { class: 'pw' }, p, eye), err, go);
   return h('div', { class: 'authwrap' }, root);
 }
 
