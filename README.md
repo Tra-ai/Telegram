@@ -38,7 +38,7 @@ Schema ប្ដូរ (Block table, `tokenVersion`, `editedAt`) → រត់�
 - Frontend: copy `client/api.ts` → `src/api.ts`, ប្រើ `watchChats` / `watchChat`
 
 ## 📱 Android app (screenshot = ខ្មៅ)
-GitHub → Actions → **Build Android APK** → Run workflow → ដាក់ URL គេហទំព័រ → រង់ចាំ ~5 នាទី → ទាញ artifact `SecureChat-apk` → install។
+GitHub → Actions → **Build Android APK** → Run workflow → ដាក់ URL គេហទំព័រ → រង់ចាំ ~5 នាទី → ទាញ artifact `Layzzchat-apk` → install។
 App ប្រើ `FLAG_SECURE` ដូច្នេះ screenshot / screen record / recent-apps thumbnail ចេញខ្មៅ។
 
 ## Bots (Bot API)
