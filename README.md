@@ -40,3 +40,20 @@ Schema ប្ដូរ (Block table, `tokenVersion`, `editedAt`) → រត់�
 ## 📱 Android app (screenshot = ខ្មៅ)
 GitHub → Actions → **Build Android APK** → Run workflow → ដាក់ URL គេហទំព័រ → រង់ចាំ ~5 នាទី → ទាញ artifact `SecureChat-apk` → install។
 App ប្រើ `FLAG_SECURE` ដូច្នេះ screenshot / screen record / recent-apps thumbnail ចេញខ្មៅ។
+
+## Bots (Bot API)
+
+Create bots in the app: **Settings → Bots → Create**. Username must end with `bot`. You get a token shown once (`<botId>:<secret>`; only a hash is stored). Regular signups can't use usernames ending in `bot`.
+
+`GET|POST /api/bot/<TOKEN>/<method>` — params as JSON body or query string. Responses: `{ ok, result }` or `{ ok:false, error_code, description }`.
+
+| Method | Params |
+|---|---|
+| `getMe` | – |
+| `getUpdates` | `offset`, `limit` (≤100), `timeout` (≤8s long-poll). Updates below `offset` are deleted (ack); kept max 24h |
+| `sendMessage` | `chat_id`, `text`, `reply_to_message_id` |
+| `editMessageText` / `deleteMessage` | `chat_id`, `message_id` (own messages only) |
+| `sendChatAction` | `chat_id` (shows "typing") |
+| `setMyCommands` / `getMyCommands` | `commands: [{command, description}]` — shown as chips in the bot's chat |
+
+A bot receives every message in chats it is a member of (private chats with users, or groups it was added to). No webhooks yet — use `getUpdates`. Rate limit: 100 requests / 10 s per bot. Deploy runs `prisma db push`, which adds the `Bot` and `BotUpdate` tables (nothing existing is changed).

@@ -14,6 +14,7 @@ router.post('/register', registerLimiter, async (req, res) => {
   const password = String(req.body?.password || '');
   const displayName = String(req.body?.displayName || username).trim().slice(0, 50);
   if (!/^[a-z0-9_]{3,32}$/.test(username)) return res.status(400).json({ error: 'Username: 3-32 chars, a-z 0-9 _' });
+  if (/bot$/.test(username)) return res.status(400).json({ error: 'Usernames ending in "bot" are reserved for bots' });
   if (password.length < 8 || password.length > 100) return res.status(400).json({ error: 'Password must be 8-100 characters' });
   if (await prisma.user.findUnique({ where: { username } })) return res.status(409).json({ error: 'Username already taken' });
   try {

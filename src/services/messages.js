@@ -1,5 +1,6 @@
 import { prisma } from '../db.js';
 import { isBlobUrl } from '../storage.js';
+import { queueBotUpdates } from './bots.js';
 
 export const userSelect = { id: true, username: true, displayName: true, avatarUrl: true };
 export const messageInclude = {
@@ -55,6 +56,8 @@ export async function createMessage(userId, data) {
     where: { chatId_userId: { chatId, userId } },
     data: { lastReadAt: msg.createdAt, typingAt: null },
   });
+  // Bots in this chat get the message in their getUpdates queue (never allowed to break sending)
+  await queueBotUpdates(prisma, msg).catch((e) => console.error('queueBotUpdates', e));
   return msg;
 }
 

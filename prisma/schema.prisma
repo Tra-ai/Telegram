@@ -44,6 +44,9 @@ model User {
   messages    Message[]
   blocking    Block[]   @relation("Blocker")
   blockedBy   Block[]   @relation("Blocked")
+  // Bots: a bot is a normal User row (username ends with "bot") + a Bot row. These two are relation-only (no new User columns).
+  botProfile  Bot?      @relation("BotUser")
+  ownedBots   Bot[]     @relation("BotOwner")
 }
 
 model Block {
@@ -113,4 +116,34 @@ model Message {
   @@index([chatId, createdAt])
   @@index([chatId, updatedAt])
   @@index([senderId])
+}
+
+// ---- Bots ----
+model Bot {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  ownerId     String
+  // sha256 of the secret half of the token. The token itself is shown once and never stored.
+  tokenHash   String   @unique
+  description String   @default("")
+  commands    Json?
+  createdAt   DateTime @default(now())
+
+  user    User        @relation("BotUser", fields: [userId], references: [id], onDelete: Cascade)
+  owner   User        @relation("BotOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  updates BotUpdate[]
+
+  @@index([ownerId])
+}
+
+// Queue of new messages for a bot (Telegram-style getUpdates). update_id = id.
+model BotUpdate {
+  id        Int      @id @default(autoincrement())
+  botId     String
+  messageId String
+  createdAt DateTime @default(now())
+
+  bot Bot @relation(fields: [botId], references: [id], onDelete: Cascade)
+
+  @@index([botId, id])
 }
