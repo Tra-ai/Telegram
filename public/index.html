@@ -8,7 +8,7 @@
 <title>Layzzchat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#fff;--surface:#fff;--field:#f1f3f5;--fg:#0f1419;--mut:#707579;--line:#e7e8ea;
@@ -461,6 +461,45 @@ html[data-ios] .auth .seg button{border-radius:8px;padding:8px 6px;font-size:15p
 html[data-ios] .auth input{border-radius:12px}
 html[data-ios] .logo{border-radius:22%;box-shadow:0 8px 24px rgba(0,122,255,.3)}
 html[data-ios] .authwrap::before,html[data-ios] .authwrap::after{display:none}
+
+/* ===== Chat-list polish (soft filters, raised search, clearer hierarchy, floating FAB, stronger tab bar) ===== */
+html:root{--pri-ink:#1a5fb4;--ink1:#1a5fb4;--ink2:#17803f;--ink3:#a35f00;--ink4:#6b3fb8;--search-bg:#fff;--search-ic:#9aa3ad;--avatar-ring:rgba(16,24,40,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}}
+:root[data-theme="dark"]{--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}
+/* search bar: white, soft drop shadow, bigger muted icon */
+html:root .searchrow input{background:var(--search-bg);border:1px solid var(--line);box-shadow:0 2px 8px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.06)}
+html:root .searchrow input:focus{border-color:var(--pri)}
+html:root .searchrow > .ic{color:var(--search-ic)}
+html:root .searchrow > .ic svg{width:24px;height:24px}
+html[data-ios] .searchrow input{height:40px;padding-left:44px}
+/* filter chips: pills, a different light tint each; active = soft tint + dark ink */
+html:root .folders{gap:8px;padding-top:4px}
+html:root .fchip{background:color-mix(in srgb,var(--ci,var(--ink1)) 9%,transparent);color:color-mix(in srgb,var(--ci,var(--ink1)) 70%,var(--mut));border:1px solid transparent;font-weight:500}
+html:root .fchip:nth-child(1){--ci:var(--ink1)}
+html:root .fchip:nth-child(2){--ci:var(--ink2)}
+html:root .fchip:nth-child(3){--ci:var(--ink3)}
+html:root .fchip:nth-child(4){--ci:var(--ink4)}
+html:root .fchip.on{background:color-mix(in srgb,var(--ci,var(--ink1)) 20%,transparent);color:var(--pri-ink);border-color:color-mix(in srgb,var(--ci,var(--ink1)) 35%,transparent);font-weight:700}
+html:root .fchip:nth-child(n+2).on{color:color-mix(in srgb,var(--ci) 85%,#000)}
+/* chat rows: more breathing room, avatar ring + soft shadow, name bold / preview light */
+html:root .row{padding:12px 14px}
+html[data-ios] .row{padding:12px 16px}
+html[data-ios] .row::after{left:84px}
+html:root .row .av{box-shadow:0 0 0 1px var(--avatar-ring),0 2px 6px rgba(16,24,40,.14)}
+html:root .row .line1 b{font-weight:700;font-size:16.5px}
+html:root .row .line2 small{font-weight:400;font-size:13.5px;color:var(--mut);opacity:.95}
+html:root .row.active .line2 small,html:root .row.active .when{color:rgba(255,255,255,.88)}
+html:root .when{gap:4px;font-size:12px}
+html:root .when .tick{display:inline-flex;margin-right:0}
+/* floating action button */
+html:root .fab,html[data-ios] .fab{box-shadow:0 10px 22px rgba(51,144,236,.42),0 3px 8px rgba(16,24,40,.2)}
+/* bottom bar: bigger icons, inactive grey, active blue, hairline above */
+html:root .tab{color:var(--mut)}
+html:root .tab.on{color:var(--pri)}
+html:root .tabic svg{width:26px;height:26px}
+html:root .tabic{height:28px}
+html[data-ios] .nav{box-shadow:0 -1px 0 var(--line)}
+html:root:not([data-ios]) .nav{border-top:1px solid var(--line)}
 </style>
 </head>
 <body>
