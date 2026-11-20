@@ -64,3 +64,7 @@ A bot receives every message in chats it is a member of (private chats with user
 - ទូរស័ព្ទជាអ្នកជ្រើសរើសថាប្រើមុខ ឬម្រាមដៃ (app មិនអាចបង្ខំឱ្យប្រើតែមុខបានទេ)។
 - បើបាត់ឧបករណ៍ទាំងអស់៖ ដាក់ env `ADMIN_PASSKEY_BYPASS=1` ក្នុង Vercel ហើយ redeploy ដើម្បីបិទការពារបណ្តោះអាសន្ន រួចលុបឧបករណ៍ចាស់ ហើយបិទ env វិញ។
 - ជម្រើស env៖ `WEBAUTHN_RP_ID` (ឧ. `yourapp.vercel.app`) និង `WEBAUTHN_ORIGIN` (ឧ. `https://yourapp.vercel.app`) ប្រសិនបើ domain មិនត្រូវស្គាល់ដោយស្វ័យប្រវត្តិ។
+
+
+## Backbook (កម្មវិធី Facebook ភ្ជាប់ជាមួយ Layzzchat)
+ថត `backbook/` ជា frontend ស្ទីល Facebook ។ backend របស់វានៅក្នុង server នេះ (`src/routes/bb.js`, ផ្លូវ `/api/v1`) ប្រើ database និងគណនីតែមួយជាមួយ Layzzchat ។ ការណែនាំ deploy មើល `backbook/README.md` ។ ត្រូវដាក់ env `CLIENT_ORIGIN` = URL របស់ Backbook ។
