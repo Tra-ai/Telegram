@@ -146,7 +146,6 @@ const ICON = {
   home: '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
   users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
   userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
-  bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.5" r="1"/><path d="M9 13.5h.01M15 13.5h.01M9.5 17h5"/>',
   msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>',
   group: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/><circle cx="5" cy="9" r="2.3"/><circle cx="19" cy="9" r="2.3"/>',
   image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
@@ -219,7 +218,7 @@ $('#lform').onsubmit = async (e) => {
 $('#out').onclick = logout;
 
 /* ---------- tabs ---------- */
-const TABS = [['overview', 'home', 'ទិដ្ឋភាពទូទៅ'], ['users', 'users', 'អ្នកប្រើ'], ['chats', 'group', 'Chat'], ['messages', 'msg', 'សារ'], ['bots', 'bot', 'Bots']];
+const TABS = [['overview', 'home', 'ទិដ្ឋភាពទូទៅ'], ['users', 'users', 'អ្នកប្រើ'], ['chats', 'group', 'Chat'], ['messages', 'msg', 'សារ']];
 function drawTabs() {
   $('#tabs').replaceChildren(...TABS.map(([id, icon, label]) => el('button', { class: id === tab ? 'on' : '', onclick: () => { tab = id; page = 1; query = ''; drawTabs(); load(); } }, ic(icon), label)));
 }
@@ -283,14 +282,6 @@ async function load() {
         el('div', { class: 'main' }, el('b', {}, m.sender.displayName, el('span', { class: 'tag gray' }, m.type)), el('small', {}, new Date(m.createdAt).toLocaleString('en-GB'))),
         act('trash', 'លុប', async () => { if (await confirmBox('លុបសារនេះ?', 'សារនឹងបាត់ពី chat របស់អ្នកទាំងពីរ។', 'លុប', true)) { await api('/messages/' + m.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger'),
         el('div', { class: 'msgtxt' }, m.text || m.fileName || `[${m.type}]`)))) : empty('រកមិនឃើញសារ'));
-    } else {
-      const { bots } = await api('/bots');
-      if (my !== gen) return;
-      view().replaceChildren(bots.length ? el('div', { class: 'list' }, bots.map((b) => el('div', { class: 'item' },
-        avatar(b.avatarUrl, b.displayName, b.online),
-        el('div', { class: 'main' }, el('b', {}, b.displayName, el('span', { class: 'tag' }, 'BOT')), el('small', {}, `@${b.username} · ម្ចាស់៖ @${b.owner.username}`)),
-        el('span', { class: 'meta' }, fmtDate(b.createdAt)),
-        act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${b.username}?`, 'Bot និងសារទាំងអស់របស់វានឹងបាត់។', 'លុប', true)) { await api('/users/' + b.userId, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')))) : empty('មិនទាន់មាន Bot'));
     }
   } catch (e) { if (e.message !== 'auth' && e.message !== 'gate' && my === gen) view().replaceChildren(empty('ផ្ទុកមិនបាន — សូមព្យាយាមម្ដងទៀត')); }
 }

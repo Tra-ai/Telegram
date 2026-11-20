@@ -1,4 +1,4 @@
-# Telegram Clone Server — Vercel + Neon
+# Layzzchat Clean Edition — Vercel + Neon
 
 Express 5 · Prisma · Neon Postgres · Vercel Blob (files) · JWT. Realtime = polling (Vercel មិនគាំទ្រ WebSocket)។
 
@@ -10,7 +10,7 @@ Express 5 · Prisma · Neon Postgres · Vercel Blob (files) · JWT. Realtime = p
    ```bash
    npm install
    cp .env.example .env      # បំពេញ DATABASE_URL, DIRECT_URL, JWT_SECRET, ADMIN_PASSWORD
-   npm run db:push
+   npm run db:sync
    npm run seed:admin
    ```
 3. **GitHub** → push → **Vercel** → Import project
@@ -41,22 +41,10 @@ Schema ប្ដូរ (Block table, `tokenVersion`, `editedAt`) → រត់�
 GitHub → Actions → **Build Android APK** → Run workflow → ដាក់ URL គេហទំព័រ → រង់ចាំ ~5 នាទី → ទាញ artifact `Layzzchat-apk` → install។
 Screenshot / screen record ថតបានធម្មតា (បានបិទ `FLAG_SECURE`)។
 
-## Bots (Bot API)
-
-Create bots in the app: **Settings → Bots → Create**. Username must end with `bot`. You get a token shown once (`<botId>:<secret>`; only a hash is stored). Regular signups can't use usernames ending in `bot`.
-
-`GET|POST /api/bot/<TOKEN>/<method>` — params as JSON body or query string. Responses: `{ ok, result }` or `{ ok:false, error_code, description }`.
-
-| Method | Params |
-|---|---|
-| `getMe` | – |
-| `getUpdates` | `offset`, `limit` (≤100), `timeout` (≤8s long-poll). Updates below `offset` are deleted (ack); kept max 24h |
-| `sendMessage` | `chat_id`, `text`, `reply_to_message_id` |
-| `editMessageText` / `deleteMessage` | `chat_id`, `message_id` (own messages only) |
-| `sendChatAction` | `chat_id` (shows "typing") |
-| `setMyCommands` / `getMyCommands` | `commands: [{command, description}]` — shown as chips in the bot's chat |
-
-A bot receives every message in chats it is a member of (private chats with users, or groups it was added to). No webhooks yet — use `getUpdates`. Rate limit: 100 requests / 10 s per bot. Deploy runs `prisma db push`, which adds the `Bot` and `BotUpdate` tables (nothing existing is changed).
+## Clean Edition
+- UI/API មិនបង្ហាញ Posts និង Bots ទៀតទេ។ តារាងចាស់ក្នុង Database ត្រូវបានរក្សាទុក មិនមានការលុបទិន្នន័យចាស់ដោយស្វ័យប្រវត្តិ។
+- Vercel Build ដំណើរការ `prisma generate` ប៉ុណ្ណោះ។ ការធ្វើ Schema Sync ត្រូវធ្វើដោយដៃក្រោយ Backup។
+- Upload ផ្ទៀងផ្ទាត់ File Signature ជាមួយ Extension មុនរក្សាទុក។
 
 ## 🔐 ស្កេនមុខ / ម្រាមដៃ ដើម្បីចូល /admin/ (Passkey)
 - ចូល /admin/ → ទិដ្ឋភាពទូទាំង → ផ្នែក **សុវត្ថិភាព Admin** → **បើកការស្កេនលើឧបករណ៍នេះ**។ ពេលក្រោយ ត្រូវស្កេន (មុខ/ម្រាមដៃ/PIN របស់ទូរស័ព្ទ) រាល់ពេលចូល (ដំណើរការ ៨ ម៉ោង)។ ការពិនិត្យធ្វើនៅ server ទាំងអស់។

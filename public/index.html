@@ -115,12 +115,6 @@ hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 .mi .ic.chev{color:var(--mut);opacity:.6}
 .subhead{display:flex;align-items:center;gap:6px;padding:4px 0 6px}
 .subhead b{font-size:19px}
-.tagbot{display:inline-block;background:var(--pri-soft);color:var(--pri);border-radius:6px;font-size:11px;font-weight:600;padding:1px 6px;margin-left:6px;vertical-align:middle}
-.cmds{display:flex;gap:8px;overflow-x:auto;padding:6px max(10px,calc((100% - 780px)/2)) 0;flex:none}
-.cmds button{flex:none;background:var(--pri-soft);color:var(--pri);border-radius:999px;padding:6px 12px;font-size:14px}
-.startbtn{margin:8px max(10px,calc((100% - 780px)/2)) 0;background:var(--pri);color:#fff;border-radius:12px;padding:13px;font-weight:600;font-size:15px;letter-spacing:.5px;flex:none}
-.tokenbox{word-break:break-all;user-select:all;background:var(--hover);border-radius:10px;padding:10px 12px;font-family:monospace;font-size:13px;margin:8px 0}
-.code{white-space:pre-wrap;word-break:break-all;background:var(--hover);border-radius:10px;padding:10px 12px;font-family:monospace;font-size:12.5px;margin:6px 0}
 .note{margin:4px 14px 10px;font-size:13.5px;color:var(--mut)}
 
 
@@ -437,8 +431,6 @@ html[data-ios] .cwrap textarea{min-height:36px;padding:8px 4px}
 html[data-ios] .cwrap button.icon{height:36px;width:36px;color:var(--mut)}
 html[data-ios] .act{width:34px;height:34px;margin-bottom:1px;box-shadow:none}
 html[data-ios] .recbar{box-shadow:none;border:.5px solid var(--line);border-radius:19px}
-html[data-ios] .startbtn{border-radius:14px}
-html[data-ios] .cmds button{background:var(--field);color:var(--pri)}
 /* sheets & dialogs */
 html[data-ios] .overlay{background:rgba(0,0,0,.4)}
 html[data-ios] .panel{border-radius:14px 14px 0 0;animation:up .38s var(--ease);background:var(--surface)}
@@ -498,19 +490,7 @@ html:root .tabic{height:28px}
 html[data-ios] .nav{box-shadow:0 -1px 0 var(--line)}
 html:root:not([data-ios]) .nav{border-top:1px solid var(--line)}
 
-/* posts */
-.postbox{margin-top:12px}.pta{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;background:transparent;color:inherit;resize:vertical}
-.pbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
-.pimgb{display:inline-flex;gap:6px;align-items:center;border:0;background:transparent;color:var(--pri);font:inherit;cursor:pointer}
-.pgo{border:0;background:var(--pri);color:#fff;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;cursor:pointer}.pgo:disabled{opacity:.5}
-.ppv{position:relative;margin-top:8px}.ppv img{max-width:100%;max-height:200px;border-radius:12px}
-.ppv .pdel{position:absolute;top:6px;right:6px;background:#0008;color:#fff;border-radius:50%;width:26px;height:26px}
-.pdel{border:0;background:transparent;cursor:pointer;font-size:15px}
-.plist .post{background:var(--surface);border-radius:16px;padding:12px 14px;margin-top:10px}
-.phead{display:flex;justify-content:space-between;align-items:center;color:var(--mut)}
-.ptext{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;font-size:16px}
-.pimg{max-width:100%;border-radius:12px;margin-top:8px;display:block;cursor:zoom-in}
-.userpf .panel{max-height:88vh;overflow-y:auto}.upf{padding:8px 4px 14px}
+
 </style>
 </head>
 <body>
@@ -581,7 +561,6 @@ const ICONS = {
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
   chev: '<path d="m9 18 6-6-6-6"/>',
   phone: '<rect x="6" y="2" width="12" height="20" rx="3"/><path d="M11 18h2"/>',
-  bot: '<rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 8V4"/><circle cx="12" cy="3.5" r="1"/><path d="M9 13.5h.01M15 13.5h.01M9.5 17h5"/>',
   bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   pie: '<path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/>',
   folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
@@ -1129,8 +1108,6 @@ function buildChat() {
     ibtn('trash', 'បោះបង់', () => stopRec(false), 'danger'));
   const act = h('button', { class: 'act', 'aria-label': 'Send', onclick: onAction }, ic('mic'));
   const composer = h('div', { class: 'composer' }, cwrap, recbar, act);
-  const cmds = h('div', { class: 'cmds', hidden: true });
-  const start = h('button', { class: 'startbtn', hidden: true }, 'START');
 
   input.addEventListener('input', () => { autosize(); refreshAct(); sendTyping(); });
   input.addEventListener('keydown', (e) => {
@@ -1139,9 +1116,9 @@ function buildChat() {
   });
   const autosize = () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 130) + 'px'; };
 
-  ui = { cmds, start, head, avSlot, titleEl, statusEl, box, jump, jumpBadge, ctx, blockBar, input, act, cwrap, recbar, recTime, composer, autosize };
+  ui = { head, avSlot, titleEl, statusEl, box, jump, jumpBadge, ctx, blockBar, input, act, cwrap, recbar, recTime, composer, autosize };
   loadingMsgs = true; stick = true; newBelow = 0;
-  setMain(h('div', { class: 'screen' + (secure ? ' secure' : '') }, head, wrap, ctx, blockBar, start, cmds, composer), 'chat');
+  setMain(h('div', { class: 'screen' + (secure ? ' secure' : '') }, head, wrap, ctx, blockBar, composer), 'chat');
   updateHeader(); refreshAct(); drawMessages('bottom');
 }
 function refreshAct() {
@@ -1161,7 +1138,6 @@ function statusInfo() {
   if (names.length) return { text: names.join(', ') + ' កំពុងវាយ', kind: 'typing typing-dots' };
   if (cur.type === 'GROUP') return { text: cur.members.length + ' សមាជិក', kind: '' };
   if (isSelf()) return { text: '', kind: '' };
-  if (cur.peer && cur.peer.id !== me.id && isBotName(cur.peer.username)) return { text: 'bot', kind: '' };
   if (cur.peer && cur.peer.online) return { text: 'កំពុងអនឡាញ', kind: 'online' };
   return { text: cur.peer ? 'ចុងក្រោយ ' + fmtFull(cur.peer.lastSeen) : '', kind: '' };
 }
@@ -1169,7 +1145,6 @@ function updateHeader() {
   if (!ui || !cur) return;
   const s = statusInfo();
   ui.titleEl.textContent = cur.title || '';
-  if (cur.type === 'PRIVATE' && cur.peer && cur.peer.id !== me.id && isBotName(cur.peer.username)) ui.titleEl.append(h('span', { class: 'tagbot' }, 'BOT'));
   ui.statusEl.textContent = s.text;
   ui.statusEl.className = 'status ' + s.kind;
   const online = cur.type === 'PRIVATE' && cur.peer && cur.peer.id !== me.id && cur.peer.online;
@@ -1192,7 +1167,7 @@ async function openChat(chat, push = true) {
     if (!cur || cur.id !== id) return;
     d.messages.forEach((m) => msgs.set(m.id, m));
     reads = d.reads; hasMore = d.hasMore; after = back5(d.serverTime); loadingMsgs = false;
-    drawMessages('bottom'); markRead(); startChatPoll(id); botInfoFor = null; loadBotInfo();
+    drawMessages('bottom'); markRead(); startChatPoll(id);
     if (wide()) ui.input.focus({ preventScroll: true });
   } catch (e) { loadingMsgs = false; drawMessages('bottom'); toast(e.message); }
 }
@@ -1242,7 +1217,6 @@ const byTime = (a, b) => new Date(a.createdAt) - new Date(b.createdAt);
 
 function drawMessages(mode) {
   if (!ui || !cur) return;
-  updateStart();
   const box = ui.box, prevH = box.scrollHeight, prevT = box.scrollTop;
   const nodes = [];
   if (loadingMsgs) {
@@ -1593,61 +1567,22 @@ function profileNode() {
       ...(me.bio ? [h('div', { class: 'kv', onclick: copy(me.bio) }, h('div', { style: 'white-space:pre-wrap' }, me.bio), h('small', {}, 'ប្រវត្តិរូប (bio)'))] : []));
   }
   draw();
-  const feed = postsCard();
   const tile = (icon, label, fn) => h('button', { class: 'tile', onclick: fn }, ic(icon, 24), label);
   return h('div', { class: 'pad' }, head, fileIn,
     h('div', { class: 'tiles' }, tile('camera', 'ដាក់រូប', () => fileIn.click()), tile('pencil', 'កែព័ត៌មាន', () => editInfo(draw)), tile('settings', 'ការកំណត់', () => { settingsPage = null; setTab('settings'); })),
-    info, feed);
-}
-/* posts on own profile */
-function postsCard() {
-  const box = h('div', { class: 'card postbox' });
-  const list = h('div', { class: 'plist' });
-  const ta = h('textarea', { class: 'pta', rows: 2, maxlength: 2000, placeholder: 'ចង់ចែករំលែកអ្វី?' });
-  const pv = h('div', { class: 'ppv' });
-  let file = null;
-  const pick = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: (e) => {
-    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
-    if (f.size > 4 * 1024 * 1024) return toast('រូបធំពេក (អតិបរមា 4MB)');
-    file = f; pv.replaceChildren(h('img', { src: URL.createObjectURL(f) }), h('button', { class: 'pdel', onclick: () => { file = null; pv.replaceChildren(); } }, '✕'));
-  } });
-  const btn = h('button', { class: 'pgo', onclick: safe(async () => {
-    const text = ta.value.trim(); if (!text && !file) return;
-    btn.disabled = true;
-    try {
-      let imageUrl; if (file) { const fd = new FormData(); fd.append('file', file, file.name); imageUrl = (await api('/upload', { method: 'POST', form: fd })).fileUrl; }
-      const d = await api('/posts', { method: 'POST', body: { text, imageUrl } });
-      ta.value = ''; file = null; pv.replaceChildren(); list.prepend(postEl(d.post, true)); toast('បានផុស');
-    } finally { btn.disabled = false; }
-  }) }, 'ផុស');
-  box.append(h('h4', {}, 'ការផុស'), ta, pv, h('div', { class: 'pbar' }, h('button', { class: 'pimgb', onclick: () => pick.click() }, ic('camera', 20), 'រូប'), btn), pick);
-  loadPosts(list, me.id, true);
-  return h('div', {}, box, list);
-}
-function postEl(p, canDel) {
-  const el = h('div', { class: 'post' },
-    h('div', { class: 'phead' }, h('small', {}, fmtFull(p.createdAt)),
-      canDel ? h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!(await confirmDialog({ title: 'លុបការផុសនេះ?', ok: 'លុប', danger: true }))) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑') : null),
-    p.text ? h('div', { class: 'ptext' }, p.text) : null,
-    p.imageUrl && safeUrl(p.imageUrl) ? h('img', { class: 'pimg', src: safeUrl(p.imageUrl), loading: 'lazy', onclick: () => lightbox(safeUrl(p.imageUrl)) }) : null);
-  return el;
-}
-function loadPosts(list, userId, canDel) {
-  api('/posts/user/' + userId).then((d) => list.replaceChildren(...(d.posts.length ? d.posts.map((p) => postEl(p, canDel)) : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'មិនទាន់មានការផុស')]))).catch(() => {});
+    info);
 }
 /* someone's profile (tap their name/avatar in a chat) */
 async function userProfile(id) {
   let u; try { u = (await api('/users/' + id)).user; } catch { return toast('រកមិនឃើញ'); }
-  const list = h('div', { class: 'plist' });
   const av = h('div', { class: 'avedit', onclick: () => { if (safeUrl(u.avatarUrl)) lightbox(safeUrl(u.avatarUrl)); } }, avatar(u.avatarUrl, u.displayName, 96));
   const body = h('div', { class: 'upf' },
     h('div', { class: 'pfhead' }, av, h('h2', {}, u.displayName),
       h('small', { class: 'status' + (u.online ? ' online' : '') }, u.online ? 'កំពុងអនឡាញ' : u.lastSeen ? 'ចុងក្រោយ ' + fmtFull(u.lastSeen) : '')),
     h('div', { class: 'card' }, h('div', { class: 'kv' }, h('div', {}, '@' + u.username), h('small', {}, 'ឈ្មោះអ្នកប្រើ')),
       u.bio ? h('div', { class: 'kv' }, h('div', { style: 'white-space:pre-wrap' }, u.bio), h('small', {}, 'ប្រវត្តិរូប (bio)')) : null),
-    h('h4', { style: 'margin:14px 4px 0' }, 'ការផុស'), list);
+  );
   modal(null, body, 'userpf');
-  loadPosts(list, u.id, false);
 }
 
 /* settings: Telegram-style menu with sub-pages */
@@ -1738,7 +1673,6 @@ function settingsNode() {
       h('div', { class: 'card' }, h('h4', {}, 'មុខងារសន្សំថ្ម'), segPref('power', [['off', 'បិទ'], ['on', 'បើក'], ['auto', 'ស្វ័យប្រវត្តិ']])),
       note('កាត់បន្ថយ animation ហើយពិនិត្យសារថ្មីឱ្យយឺតជាងមុន 3 ដង។ ស្វ័យប្រវត្តិ៖ បើកពេលថ្មនៅសល់ក្រោម 20% ហើយមិនកំពុងសាក (ប្រសិនបើឧបករណ៍គាំទ្រ)។'));
   }
-  if (settingsPage === 'bots') return botsPage();
   if (settingsPage === 'lang') {
     return subPage('ភាសា',
       h('div', { class: 'card' }, h('div', { class: 'row', style: 'margin:0;cursor:default' }, h('div', { class: 'grow' }, h('b', {}, 'ខ្មែរ'), h('small', {}, 'Khmer')), h('span', { class: 'tick' }, ic('check', 22)))),
@@ -1756,7 +1690,6 @@ function settingsNode() {
       menuItem(C('#ff7a85', '#e5384a'), 'bell', 'ការជូនដំណឹង', 'សំឡេង, ញ័រ', () => goSettings('notif')),
       menuItem(C('#6d8dff', '#3b5bdb'), 'pie', 'ទិន្នន័យ និងទំហំផ្ទុក', 'ការផ្ទុករូបភាព', () => goSettings('data')),
       menuItem(C('#4aa8ff', '#1c7ed6'), 'folder', 'តម្រង chat', 'ទាំងអស់, ឯកជន, ក្រុម, មិនទាន់អាន', () => goSettings('folders')),
-      menuItem(C('#38d3c0', '#0b9c8c'), 'bot', 'Bots', 'បង្កើត និងគ្រប់គ្រង Bot របស់អ្នក', () => goSettings('bots')),
       menuItem(C('#4dd0e1', '#0097a7'), 'devices', 'ឧបករណ៍', 'គ្រប់គ្រងឧបករណ៍ដែលបានចូល', () => goSettings('devices')),
       menuItem(C('#ffa94d', '#e8590c'), 'battery', 'សន្សំថ្ម', 'កាត់បន្ថយការប្រើថ្មពេលថ្មទាប', () => goSettings('power')),
       menuItem(C('#b983f5', '#7c3fe0'), 'globe', 'ភាសា', 'ខ្មែរ', () => goSettings('lang')),
@@ -1765,86 +1698,6 @@ function settingsNode() {
     h('div', { style: 'height:12px' }));
 }
 
-/* ---------- Bots: create & manage (like BotFather, inside the app) ---------- */
-const isBotName = (u) => /bot$/i.test(u || '');
-const apiBase = () => location.origin + '/api/bot/';
-function botsPage() {
-  const list = h('div', {});
-  const load = safe(async () => {
-    const d = await api('/bots');
-    list.replaceChildren(...(d.bots.length ? d.bots.map((b) => h('div', { class: 'row', style: 'margin:0', onclick: () => botDetail(b, load) },
-      avatar(b.avatarUrl, b.displayName, 42), h('div', { class: 'grow' }, h('b', {}, b.displayName, h('span', { class: 'tagbot' }, 'BOT')), h('small', {}, '@' + b.username)), ic('chev', 18)))
-      : [h('p', { class: 'muted', style: 'margin:8px 12px' }, 'អ្នកមិនទាន់មាន Bot ទេ')]));
-  });
-  load();
-  return subPage('Bots',
-    h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: () => createBot(load) }, ic('plus'), 'បង្កើត Bot ថ្មី'), list),
-    note('Bot គឺជាគណនីពិសេសដែលកម្មវិធី (code) របស់អ្នកគ្រប់គ្រង តាមរយៈ Bot API។ Username ត្រូវបញ្ចប់ដោយ "bot"។ អាចមានបាន 10 Bot។'));
-}
-function showToken(b, token) {
-  const close = modal('Token របស់ Bot', h('div', {},
-    h('p', { class: 'muted' }, 'ចម្លង token នេះទុក — វាបង្ហាញតែម្ដងគត់។ ហាមចែកអោយអ្នកដទៃ។'),
-    h('div', { class: 'tokenbox' }, token),
-    h('button', { class: 'primary', onclick: async () => { try { await navigator.clipboard.writeText(token); toast('បានចម្លង'); } catch { toast('សូមចុចសង្កត់លើ token ដើម្បីចម្លង'); } } }, 'ចម្លង Token'),
-    h('div', { style: 'height:8px' }),
-    h('button', { onclick: () => { close(); botDetail(b); } }, 'រួចរាល់')));
-}
-function createBot(reload) {
-  const name = h('input', { placeholder: 'ឈ្មោះ Bot (ឧ. ហាងខ្ញុំ)', maxlength: 50 });
-  const user = h('input', { placeholder: 'username ឧ. my_shop_bot', maxlength: 32, autocapitalize: 'none', autocomplete: 'off' });
-  const desc = h('input', { placeholder: 'ពិពណ៌នា (មិនបង្ខំ)', maxlength: 200 });
-  const close = modal('បង្កើត Bot ថ្មី', h('div', {}, name, user, desc, h('button', { class: 'primary', onclick: safe(async () => {
-    const d = await api('/bots', { method: 'POST', body: { name: name.value, username: user.value, description: desc.value } });
-    close(); reload && reload(); showToken(d.bot, d.token);
-  }) }, 'បង្កើត')));
-  setTimeout(() => name.focus(), 80);
-}
-function botDetail(b, reload) {
-  const close = modal(b.displayName, h('div', {},
-    h('p', { class: 'muted', style: 'margin:0 0 8px' }, '@' + b.username + (b.description ? ' · ' + b.description : '')),
-    h('div', { class: 'card', style: 'margin:0' },
-      h('button', { class: 'sheet-i', onclick: safe(async () => { close(); const u = { id: b.id, displayName: b.displayName, username: b.username, avatarUrl: b.avatarUrl }; await openPrivate([u]); }) }, ic('message'), 'បើក chat ជាមួយ Bot'),
-      h('button', { class: 'sheet-i', onclick: safe(async () => {
-        if (!await confirmDialog({ title: 'បង្កើត token ថ្មី?', text: 'token ចាស់នឹងឈប់ដំណើរការភ្លាមៗ។' })) return;
-        const d = await api(`/bots/${b.id}/token`, { method: 'POST', body: {} }); close(); showToken(b, d.token);
-      }) }, ic('key'), 'បង្កើត Token ថ្មី'),
-      h('button', { class: 'sheet-i', onclick: safe(async () => {
-        const v = await promptDialog({ title: 'ឈ្មោះ Bot', value: b.displayName }); if (!v || !v.trim()) return;
-        const d = await api(`/bots/${b.id}`, { method: 'PATCH', body: { name: v } }); close(); reload && reload(); botDetail(d.bot, reload);
-      }) }, ic('pencil'), 'ប្ដូរឈ្មោះ'),
-      h('button', { class: 'sheet-i', onclick: safe(async () => {
-        const v = await promptDialog({ title: 'ពិពណ៌នា Bot', value: b.description || '' }); if (v == null) return;
-        const d = await api(`/bots/${b.id}`, { method: 'PATCH', body: { description: v } }); close(); reload && reload(); botDetail(d.bot, reload);
-      }) }, ic('message'), 'ប្ដូរពិពណ៌នា'),
-      h('button', { class: 'sheet-i', onclick: () => { close(); botDocs(b); } }, ic('bot'), 'របៀបប្រើ API'),
-      h('button', { class: 'sheet-i danger', onclick: safe(async () => {
-        if (!await confirmDialog({ title: 'លុប Bot?', text: 'chat និងសារទាំងអស់របស់ Bot នឹងបាត់។', ok: 'លុប', danger: true })) return;
-        await api(`/bots/${b.id}`, { method: 'DELETE' }); close(); reload && reload(); toast('បានលុប');
-      }) }, ic('trash'), 'លុប Bot'))));
-}
-function botDocs(b) {
-  const base = apiBase() + '<TOKEN>';
-  const code = `# ទទួលសារថ្មី\ncurl "${base}/getUpdates?timeout=5"\n\n# ឆ្លើយតប\ncurl -X POST "${base}/sendMessage" \\\n  -H "Content-Type: application/json" \\\n  -d '{"chat_id":"<chat.id>","text":"សួស្ដី!"}'\n\n# Python\nimport requests, time\nAPI = "${base}"\noffset = None\nwhile True:\n    r = requests.get(API + "/getUpdates", params={"offset": offset, "timeout": 5}).json()\n    for u in r["result"]:\n        offset = u["update_id"] + 1\n        m = u["message"]\n        if m.get("text"):\n            requests.post(API + "/sendMessage", json={"chat_id": m["chat"]["id"], "text": "អ្នកនិយាយថា: " + m["text"]})`;
-  modal('Bot API · @' + b.username, h('div', {},
-    h('p', { class: 'muted', style: 'margin:0' }, 'Methods: getMe, getUpdates, sendMessage, editMessageText, deleteMessage, sendChatAction, setMyCommands, getMyCommands។ ជំនួស <TOKEN> ដោយ token របស់ Bot។'),
-    h('div', { class: 'code' }, code)));
-}
-// In a bot's chat: command chips (from setMyCommands) + a START button on an empty chat
-let botInfoFor = null;
-async function loadBotInfo() {
-  if (!ui || !cur || cur.type !== 'PRIVATE' || !cur.peer || !isBotName(cur.peer.username) || cur.peer.id === me.id) { if (ui) { ui.cmds.hidden = true; ui.start.hidden = true; } return; }
-  const id = cur.id;
-  let info = { commands: [] };
-  try { info = await api('/bots/info/' + cur.peer.id); } catch { /* fine */ }
-  if (!cur || cur.id !== id) return;
-  botInfoFor = id;
-  const send = (t) => { ui.input.value = t; sendText(); };
-  ui.cmds.replaceChildren(...(info.commands || []).map((c) => h('button', { title: c.description, onclick: () => send('/' + c.command) }, '/' + c.command)));
-  ui.cmds.hidden = !(info.commands || []).length;
-  ui.start.onclick = () => { ui.start.hidden = true; send('/start'); };
-  updateStart();
-}
-function updateStart() { if (ui && ui.start && botInfoFor === (cur && cur.id)) ui.start.hidden = !!msgs.size || !!cur.blockedByMe; }
 function changePassword() {
   const cp = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន', autocomplete: 'current-password' });
   const np = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ថ្មី (8+ តួ)', autocomplete: 'new-password' });

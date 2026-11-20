@@ -42,12 +42,6 @@ router.get('/series', async (_req, res) => {
   res.json({ days });
 });
 
-router.get('/bots', async (_req, res) => {
-  const bots = await prisma.bot.findMany({ orderBy: { createdAt: 'desc' }, take: 100, include: { user: true, owner: true } });
-  res.json({ bots: bots.map((b) => ({ id: b.id, userId: b.userId, username: b.user.username, displayName: b.user.displayName, avatarUrl: b.user.avatarUrl,
-    owner: { username: b.owner.username, displayName: b.owner.displayName }, createdAt: b.createdAt, online: isOnline(b.user.lastSeen) })) });
-});
-
 router.get('/users', async (req, res) => {
   const q = String(req.query.q || '').trim();
   const page = Math.max(Number(req.query.page) || 1, 1);

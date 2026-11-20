@@ -49,5 +49,5 @@ export async function removeFileIfUnused(url) {
     prisma.chat.count({ where: { avatarUrl: url } }),
     prisma.post.count({ where: { imageUrl: url } }),
   ]);
-  if (!msgs && !users && !chats) await removeFile(url);
+  if (!msgs && !users && !chats && !posts) await removeFile(url);
 }
