@@ -6,7 +6,6 @@ import userRoutes from '../src/routes/users.js';
 import chatRoutes from '../src/routes/chats.js';
 import uploadRoutes from '../src/routes/upload.js';
 import adminRoutes from '../src/routes/admin.js';
-import bbRoutes from '../src/routes/bb.js';
 import postRoutes from '../src/routes/posts.js';
 import botRoutes from '../src/routes/bots.js';
 import botApiRoutes from '../src/routes/botapi.js';
@@ -23,7 +22,6 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/posts', postRoutes);
-app.use('/api/v1', bbRoutes); // Backbook (social app) API
 app.use('/api/upload', uploadRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/bots', botRoutes); // manage your bots (user login)

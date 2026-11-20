@@ -36,10 +36,6 @@ model User {
   tokenVersion Int      @default(0)
   bio          String   @default("")
   avatarUrl    String?
-  // Backbook (social) profile extras
-  cover        String?
-  gender       String   @default("male")
-  details      Json?
   role         Role     @default(USER)
   isBanned     Boolean  @default(false)
   // Doubles as presence: online = lastSeen within the last 40s
@@ -55,10 +51,6 @@ model User {
   ownedBots   Bot[]     @relation("BotOwner")
   passkeys    AdminPasskey[]
   posts       Post[]
-  bbPosts     BbPost[]
-  bbReacts    BbReact[]
-  bbComments  BbComment[]
-  bbNotifs    BbNotification[] @relation("NotifTo")
 }
 
 model Post {
@@ -93,8 +85,6 @@ model Chat {
   ownerId    String?
   // PRIVATE: "idA:idB" (sorted). idA:idA = Saved Messages
   privateKey String?  @unique
-  // Backbook chat theme (1-based index)
-  theme      Int      @default(1)
   createdAt  DateTime @default(now())
 
   members  Member[]
@@ -186,99 +176,4 @@ model AdminPasskey {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   @@index([userId])
-}
-
-// ---------------- Backbook (Facebook-style social app) ----------------
-model BbPost {
-  id         String   @id @default(cuid())
-  userId     String
-  type       String   @default("normal") // normal | background | image | profilePhoto | cover | share
-  text       String   @default("")
-  background Int?
-  images     String[]
-  sharedId   String?
-  createdAt  DateTime @default(now())
-
-  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  shared   BbPost?     @relation("Shares", fields: [sharedId], references: [id], onDelete: SetNull)
-  shares   BbPost[]    @relation("Shares")
-  reacts   BbReact[]
-  comments BbComment[]
-
-  @@index([userId, createdAt])
-  @@index([createdAt])
-}
-
-model BbReact {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
-  type      String
-  createdAt DateTime @default(now())
-
-  post BbPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([postId, userId])
-}
-
-model BbComment {
-  id        String   @id @default(cuid())
-  postId    String
-  userId    String
-  parentId  String?
-  text      String   @default("")
-  photo     String?
-  likes     String[] // user ids
-  createdAt DateTime @default(now())
-
-  post    BbPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  parent  BbComment?  @relation("Replies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies BbComment[] @relation("Replies")
-
-  @@index([postId, createdAt])
-  @@index([parentId])
-}
-
-// Friend request / friendship. PENDING = request, ACCEPTED = friends.
-model BbFriend {
-  id          String   @id @default(cuid())
-  senderId    String
-  recipientId String
-  status      String   @default("PENDING")
-  createdAt   DateTime @default(now())
-
-  @@unique([senderId, recipientId])
-  @@index([recipientId])
-}
-
-model BbFollow {
-  followerId  String
-  followingId String
-
-  @@id([followerId, followingId])
-}
-
-model BbNotification {
-  id        String   @id @default(cuid())
-  userId    String
-  senderId  String?
-  type      String
-  content   String
-  click     String   @default("/")
-  seen      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  user User @relation("NotifTo", fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-}
-
-model BbSearch {
-  userId    String
-  targetId  String
-  createdAt DateTime @default(now())
-
-  @@id([userId, targetId])
 }
