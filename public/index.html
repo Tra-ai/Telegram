@@ -1622,7 +1622,7 @@ function postsCard() {
   function postEl(p) {
     const el = h('div', { class: 'post' },
       h('div', { class: 'phead' }, h('small', {}, fmtFull(p.createdAt)),
-        h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!confirm('លុបការផុសនេះ?')) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑')),
+        h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!(await confirmDialog({ title: 'លុបការផុសនេះ?', ok: 'លុប', danger: true }))) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑')),
       p.text ? h('div', { class: 'ptext' }, p.text) : null,
       p.imageUrl && safeUrl(p.imageUrl) ? h('img', { class: 'pimg', src: safeUrl(p.imageUrl), loading: 'lazy' }) : null);
     return el;
