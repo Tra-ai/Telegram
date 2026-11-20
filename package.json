@@ -12,7 +12,7 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "seed:admin": "node src/seed-admin.js",
-    "vercel-build": "prisma generate && prisma db push --skip-generate && (node src/seed-admin.js || true)"
+    "vercel-build": "prisma generate && prisma db push --skip-generate --accept-data-loss && (node src/seed-admin.js || true)"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
