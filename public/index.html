@@ -463,36 +463,33 @@ html[data-ios] .logo{border-radius:22%;box-shadow:0 8px 24px rgba(0,122,255,.3)}
 html[data-ios] .authwrap::before,html[data-ios] .authwrap::after{display:none}
 
 /* ===== Chat-list polish (soft filters, raised search, clearer hierarchy, floating FAB, stronger tab bar) ===== */
-html:root{--pri-ink:#1a5fb4;--ink1:#1a5fb4;--ink2:#17803f;--ink3:#a35f00;--ink4:#6b3fb8;--search-bg:#fff;--search-ic:#9aa3ad;--avatar-ring:rgba(16,24,40,.08)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}}
-:root[data-theme="dark"]{--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}
+html:root{--pri-ink:#1a5fb4;--ink1:#1a5fb4;--ink2:#17803f;--ink3:#a35f00;--ink4:#6b3fb8;--search-bg:#f1f3f5;--chip-bg:#eceff2;--chip-on:#1a5fb4;--search-ic:#9aa3ad;--avatar-ring:rgba(16,24,40,.08)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--chip-bg:var(--field);--chip-on:#2d6bc4;--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}}
+:root[data-theme="dark"]{--pri-ink:#9fcdff;--ink1:#8cc4ff;--ink2:#6fdc9a;--ink3:#ffc15e;--ink4:#c6a6ff;--search-bg:var(--field);--chip-bg:var(--field);--chip-on:#2d6bc4;--search-ic:#8a9aad;--avatar-ring:rgba(255,255,255,.12)}
 /* search bar: white, soft drop shadow, bigger muted icon */
-html:root .searchrow input{background:var(--search-bg);border:1px solid var(--line);box-shadow:0 2px 8px rgba(16,24,40,.08),0 1px 2px rgba(16,24,40,.06)}
-html:root .searchrow input:focus{border-color:var(--pri)}
+html:root .searchrow input{background:var(--search-bg);border:0;border-radius:999px;box-shadow:0 1px 3px rgba(16,24,40,.14)}
+html:root .searchrow input:focus{box-shadow:0 0 0 2px var(--pri-soft),0 1px 3px rgba(16,24,40,.14)}
 html:root .searchrow > .ic{color:var(--search-ic)}
 html:root .searchrow > .ic svg{width:24px;height:24px}
-html[data-ios] .searchrow input{height:40px;padding-left:44px}
-/* filter chips: pills, a different light tint each; active = soft tint + dark ink */
+html[data-ios] .searchrow input{height:42px;padding-left:46px;border-radius:999px}
+/* filter chips: pills in a row; active = dark blue + white text, others light grey + dark text */
 html:root .folders{gap:8px;padding-top:4px}
-html:root .fchip{background:color-mix(in srgb,var(--ci,var(--ink1)) 9%,transparent);color:color-mix(in srgb,var(--ci,var(--ink1)) 70%,var(--mut));border:1px solid transparent;font-weight:500}
-html:root .fchip:nth-child(1){--ci:var(--ink1)}
-html:root .fchip:nth-child(2){--ci:var(--ink2)}
-html:root .fchip:nth-child(3){--ci:var(--ink3)}
-html:root .fchip:nth-child(4){--ci:var(--ink4)}
-html:root .fchip.on{background:color-mix(in srgb,var(--ci,var(--ink1)) 20%,transparent);color:var(--pri-ink);border-color:color-mix(in srgb,var(--ci,var(--ink1)) 35%,transparent);font-weight:700}
-html:root .fchip:nth-child(n+2).on{color:color-mix(in srgb,var(--ci) 85%,#000)}
+html:root .fchip{background:var(--chip-bg);color:var(--fg);border:0;font-weight:500}
+html:root .fchip.on{background:var(--chip-on);color:#fff;font-weight:600}
 /* chat rows: more breathing room, avatar ring + soft shadow, name bold / preview light */
 html:root .row{padding:12px 14px}
 html[data-ios] .row{padding:12px 16px}
-html[data-ios] .row::after{left:84px}
+html[data-ios] .row::after{left:88px}
 html:root .row .av{box-shadow:0 0 0 1px var(--avatar-ring),0 2px 6px rgba(16,24,40,.14)}
 html:root .row .line1 b{font-weight:700;font-size:16.5px}
 html:root .row .line2 small{font-weight:400;font-size:13.5px;color:var(--mut);opacity:.95}
 html:root .row.active .line2 small,html:root .row.active .when{color:rgba(255,255,255,.88)}
 html:root .when{gap:4px;font-size:12px}
 html:root .when .tick{display:inline-flex;margin-right:0}
+/* header title: left aligned, big and bold */
+html:root .bar .title{text-align:left;font-size:27px;font-weight:800;letter-spacing:-.4px;padding-left:6px}
 /* floating action button */
-html:root .fab,html[data-ios] .fab{box-shadow:0 10px 22px rgba(51,144,236,.42),0 3px 8px rgba(16,24,40,.2)}
+html:root .fab,html[data-ios] .fab{box-shadow:0 8px 24px rgba(51,144,236,.55),0 2px 6px rgba(51,144,236,.3)}
 /* bottom bar: bigger icons, inactive grey, active blue, hairline above */
 html:root .tab{color:var(--mut)}
 html:root .tab.on{color:var(--pri)}
@@ -871,7 +868,7 @@ function drawNav() {
   const tab = (k, icon, label) => h('button', { class: 'tab' + (sideTab === k ? ' on' : ''), 'aria-label': label, 'aria-current': sideTab === k ? 'page' : null, onclick: () => setTab(k) },
     h('span', { class: 'tabic' }, icon, k === 'chats' && unread ? h('span', { class: 'badge' }, unread > 99 ? '99+' : unread) : null), h('span', {}, label));
   navEl.replaceChildren(tab('chats', ic('message', 22), 'សារ'), tab('contacts', ic('contacts', 22), 'ទំនាក់ទំនង'),
-    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 24), 'ខ្ញុំ'));
+    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 26), 'ខ្ញុំ'));
 }
 function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildren(node); drawList(); }
 function emptyMain() {
@@ -942,7 +939,7 @@ function drawChatRows() {
       && c.members.some((m) => m.userId === c.peer.id && new Date(m.lastReadAt) >= new Date(lm.createdAt));
     const showTick = mine && !(c.peer && c.peer.id === me.id);
     return h('div', { class: 'row' + (cur && cur.id === c.id ? ' active' : ''), role: 'button', tabindex: '0', onclick: () => openChat(c), onkeydown: (e) => { if (e.key === 'Enter') openChat(c); } },
-      avatarOnline(c.avatarUrl, c.title, 52, c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online),
+      avatarOnline(c.avatarUrl, c.title, 56, c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online),
       h('div', { class: 'grow' },
         h('div', { class: 'line1' }, c.type === 'GROUP' ? h('span', { class: 'ic', style: 'opacity:.7' }, ic('users', 16)) : null, h('b', {}, c.title),
           h('span', { class: 'when' }, showTick ? h('span', { class: 'tick' }, ic(peerRead ? 'checks' : 'check', 16)) : null, sameDay(t, new Date()) ? fmtTime(t) : fmtShortDate(t))),
