@@ -50,6 +50,18 @@ model User {
   botProfile  Bot?      @relation("BotUser")
   ownedBots   Bot[]     @relation("BotOwner")
   passkeys    AdminPasskey[]
+  posts       Post[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  userId    String
+  text      String   @default("")
+  imageUrl  String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 model Block {

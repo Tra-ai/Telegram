@@ -497,6 +497,19 @@ html:root .tabic svg{width:26px;height:26px}
 html:root .tabic{height:28px}
 html[data-ios] .nav{box-shadow:0 -1px 0 var(--line)}
 html:root:not([data-ios]) .nav{border-top:1px solid var(--line)}
+
+/* posts */
+.postbox{margin-top:12px}.pta{width:100%;box-sizing:border-box;border:1px solid var(--line);border-radius:12px;padding:10px;font:inherit;background:transparent;color:inherit;resize:vertical}
+.pbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+.pimgb{display:inline-flex;gap:6px;align-items:center;border:0;background:transparent;color:var(--pri);font:inherit;cursor:pointer}
+.pgo{border:0;background:var(--pri);color:#fff;border-radius:18px;padding:8px 20px;font:inherit;font-weight:600;cursor:pointer}.pgo:disabled{opacity:.5}
+.ppv{position:relative;margin-top:8px}.ppv img{max-width:100%;max-height:200px;border-radius:12px}
+.ppv .pdel{position:absolute;top:6px;right:6px;background:#0008;color:#fff;border-radius:50%;width:26px;height:26px}
+.pdel{border:0;background:transparent;cursor:pointer;font-size:15px}
+.plist .post{background:var(--surface);border-radius:16px;padding:12px 14px;margin-top:10px}
+.phead{display:flex;justify-content:space-between;align-items:center;color:var(--mut)}
+.ptext{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;font-size:16px}
+.pimg{max-width:100%;border-radius:12px;margin-top:8px;display:block}
 </style>
 </head>
 <body>
@@ -1579,10 +1592,44 @@ function profileNode() {
       ...(me.bio ? [h('div', { class: 'kv', onclick: copy(me.bio) }, h('div', { style: 'white-space:pre-wrap' }, me.bio), h('small', {}, 'ប្រវត្តិរូប (bio)'))] : []));
   }
   draw();
+  const feed = postsCard();
   const tile = (icon, label, fn) => h('button', { class: 'tile', onclick: fn }, ic(icon, 24), label);
   return h('div', { class: 'pad' }, head, fileIn,
     h('div', { class: 'tiles' }, tile('camera', 'ដាក់រូប', () => fileIn.click()), tile('pencil', 'កែព័ត៌មាន', () => editInfo(draw)), tile('settings', 'ការកំណត់', () => { settingsPage = null; setTab('settings'); })),
-    info);
+    info, feed);
+}
+/* posts on own profile */
+function postsCard() {
+  const box = h('div', { class: 'card postbox' });
+  const list = h('div', { class: 'plist' });
+  const ta = h('textarea', { class: 'pta', rows: 2, maxlength: 2000, placeholder: 'ចង់ចែករំលែកអ្វី?' });
+  const pv = h('div', { class: 'ppv' });
+  let file = null;
+  const pick = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: (e) => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    if (f.size > 4 * 1024 * 1024) return toast('រូបធំពេក (អតិបរមា 4MB)');
+    file = f; pv.replaceChildren(h('img', { src: URL.createObjectURL(f) }), h('button', { class: 'pdel', onclick: () => { file = null; pv.replaceChildren(); } }, '✕'));
+  } });
+  const btn = h('button', { class: 'pgo', onclick: safe(async () => {
+    const text = ta.value.trim(); if (!text && !file) return;
+    btn.disabled = true;
+    try {
+      let imageUrl; if (file) { const fd = new FormData(); fd.append('file', file, file.name); imageUrl = (await api('/upload', { method: 'POST', form: fd })).fileUrl; }
+      const d = await api('/posts', { method: 'POST', body: { text, imageUrl } });
+      ta.value = ''; file = null; pv.replaceChildren(); list.prepend(postEl(d.post)); toast('បានផុស');
+    } finally { btn.disabled = false; }
+  }) }, 'ផុស');
+  function postEl(p) {
+    const el = h('div', { class: 'post' },
+      h('div', { class: 'phead' }, h('small', {}, fmtFull(p.createdAt)),
+        h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!confirm('លុបការផុសនេះ?')) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑')),
+      p.text ? h('div', { class: 'ptext' }, p.text) : null,
+      p.imageUrl && safeUrl(p.imageUrl) ? h('img', { class: 'pimg', src: safeUrl(p.imageUrl), loading: 'lazy' }) : null);
+    return el;
+  }
+  box.append(h('h4', {}, 'ការផុស'), ta, pv, h('div', { class: 'pbar' }, h('button', { class: 'pimgb', onclick: () => pick.click() }, ic('camera', 20), 'រូប'), btn), pick);
+  api('/posts/user/' + me.id).then((d) => list.replaceChildren(...(d.posts.length ? d.posts.map(postEl) : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'មិនទាន់មានការផុស')]))).catch(() => {});
+  return h('div', {}, box, list);
 }
 
 /* settings: Telegram-style menu with sub-pages */

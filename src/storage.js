@@ -43,10 +43,11 @@ export const removeFile = (url) => (isBlobUrl(url) ? del(url).catch(() => {}) : 
 // Same file URL can be reused by several messages / an avatar → only delete when nothing references it anymore
 export async function removeFileIfUnused(url) {
   if (!url || !isBlobUrl(url)) return;
-  const [msgs, users, chats] = await Promise.all([
+  const [msgs, users, chats, posts] = await Promise.all([
     prisma.message.count({ where: { fileUrl: url } }),
     prisma.user.count({ where: { avatarUrl: url } }),
     prisma.chat.count({ where: { avatarUrl: url } }),
+    prisma.post.count({ where: { imageUrl: url } }),
   ]);
   if (!msgs && !users && !chats) await removeFile(url);
 }
