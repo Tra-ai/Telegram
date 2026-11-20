@@ -509,7 +509,8 @@ html:root:not([data-ios]) .nav{border-top:1px solid var(--line)}
 .plist .post{background:var(--surface);border-radius:16px;padding:12px 14px;margin-top:10px}
 .phead{display:flex;justify-content:space-between;align-items:center;color:var(--mut)}
 .ptext{white-space:pre-wrap;overflow-wrap:anywhere;margin-top:6px;font-size:16px}
-.pimg{max-width:100%;border-radius:12px;margin-top:8px;display:block}
+.pimg{max-width:100%;border-radius:12px;margin-top:8px;display:block;cursor:zoom-in}
+.userpf .panel{max-height:88vh;overflow-y:auto}.upf{padding:8px 4px 14px}
 </style>
 </head>
 <body>
@@ -1102,7 +1103,7 @@ function buildChat() {
   const statusEl = h('small', { class: 'status' });
   const head = h('div', { class: 'bar' },
     ibtn('back', 'Back', () => history.back(), 'back'),
-    h('div', { class: 'peer', onclick: () => { if (cur.type === 'GROUP') groupInfo(); } }, avSlot, h('div', { class: 'grow' }, titleEl, statusEl)),
+    h('div', { class: 'peer', onclick: () => { if (cur.type === 'GROUP') groupInfo(); else if (cur.peer) userProfile(cur.peer.id); } }, avSlot, h('div', { class: 'grow' }, titleEl, statusEl)),
     ibtn('more', 'Menu', chatMenu));
 
   const box = h('div', { class: 'msgs' });
@@ -1616,20 +1617,37 @@ function postsCard() {
     try {
       let imageUrl; if (file) { const fd = new FormData(); fd.append('file', file, file.name); imageUrl = (await api('/upload', { method: 'POST', form: fd })).fileUrl; }
       const d = await api('/posts', { method: 'POST', body: { text, imageUrl } });
-      ta.value = ''; file = null; pv.replaceChildren(); list.prepend(postEl(d.post)); toast('បានផុស');
+      ta.value = ''; file = null; pv.replaceChildren(); list.prepend(postEl(d.post, true)); toast('បានផុស');
     } finally { btn.disabled = false; }
   }) }, 'ផុស');
-  function postEl(p) {
-    const el = h('div', { class: 'post' },
-      h('div', { class: 'phead' }, h('small', {}, fmtFull(p.createdAt)),
-        h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!(await confirmDialog({ title: 'លុបការផុសនេះ?', ok: 'លុប', danger: true }))) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑')),
-      p.text ? h('div', { class: 'ptext' }, p.text) : null,
-      p.imageUrl && safeUrl(p.imageUrl) ? h('img', { class: 'pimg', src: safeUrl(p.imageUrl), loading: 'lazy' }) : null);
-    return el;
-  }
   box.append(h('h4', {}, 'ការផុស'), ta, pv, h('div', { class: 'pbar' }, h('button', { class: 'pimgb', onclick: () => pick.click() }, ic('camera', 20), 'រូប'), btn), pick);
-  api('/posts/user/' + me.id).then((d) => list.replaceChildren(...(d.posts.length ? d.posts.map(postEl) : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'មិនទាន់មានការផុស')]))).catch(() => {});
+  loadPosts(list, me.id, true);
   return h('div', {}, box, list);
+}
+function postEl(p, canDel) {
+  const el = h('div', { class: 'post' },
+    h('div', { class: 'phead' }, h('small', {}, fmtFull(p.createdAt)),
+      canDel ? h('button', { class: 'pdel', 'aria-label': 'Delete', onclick: safe(async () => { if (!(await confirmDialog({ title: 'លុបការផុសនេះ?', ok: 'លុប', danger: true }))) return; await api('/posts/' + p.id, { method: 'DELETE' }); el.remove(); }) }, '🗑') : null),
+    p.text ? h('div', { class: 'ptext' }, p.text) : null,
+    p.imageUrl && safeUrl(p.imageUrl) ? h('img', { class: 'pimg', src: safeUrl(p.imageUrl), loading: 'lazy', onclick: () => lightbox(safeUrl(p.imageUrl)) }) : null);
+  return el;
+}
+function loadPosts(list, userId, canDel) {
+  api('/posts/user/' + userId).then((d) => list.replaceChildren(...(d.posts.length ? d.posts.map((p) => postEl(p, canDel)) : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'មិនទាន់មានការផុស')]))).catch(() => {});
+}
+/* someone's profile (tap their name/avatar in a chat) */
+async function userProfile(id) {
+  let u; try { u = (await api('/users/' + id)).user; } catch { return toast('រកមិនឃើញ'); }
+  const list = h('div', { class: 'plist' });
+  const av = h('div', { class: 'avedit', onclick: () => { if (safeUrl(u.avatarUrl)) lightbox(safeUrl(u.avatarUrl)); } }, avatar(u.avatarUrl, u.displayName, 96));
+  const body = h('div', { class: 'upf' },
+    h('div', { class: 'pfhead' }, av, h('h2', {}, u.displayName),
+      h('small', { class: 'status' + (u.online ? ' online' : '') }, u.online ? 'កំពុងអនឡាញ' : u.lastSeen ? 'ចុងក្រោយ ' + fmtFull(u.lastSeen) : '')),
+    h('div', { class: 'card' }, h('div', { class: 'kv' }, h('div', {}, '@' + u.username), h('small', {}, 'ឈ្មោះអ្នកប្រើ')),
+      u.bio ? h('div', { class: 'kv' }, h('div', { style: 'white-space:pre-wrap' }, u.bio), h('small', {}, 'ប្រវត្តិរូប (bio)')) : null),
+    h('h4', { style: 'margin:14px 4px 0' }, 'ការផុស'), list);
+  modal(null, body, 'userpf');
+  loadPosts(list, u.id, false);
 }
 
 /* settings: Telegram-style menu with sub-pages */
