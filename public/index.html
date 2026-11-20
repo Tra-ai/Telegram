@@ -477,14 +477,14 @@ html:root .folders{gap:8px;padding-top:4px}
 html:root .fchip{background:var(--chip-bg);color:var(--fg);border:0;font-weight:500}
 html:root .fchip.on{background:var(--chip-on);color:#fff;font-weight:600}
 /* chat rows: more breathing room, avatar ring + soft shadow, name bold / preview light */
-html:root .row{padding:12px 14px}
-html[data-ios] .row{padding:12px 16px}
-html[data-ios] .row::after{left:88px}
+html:root .row{padding:9px 14px}
+html[data-ios] .row{padding:9px 16px}
+html[data-ios] .row::after{left:78px}
 html:root .row .av{box-shadow:0 0 0 1px var(--avatar-ring),0 2px 6px rgba(16,24,40,.14)}
-html:root .row .line1 b{font-weight:700;font-size:16.5px}
-html:root .row .line2 small{font-weight:400;font-size:13.5px;color:var(--mut);opacity:.95}
+html:root .row .line1 b{font-weight:700;font-size:15.5px}
+html:root .row .line2 small{font-weight:400;font-size:13px;color:var(--mut);opacity:.95}
 html:root .row.active .line2 small,html:root .row.active .when{color:rgba(255,255,255,.88)}
-html:root .when{gap:4px;font-size:12px}
+html:root .when{gap:3px;font-size:11.5px}
 html:root .when .tick{display:inline-flex;margin-right:0}
 /* header title: left aligned, big and bold */
 html:root .bar .title{text-align:left;font-size:27px;font-weight:800;letter-spacing:-.4px;padding-left:6px}
@@ -939,7 +939,7 @@ function drawChatRows() {
       && c.members.some((m) => m.userId === c.peer.id && new Date(m.lastReadAt) >= new Date(lm.createdAt));
     const showTick = mine && !(c.peer && c.peer.id === me.id);
     return h('div', { class: 'row' + (cur && cur.id === c.id ? ' active' : ''), role: 'button', tabindex: '0', onclick: () => openChat(c), onkeydown: (e) => { if (e.key === 'Enter') openChat(c); } },
-      avatarOnline(c.avatarUrl, c.title, 56, c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online),
+      avatarOnline(c.avatarUrl, c.title, 50, c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online),
       h('div', { class: 'grow' },
         h('div', { class: 'line1' }, c.type === 'GROUP' ? h('span', { class: 'ic', style: 'opacity:.7' }, ic('users', 16)) : null, h('b', {}, c.title),
           h('span', { class: 'when' }, showTick ? h('span', { class: 'tick' }, ic(peerRead ? 'checks' : 'check', 16)) : null, sameDay(t, new Date()) ? fmtTime(t) : fmtShortDate(t))),
