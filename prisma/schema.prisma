@@ -49,6 +49,7 @@ model User {
   // Bots: a bot is a normal User row (username ends with "bot") + a Bot row. These two are relation-only (no new User columns).
   botProfile  Bot?      @relation("BotUser")
   ownedBots   Bot[]     @relation("BotOwner")
+  passkeys    AdminPasskey[]
 }
 
 model Block {
@@ -148,4 +149,19 @@ model BotUpdate {
   bot Bot @relation(fields: [botId], references: [id], onDelete: Cascade)
 
   @@index([botId, id])
+}
+
+// Face / fingerprint / screen-lock (WebAuthn) credentials that unlock the admin dashboard
+model AdminPasskey {
+  id           String    @id @default(cuid())
+  userId       String
+  credentialId String    @unique
+  publicKey    String
+  counter      Int       @default(0)
+  name         String    @default("")
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@index([userId])
 }

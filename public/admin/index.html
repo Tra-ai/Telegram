@@ -19,7 +19,7 @@
   .hide{display:none!important}
 
   /* login */
-  #login{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 60% at 50% 0%,var(--pri-soft),transparent 70%),var(--bg)}
+  #login,#gate{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 60% at 50% 0%,var(--pri-soft),transparent 70%),var(--bg)}
   .lbox{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
   .lbox .logo{width:76px;height:76px;border-radius:24px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;background:linear-gradient(145deg,#59b3ff,var(--pri));box-shadow:0 10px 28px var(--pri-soft)}
   .lbox h1{margin:6px 0 0;text-align:center;font-size:26px;font-weight:800;letter-spacing:-.4px}
@@ -29,6 +29,11 @@
   .lbox input:focus{border-color:var(--pri);background:var(--card)}
   .btn{height:52px;border-radius:999px;background:var(--pri);color:#fff;font-weight:700;padding:0 24px;box-shadow:0 8px 20px var(--pri-soft)}
   .btn:disabled{opacity:.6}
+  .btn.ghost{background:transparent;color:var(--mut);box-shadow:none;height:44px}
+  .lbox .err.ok{color:var(--mut)}
+  .keyrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--field)}
+  .keyrow:first-of-type{border-top:0}
+  .keyrow .main{flex:1;min-width:0}.keyrow small{display:block;color:var(--mut)}
   .err{color:var(--red);text-align:center;min-height:1.4em;font-size:14px}
 
   /* shell */
@@ -111,6 +116,17 @@
   </form>
 </div>
 
+<div id="gate" class="hide">
+  <div class="lbox">
+    <div class="logo"><span class="ic" id="glogo"></span></div>
+    <h1>ស្កេនដើម្បីចូល</h1>
+    <p>ប្រើមុខ ម្រាមដៃ ឬ PIN របស់ទូរស័ព្ទ ដើម្បីបើកផ្ទាំង Admin</p>
+    <div class="err" id="gerr" role="alert"></div>
+    <button class="btn" id="gscan" type="button">ស្កេនឥឡូវនេះ</button>
+    <button class="btn ghost" id="gout" type="button">ចាកចេញ</button>
+  </div>
+</div>
+
 <div id="app" class="hide">
   <header>
     <div class="hin">
@@ -139,6 +155,7 @@ const ICON = {
   search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
   trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  face: '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M9.5 15.5a3.5 3.5 0 0 0 5 0"/>',
   shield: '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1Z"/>',
   logoff: '<path d="M18.4 6.6a9 9 0 1 1-12.8 0"/><path d="M12 2v10"/>',
   ext: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
@@ -156,14 +173,20 @@ let token = localStorage.getItem('adminToken');
 let tab = 'overview', page = 1, query = '';
 let gen = 0; // ignore responses of an older tab/search
 
+// "pass" = proof that this admin just scanned their face / fingerprint (kept for this browser tab only)
+let pass = ''; try { pass = sessionStorage.getItem('adminPass') || ''; } catch { /* ignore */ }
+function setPass(v) { pass = v || ''; try { v ? sessionStorage.setItem('adminPass', v) : sessionStorage.removeItem('adminPass'); } catch { /* ignore */ } }
 async function api(path, opts = {}) {
-  const r = await fetch('/api/admin' + path, { ...opts, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token } });
-  if (r.status === 401 || r.status === 403) { logout(); throw new Error('auth'); }
+  const headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
+  if (pass) headers['X-Admin-Pass'] = pass;
+  const r = await fetch('/api/admin' + path, { ...opts, headers });
   const d = await r.json().catch(() => ({}));
+  if (r.status === 403 && d.code === 'PASSKEY_REQUIRED') { setPass(''); showGate(); throw new Error('gate'); }
+  if (r.status === 401 || r.status === 403) { logout(); throw new Error('auth'); }
   if (!r.ok) { toast(d.error || 'មានបញ្ហា'); throw new Error(d.error || 'Request failed'); }
   return d;
 }
-function logout() { localStorage.removeItem('adminToken'); token = null; $('#app').classList.add('hide'); $('#login').classList.remove('hide'); }
+function logout() { localStorage.removeItem('adminToken'); token = null; setPass(''); $('#app').classList.add('hide'); $('#gate').classList.add('hide'); $('#login').classList.remove('hide'); }
 function toast(text) { const t = el('div', { class: 'toast', role: 'status' }, text); document.body.append(t); setTimeout(() => t.remove(), 2600); }
 function confirmBox(title, text, ok, danger) {
   return new Promise((res) => {
@@ -180,7 +203,7 @@ const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric',
 const act = (icon, text, fn, cls = '') => el('button', { class: cls, onclick: fn }, ic(icon), text);
 
 /* ---------- login ---------- */
-$('#llogo').replaceWith(ic('chat')); $('#hlogo').replaceWith(ic('chat'));
+$('#glogo').replaceWith(ic('face')); $('#llogo').replaceWith(ic('chat')); $('#hlogo').replaceWith(ic('chat'));
 $('#toapp').append(ic('ext'), ' app'); $('#out').append(ic('out'), 'ចាកចេញ');
 $('#lform').onsubmit = async (e) => {
   e.preventDefault(); $('#lerr').textContent = ''; $('#go').disabled = true;
@@ -238,7 +261,8 @@ async function load() {
         el('div', { class: 'stats' },
           stat('pulse', 'កំពុងអនឡាញ', s.onlineNow, 'g'), stat('users', 'អ្នកប្រើសរុប', s.users), stat('userplus', 'ថ្មី (24 ម៉ោង)', s.newUsers, 'g'), stat('ban', 'ត្រូវបាន ban', s.banned, 'r'),
           stat('group', 'Chat សរុប', s.chats), stat('users', 'ក្រុម', s.groups), stat('msg', 'សារសរុប', s.messages), stat('msg', 'សារ (24 ម៉ោង)', s.messagesToday, 'g'), stat('image', 'Media', s.media)),
-        el('div', { class: 'panels' }, chart('អ្នកប្រើថ្មី 7 ថ្ងៃចុងក្រោយ', ser.days, 'users'), chart('សារ 7 ថ្ងៃចុងក្រោយ', ser.days, 'messages')));
+        el('div', { class: 'panels' }, chart('អ្នកប្រើថ្មី 7 ថ្ងៃចុងក្រោយ', ser.days, 'users'), chart('សារ 7 ថ្ងៃចុងក្រោយ', ser.days, 'messages')),
+        await securityPanel().catch(() => null));
     } else if (tab === 'users') {
       const d = await api(`/users?q=${q}&page=${page}`);
       if (my !== gen) return;
@@ -268,7 +292,7 @@ async function load() {
         el('span', { class: 'meta' }, fmtDate(b.createdAt)),
         act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${b.username}?`, 'Bot និងសារទាំងអស់របស់វានឹងបាត់។', 'លុប', true)) { await api('/users/' + b.userId, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')))) : empty('មិនទាន់មាន Bot'));
     }
-  } catch (e) { if (e.message !== 'auth' && my === gen) view().replaceChildren(empty('ផ្ទុកមិនបាន — សូមព្យាយាមម្ដងទៀត')); }
+  } catch (e) { if (e.message !== 'auth' && e.message !== 'gate' && my === gen) view().replaceChildren(empty('ផ្ទុកមិនបាន — សូមព្យាយាមម្ដងទៀត')); }
 }
 
 function userItem(u) {
@@ -284,7 +308,69 @@ function userItem(u) {
       act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${u.username}?`, 'គណនី និងសារទាំងអស់របស់គាត់នឹងបាត់ជារៀងរហូត។', 'លុប', true)) { await api('/users/' + u.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')));
 }
 
-function start() { $('#login').classList.add('hide'); $('#app').classList.remove('hide'); drawTabs(); load(); }
+/* ---------- face / fingerprint gate (WebAuthn passkeys, checked by the server) ---------- */
+const toBuf = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (s.length % 4)) % 4)), (c) => c.charCodeAt(0)).buffer;
+const fromBuf = (b) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+const canScan = () => !!(window.PublicKeyCredential && navigator.credentials && window.isSecureContext);
+const scanError = (e) => (e && e.name === 'NotAllowedError' ? 'បានបោះបង់ ឬអស់ពេល — សូមព្យាយាមម្ដងទៀត'
+  : e && e.name === 'InvalidStateError' ? 'ឧបករណ៍នេះបានចុះឈ្មោះរួចហើយ' : (e && e.message) || 'ស្កេនមិនបាន');
+
+async function scanIn() {
+  const o = await api('/passkey/login/options', { method: 'POST' });
+  const pk = o.options; pk.challenge = toBuf(pk.challenge); pk.allowCredentials = pk.allowCredentials.map((c) => ({ ...c, id: toBuf(c.id) }));
+  const c = await navigator.credentials.get({ publicKey: pk });
+  const d = await api('/passkey/login/verify', { method: 'POST', body: JSON.stringify({ state: o.state, credential: { id: c.id,
+    response: { clientDataJSON: fromBuf(c.response.clientDataJSON), authenticatorData: fromBuf(c.response.authenticatorData), signature: fromBuf(c.response.signature) } } }) });
+  setPass(d.pass);
+}
+async function enrol(name) {
+  const o = await api('/passkey/register/options', { method: 'POST' });
+  const pk = o.options; pk.challenge = toBuf(pk.challenge); pk.user.id = toBuf(pk.user.id); pk.excludeCredentials = pk.excludeCredentials.map((c) => ({ ...c, id: toBuf(c.id) }));
+  const c = await navigator.credentials.create({ publicKey: pk });
+  const d = await api('/passkey/register/verify', { method: 'POST', body: JSON.stringify({ state: o.state, name, credential: { id: c.id,
+    response: { clientDataJSON: fromBuf(c.response.clientDataJSON), attestationObject: fromBuf(c.response.attestationObject) } } }) });
+  setPass(d.pass);
+}
+function showGate() {
+  $('#app').classList.add('hide'); $('#login').classList.add('hide'); $('#gate').classList.remove('hide');
+  $('#gerr').textContent = canScan() ? '' : 'កម្មវិធី/ឧបករណ៍នេះមិនគាំទ្រការស្កេន។ សូមបើក /admin/ ក្នុង Chrome (HTTPS) លើទូរស័ព្ទដែលបានចុះឈ្មោះ។';
+  $('#gscan').disabled = !canScan();
+}
+$('#gscan').onclick = async () => {
+  $('#gerr').textContent = ''; $('#gscan').disabled = true;
+  try { await scanIn(); $('#gate').classList.add('hide'); start(); } catch (e) { if (e.message !== 'gate') $('#gerr').textContent = scanError(e); }
+  $('#gscan').disabled = !canScan();
+};
+$('#gout').onclick = logout;
+
+async function securityPanel() {
+  const st = await api('/passkey/status');
+  const box = el('div', { class: 'panel', style: 'margin-top:12px' });
+  const draw = (st) => {
+    box.replaceChildren(el('h3', {}, 'សុវត្ថិភាព Admin — ស្កេនមុខ/ម្រាមដៃ'),
+      el('p', { style: 'margin:0 0 10px;color:var(--mut);font-size:14px' }, st.enabled ? 'បើកហើយ៖ ត្រូវស្កេនរាល់ពេលចូលផ្ទាំងនេះ (រយៈពេល ៨ ម៉ោង)។' : 'មិនទាន់បើក៖ អ្នកណាមាន password Admin ក៏ចូលបាន។ ចុះឈ្មោះទូរស័ព្ទនេះដើម្បីបើក។'),
+      ...st.passkeys.map((k) => el('div', { class: 'keyrow' }, ic('face'), el('div', { class: 'main' }, el('b', {}, k.name || 'ឧបករណ៍'), el('small', {}, 'ចុះឈ្មោះ ' + fmtDate(k.createdAt) + (k.lastUsedAt ? ' · ប្រើចុងក្រោយ ' + fmtDate(k.lastUsedAt) : ''))),
+        act('trash', 'លុប', async () => {
+          if (!await confirmBox('លុបឧបករណ៍នេះ?', st.passkeys.length === 1 ? 'នេះជាឧបករណ៍ចុងក្រោយ — ការស្កេននឹងត្រូវបិទ។' : (k.name || 'ឧបករណ៍'), 'លុប', true)) return;
+          await api('/passkey/' + k.id, { method: 'DELETE' }); toast('បានលុប'); draw(await api('/passkey/status'));
+        }))),
+      canScan() ? el('div', { class: 'acts', style: 'margin-top:10px' }, act('face', st.passkeys.length ? 'បន្ថែមឧបករណ៍' : 'បើកការស្កេនលើឧបករណ៍នេះ', async () => {
+        try { await enrol((/Android|iPhone|iPad/.test(navigator.userAgent) ? 'ទូរស័ព្ទ' : 'កុំព្យូទ័រ')); toast('ចុះឈ្មោះរួចរាល់'); draw(await api('/passkey/status')); } catch (e) { if (e.message !== 'gate') toast(scanError(e)); }
+      }))
+        : el('p', { style: 'margin:10px 0 0;color:var(--mut);font-size:14px' }, 'ឧបករណ៍/កម្មវិធីនេះមិនគាំទ្រ — សូមបើកក្នុង Chrome (HTTPS) ដើម្បីចុះឈ្មោះ។'));
+  };
+  draw(st);
+  return box;
+}
+
+async function start() {
+  $('#login').classList.add('hide');
+  try {
+    const st = await api('/passkey/status');
+    if (st.enabled && !st.verified) return showGate();
+  } catch { return; }
+  $('#gate').classList.add('hide'); $('#app').classList.remove('hide'); drawTabs(); load();
+}
 if (token) start();
 </script>
 </body>

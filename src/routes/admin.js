@@ -6,9 +6,12 @@ import { messageInclude } from '../services/messages.js';
 import { removeFileIfUnused } from '../storage.js';
 import { invalidateUser } from '../auth.js';
 import { leaveGroup } from '../services/groups.js';
+import passkeyRoutes, { requirePass } from './adminPasskey.js';
 
 const router = Router();
 router.use(requireAuth, requireAdmin);
+router.use('/passkey', passkeyRoutes); // face / fingerprint gate (enrol + verify)
+router.use(requirePass); // every route below needs the gate once an admin has enrolled
 const live = { deletedAt: null };
 
 router.get('/stats', async (_req, res) => {

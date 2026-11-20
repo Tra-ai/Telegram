@@ -57,3 +57,10 @@ Create bots in the app: **Settings → Bots → Create**. Username must end with
 | `setMyCommands` / `getMyCommands` | `commands: [{command, description}]` — shown as chips in the bot's chat |
 
 A bot receives every message in chats it is a member of (private chats with users, or groups it was added to). No webhooks yet — use `getUpdates`. Rate limit: 100 requests / 10 s per bot. Deploy runs `prisma db push`, which adds the `Bot` and `BotUpdate` tables (nothing existing is changed).
+
+## 🔐 ស្កេនមុខ / ម្រាមដៃ ដើម្បីចូល /admin/ (Passkey)
+- ចូល /admin/ → ទិដ្ឋភាពទូទាំង → ផ្នែក **សុវត្ថិភាព Admin** → **បើកការស្កេនលើឧបករណ៍នេះ**។ ពេលក្រោយ ត្រូវស្កេន (មុខ/ម្រាមដៃ/PIN របស់ទូរស័ព្ទ) រាល់ពេលចូល (ដំណើរការ ៨ ម៉ោង)។ ការពិនិត្យធ្វើនៅ server ទាំងអស់។
+- ត្រូវបើក /admin/ ក្នុង **Chrome (HTTPS)**។ APK (WebView) មិនគាំទ្រ WebAuthn ទេ។
+- ទូរស័ព្ទជាអ្នកជ្រើសរើសថាប្រើមុខ ឬម្រាមដៃ (app មិនអាចបង្ខំឱ្យប្រើតែមុខបានទេ)។
+- បើបាត់ឧបករណ៍ទាំងអស់៖ ដាក់ env `ADMIN_PASSKEY_BYPASS=1` ក្នុង Vercel ហើយ redeploy ដើម្បីបិទការពារបណ្តោះអាសន្ន រួចលុបឧបករណ៍ចាស់ ហើយបិទ env វិញ។
+- ជម្រើស env៖ `WEBAUTHN_RP_ID` (ឧ. `yourapp.vercel.app`) និង `WEBAUTHN_ORIGIN` (ឧ. `https://yourapp.vercel.app`) ប្រសិនបើ domain មិនត្រូវស្គាល់ដោយស្វ័យប្រវត្តិ។
