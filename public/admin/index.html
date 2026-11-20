@@ -2,367 +2,1275 @@
 <html lang="km">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#3390ec">
-<title>Layzzchat Admin</title>
+<title>Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#f4f6f9;--card:#fff;--field:#eef1f5;--fg:#0f1419;--mut:#6b7885;--line:#e4e8ed;--pri:#3390ec;--pri-soft:rgba(51,144,236,.12);
-    --red:#e5484d;--red-soft:rgba(229,72,77,.12);--green:#2fb457;--green-soft:rgba(47,180,87,.14);--shadow:0 1px 2px rgba(15,25,40,.06),0 4px 14px rgba(15,25,40,.05)}
-  @media (prefers-color-scheme:dark){:root{--bg:#0e1621;--card:#17212b;--field:#223040;--fg:#f1f4f7;--mut:#8196a9;--line:#243447;--pri:#4ea4f6;--pri-soft:rgba(78,164,246,.16);
-    --red:#ff6b70;--red-soft:rgba(255,107,112,.14);--green:#4cd27a;--green-soft:rgba(76,210,122,.14);--shadow:0 1px 2px rgba(0,0,0,.3)}}
-  *{box-sizing:border-box}
-  body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Khmer",sans-serif;background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%}
-  button,input{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
-  input{cursor:text}
-  .ic{display:inline-flex;vertical-align:middle}
-  .ic svg{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .hide{display:none!important}
+:root{
+  --bg:#fff;--surface:#fff;--field:#f1f3f5;--fg:#0f1419;--mut:#707579;--line:#e7e8ea;
+  --pri:#3390ec;--pri-soft:rgba(51,144,236,.12);--on-pri:#fff;
+  --in:#fff;--out:#d8ebff;--chat-bg:#e9eef3;--danger:#e53935;--ok:#2bb26a;
+  --hover:rgba(0,0,0,.045);--shadow:0 1px 2px rgba(16,24,40,.12);--shadow-lg:0 12px 40px rgba(16,24,40,.25);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0e1621;--surface:#17212b;--field:#242f3d;--fg:#f4f6f8;--mut:#7f91a4;--line:#0b121a;
+  --pri:#4ea4f6;--pri-soft:rgba(78,164,246,.16);--on-pri:#06121f;
+  --in:#182533;--out:#2b5278;--chat-bg:#0e1621;--danger:#ff6b66;--ok:#4dd08a;
+  --hover:rgba(255,255,255,.06);--shadow:0 1px 2px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.6);}}
+:root[data-theme="dark"]{
+  --bg:#0e1621;--surface:#17212b;--field:#242f3d;--fg:#f4f6f8;--mut:#7f91a4;--line:#0b121a;
+  --pri:#4ea4f6;--pri-soft:rgba(78,164,246,.16);--on-pri:#06121f;
+  --in:#182533;--out:#2b5278;--chat-bg:#0e1621;--danger:#ff6b66;--ok:#4dd08a;
+  --hover:rgba(255,255,255,.06);--shadow:0 1px 2px rgba(0,0,0,.4);--shadow-lg:0 12px 40px rgba(0,0,0,.6);}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 "Kantumruy Pro","Noto Sans Khmer",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:var(--field);border-radius:12px;padding:11px 16px;transition:background .15s,transform .1s,opacity .15s}
+button:active{transform:scale(.97)}
+button:disabled{opacity:.55;cursor:default}
+input,textarea{width:100%;padding:12px 14px;border:1.5px solid transparent;border-radius:12px;background:var(--field);outline:none;margin:5px 0;transition:border-color .15s}
+input:focus,textarea:focus{border-color:var(--pri)}
+::placeholder{color:var(--mut);opacity:.85}
+button.primary{background:var(--pri);color:var(--on-pri);width:100%;margin-top:10px;font-weight:600;padding:13px}
+button.danger,.danger{color:var(--danger)}
+button.ghost{background:transparent}
+.ic{display:inline-flex;flex:none;vertical-align:middle}
+button.icon{background:transparent;padding:0;width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:var(--mut);flex:none}
+button.icon:hover{background:var(--hover)}
+a{color:var(--pri)}
+small,.muted{color:var(--mut)}
+hr{border:0;border-top:1px solid var(--line);margin:10px 0}
 
-  /* login */
-  #login,#gate{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(120% 60% at 50% 0%,var(--pri-soft),transparent 70%),var(--bg)}
-  .lbox{width:100%;max-width:380px;display:flex;flex-direction:column;gap:12px}
-  .lbox .logo{width:76px;height:76px;border-radius:24px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:36px;color:#fff;background:linear-gradient(145deg,#59b3ff,var(--pri));box-shadow:0 10px 28px var(--pri-soft)}
-  .lbox h1{margin:6px 0 0;text-align:center;font-size:26px;font-weight:800;letter-spacing:-.4px}
-  .lbox p{margin:0 0 10px;text-align:center;color:var(--mut)}
-  .lbox label{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin:4px 4px -6px}
-  .lbox input{height:52px;border-radius:999px;padding:0 22px;background:var(--field);border:1.5px solid transparent;outline:0;width:100%}
-  .lbox input:focus{border-color:var(--pri);background:var(--card)}
-  .btn{height:52px;border-radius:999px;background:var(--pri);color:#fff;font-weight:700;padding:0 24px;box-shadow:0 8px 20px var(--pri-soft)}
-  .btn:disabled{opacity:.6}
-  .btn.ghost{background:transparent;color:var(--mut);box-shadow:none;height:44px}
-  .lbox .err.ok{color:var(--mut)}
-  .keyrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--field)}
-  .keyrow:first-of-type{border-top:0}
-  .keyrow .main{flex:1;min-width:0}.keyrow small{display:block;color:var(--mut)}
-  .err{color:var(--red);text-align:center;min-height:1.4em;font-size:14px}
+/* ---- shell: 1 pane on phones, 2 panes on wide screens ---- */
+.shell{display:flex;height:100dvh;background:var(--bg)}
+.side{width:100%;min-width:0;display:flex;flex-direction:column;background:var(--surface);position:relative}
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--chat-bg);position:relative}
+@media (min-width:860px){.side{width:360px;flex:none;border-right:1px solid var(--line)}.back{display:none!important}}
+@media (max-width:859px){
+  .shell[data-view="list"] .main{display:none}
+  .shell:not([data-view="list"]) .side{display:none}
+  .main>.screen{animation:slidein .22s ease-out}
+}
+@keyframes slidein{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.screen{height:100%;display:flex;flex-direction:column;min-height:0;position:relative}
+.empty-main{margin:auto;text-align:center;color:var(--mut);padding:24px}
+.empty-main .ic{width:84px;height:84px;border-radius:50%;background:var(--surface);align-items:center;justify-content:center;margin-bottom:12px;box-shadow:var(--shadow)}
 
-  /* shell */
-  header{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
-  .hin{max-width:1100px;margin:auto;display:flex;align-items:center;gap:12px;padding:10px 16px}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;flex:1;min-width:0}
-  .brand i{flex:none;width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#59b3ff,var(--pri));color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:18px}
-  .brand small{color:var(--mut);font-weight:500;margin-left:4px}
-  .iconbtn{color:inherit;text-decoration:none;flex:none;height:38px;padding:0 14px;border-radius:999px;background:var(--field);display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
-  .tabs{max-width:1100px;margin:auto;display:flex;gap:6px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}
-  .tabs::-webkit-scrollbar{display:none}
-  .tabs button{flex:none;height:38px;padding:0 16px;border-radius:999px;color:var(--mut);font-weight:600;display:flex;align-items:center;gap:7px}
-  .tabs button.on{background:var(--pri);color:#fff}
-  main{max-width:1100px;margin:auto;padding:16px}
-  h2{margin:0 0 12px;font-size:18px}
+/* ---- top bars ---- */
+.bar{display:flex;align-items:center;gap:6px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px;min-height:58px;background:var(--surface);box-shadow:0 1px 0 var(--line);position:relative;z-index:4;flex:none}
+.bar .title{flex:1;font-size:19px;font-weight:700;min-width:0}
+.peer{display:flex;align-items:center;gap:10px;flex:1;min-width:0;cursor:pointer;padding:2px 4px;border-radius:12px}
+.grow{flex:1;min-width:0}
+.grow b,.grow small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grow b{font-weight:600;line-height:1.35}
+.status{font-size:13px}
+.status.online,.status.typing{color:var(--pri)}
+.typing-dots::after{content:"";display:inline-block;width:1.2em;text-align:left;animation:dots 1.2s steps(4,end) infinite}
+@keyframes dots{0%{content:""}25%{content:"."}50%{content:".."}75%{content:"..."}}
 
-  /* overview */
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
-  .stat{background:var(--card);border-radius:18px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
-  .stat .top{display:flex;align-items:center;gap:8px;color:var(--mut);font-size:13px}
-  .stat .bub{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;background:var(--pri-soft);color:var(--pri)}
-  .stat .bub.g{background:var(--green-soft);color:var(--green)} .stat .bub.r{background:var(--red-soft);color:var(--red)}
-  .stat b{font-size:28px;line-height:1;letter-spacing:-.5px}
-  .panels{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
-  .panel{background:var(--card);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
-  .panel h3{margin:0 0 14px;font-size:15px}
-  .chart{display:flex;align-items:flex-end;gap:8px;height:150px}
-  .col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:5px;min-width:0}
-  .col .v{font-size:12px;font-weight:700}
-  .col .bar{width:100%;max-width:38px;border-radius:8px 8px 4px 4px;background:var(--pri);min-height:4px;opacity:.9}
-  .col .d{font-size:11px;color:var(--mut)}
 
-  /* lists */
-  .bar2{display:flex;gap:8px;margin-bottom:12px}
-  .bar2 input{flex:1;height:46px;border-radius:999px;padding:0 20px;background:var(--card);box-shadow:var(--shadow);outline:0;border:1.5px solid transparent;min-width:0}
-  .bar2 input:focus{border-color:var(--pri)}
-  .bar2 .go{height:46px;width:46px;border-radius:50%;background:var(--pri);color:#fff;font-size:19px;display:flex;align-items:center;justify-content:center}
-  .list{display:flex;flex-direction:column;gap:10px}
-  .item{background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .av{width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:17px;background:linear-gradient(145deg,#59b3ff,var(--pri));position:relative;background-size:cover;background-position:center}
-  .av .on{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--green);border:2.5px solid var(--card)}
-  .main{flex:1;min-width:170px}
-  .main b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .main small{color:var(--mut);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--pri-soft);color:var(--pri);margin-left:6px;vertical-align:1px}
-  .tag.red{background:var(--red-soft);color:var(--red)} .tag.gray{background:var(--field);color:var(--mut)}
-  .acts{display:flex;gap:6px;flex-wrap:wrap}
-  .acts button{height:34px;padding:0 13px;border-radius:999px;background:var(--field);font-size:13px;font-weight:600;display:flex;align-items:center;gap:5px}
-  .acts .danger{color:var(--red);background:var(--red-soft)}
-  .meta{color:var(--mut);font-size:13px;white-space:nowrap}
-  .msgtxt{width:100%;background:var(--field);border-radius:12px;padding:8px 12px;word-break:break-word;font-size:14px}
-  .pager{display:flex;justify-content:center;align-items:center;gap:14px;margin-top:14px;color:var(--mut)}
-  .pager button{height:38px;padding:0 16px;border-radius:999px;background:var(--card);box-shadow:var(--shadow);font-weight:600}
-  .pager button:disabled{opacity:.4}
-  .empty{text-align:center;color:var(--mut);padding:36px 0}
-  .skel{height:68px;border-radius:18px;background:linear-gradient(90deg,var(--card),var(--field),var(--card));background-size:200% 100%;animation:sh 1.2s infinite}
-  @keyframes sh{to{background-position:-200% 0}}
+/* ---- bottom navigation (floating pill) ---- */
+.sidebody{flex:1;min-height:0;display:flex;flex-direction:column;position:relative}
+.nav{position:absolute;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));display:flex;gap:2px;padding:6px;background:var(--surface);border-radius:34px;box-shadow:0 6px 28px rgba(16,24,40,.28),0 0 0 1px var(--line);z-index:6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}}
+:root[data-theme="dark"] .nav{box-shadow:0 6px 28px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06)}
+.tab{flex:1;background:transparent;border-radius:28px;padding:7px 2px 5px;display:flex;flex-direction:column;align-items:center;gap:1px;color:var(--fg);font-size:12px;font-weight:600;min-width:0}
+.tab span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tab.on{background:var(--pri-soft);color:var(--pri)}
+.tabic{position:relative;display:inline-flex;height:28px;align-items:center}
+.tabic .av{box-shadow:0 0 0 2px transparent}
+.tab.on .tabic .av{box-shadow:0 0 0 2px var(--pri)}
+.tabic .badge{position:absolute;top:-4px;left:14px;font-size:11px;height:19px;line-height:19px;min-width:19px;padding:0 5px;border:2px solid var(--surface);box-sizing:content-box}
+.sidebody .list{padding-bottom:110px}
+.sidebody .pad{padding-bottom:120px}
 
-  /* dialogs */
-  .ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50}
-  .dlg{background:var(--card);border-radius:22px;padding:22px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.35)}
-  .dlg b{font-size:18px} .dlg p{color:var(--mut);margin:8px 0 18px}
-  .dlg .row{display:flex;gap:10px} .dlg .row button{flex:1;height:46px;border-radius:999px;background:var(--field);font-weight:700}
-  .dlg .row .ok{background:var(--pri);color:#fff} .dlg .row .ok.danger{background:var(--red)}
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111c27;color:#fff;padding:11px 18px;border-radius:999px;z-index:60;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.35);max-width:90vw}
+
+/* ---- profile tab ---- */
+.pfhead{text-align:center;padding:18px 0 6px}
+.pfhead h2{margin:14px 0 0;font-size:24px;line-height:1.3}
+.pfhead .status{display:block;margin-top:2px;font-size:15px}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:16px 0}
+.tile{background:var(--surface);border-radius:18px;padding:14px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13.5px;font-weight:600;box-shadow:var(--shadow);color:var(--fg)}
+.tile .ic{color:var(--pri)}
+.kv{padding:10px 14px;cursor:pointer;border-radius:12px}
+.kv:hover{background:var(--hover)}
+.kv div{font-size:17px;overflow-wrap:anywhere}
+.kv small{display:block;margin-top:1px}
+
+
+/* ---- settings menu ---- */
+.sethead{text-align:center;padding:14px 0 6px}
+.sethead h3{margin:10px 0 0;font-size:21px;line-height:1.3}
+.mi{display:flex;align-items:center;gap:14px;padding:10px 12px;cursor:pointer;border-radius:14px;width:100%;background:transparent;text-align:left;color:inherit;text-decoration:none}
+.mi:hover{background:var(--hover)}
+.mi .sq{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+.mi .grow b{font-weight:500;font-size:16px}
+.mi .grow small{font-size:13.5px}
+.mi .ic.chev{color:var(--mut);opacity:.6}
+.subhead{display:flex;align-items:center;gap:6px;padding:4px 0 6px}
+.subhead b{font-size:19px}
+.note{margin:4px 14px 10px;font-size:13.5px;color:var(--mut)}
+
+/* ---- avatar ---- */
+.avw{position:relative;flex:none;line-height:0}
+.av{border-radius:50%;object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;line-height:1}
+.dot{position:absolute;right:0;bottom:0;width:13px;height:13px;border-radius:50%;background:var(--ok);border:2.5px solid var(--surface)}
+.row.active .dot{border-color:var(--pri)}
+
+/* ---- chat list ---- */
+.searchrow{padding:8px 12px;position:relative;flex:none}
+.searchrow input{margin:0;padding:10px 14px 10px 40px;border-radius:22px}
+.searchrow .ic{position:absolute;left:25px;top:50%;transform:translateY(-50%);color:var(--mut);pointer-events:none}
+.list{flex:1;overflow-y:auto;overscroll-behavior:contain;padding-bottom:90px}
+.row{display:flex;align-items:center;gap:12px;padding:9px 12px;cursor:pointer;margin:0 6px;border-radius:14px;transition:background .12s}
+.row:hover{background:var(--hover)}
+.row:active{background:var(--pri-soft)}
+.row.active,.row.active:hover{background:var(--pri);color:var(--on-pri)}
+.row.active small,.row.active .right,.row.active .grow small{color:rgba(255,255,255,.82)}
+.row.active .badge{background:#fff;color:var(--pri)}
+.row .line1{display:flex;align-items:center;gap:6px}
+.row .line1 b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .line2{display:flex;align-items:center;gap:6px}
+.row .line2 small{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.when{font-size:12px;color:var(--mut);flex:none;display:inline-flex;align-items:center;gap:2px}
+.row.active .when{color:rgba(255,255,255,.82)}
+.tick{color:var(--pri)}
+.row.active .tick{color:#fff}
+.badge{background:var(--pri);color:var(--on-pri);border-radius:999px;font-size:12px;font-weight:600;padding:0 7px;min-width:22px;height:22px;line-height:22px;text-align:center;flex:none}
+.tag{font-size:12px;border-radius:6px;padding:0 7px;color:var(--pri);background:var(--pri-soft);flex:none}
+.fab{position:absolute;right:18px;bottom:calc(92px + env(safe-area-inset-bottom));width:56px;height:56px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;padding:0;box-shadow:var(--shadow-lg);z-index:5}
+.sk{border-radius:10px;background:linear-gradient(90deg,var(--field) 25%,var(--hover) 37%,var(--field) 63%);background-size:400% 100%;animation:shimmer 1.4s ease infinite}
+@keyframes shimmer{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.row-sk{display:flex;gap:12px;padding:10px 18px;align-items:center}
+
+/* ---- messages ---- */
+.msgwrap{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
+.msgs{flex:1;overflow-y:auto;overscroll-behavior:contain;padding:8px max(10px,calc((100% - 780px)/2));display:flex;flex-direction:column}
+.msg{display:flex;align-items:flex-end;gap:6px;margin-top:2px;scroll-margin:70px}
+.msg.first{margin-top:9px}
+.msg.mine{justify-content:flex-end}
+.msg .avs{width:32px;flex:none;line-height:0}
+.bub{position:relative;max-width:min(80%,540px);background:var(--in);border-radius:17px;padding:6px 11px 6px;box-shadow:var(--shadow);overflow-wrap:anywhere;word-break:break-word;transition:transform .15s}
+.bub::after{content:"";display:block;clear:both}
+.msg:not(.mine) .bub{border-bottom-left-radius:5px}
+.msg:not(.mine):not(.first) .bub{border-top-left-radius:5px}
+.msg.mine .bub{background:var(--out);border-bottom-right-radius:5px}
+.msg.mine:not(.first) .bub{border-top-right-radius:5px}
+.msg:not(.last):not(.mine) .bub{border-bottom-left-radius:5px}
+.bub.failed{outline:1.5px solid var(--danger)}
+.bub.pending{opacity:.75}
+.flash .bub{animation:flash 1.1s ease}
+@keyframes flash{0%,60%{box-shadow:0 0 0 3px var(--pri)}100%{box-shadow:var(--shadow)}}
+.who{font-size:13px;font-weight:600;margin-bottom:1px}
+.txt{white-space:pre-wrap;line-height:1.5}
+.meta{float:right;margin:8px 0 -3px 12px;font-size:11.5px;color:var(--mut);display:inline-flex;align-items:center;gap:3px;line-height:1.2;user-select:none}
+.meta .tick{display:inline-flex}
+.meta .err{color:var(--danger)}
+.blockmeta{display:flex;justify-content:flex-end;margin-top:2px}
+.blockmeta .meta{float:none;margin:0}
+.media{position:relative;line-height:0;margin:-2px -5px 2px;border-radius:12px;overflow:hidden;cursor:zoom-in}
+.media img,.media video{display:block;max-width:100%;max-height:360px;width:auto;height:auto;min-width:140px;background:var(--field)}
+.media video{cursor:auto}
+.media .meta{position:absolute;right:7px;bottom:6px;margin:0;float:none;background:rgba(0,0,0,.5);color:#fff;border-radius:11px;padding:1px 8px}
+.media .meta .tick{color:#fff}
+.quote{border-left:3px solid var(--pri);background:var(--pri-soft);padding:3px 9px;margin:2px 0 5px;font-size:13.5px;border-radius:4px 8px 8px 4px;cursor:pointer;line-height:1.4;overflow:hidden}
+.quote b{display:block;color:var(--pri);font-weight:600}
+.quote div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--mut)}
+.file{display:flex;align-items:center;gap:10px;padding:2px 0;text-decoration:none;color:inherit;min-width:190px}
+.file .fi{width:42px;height:42px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;flex:none}
+.file small{display:block}
+.voice{display:flex;align-items:center;gap:10px;min-width:210px;padding:2px 0}
+.voice .pp{width:40px;height:40px;border-radius:50%;background:var(--pri);color:var(--on-pri);padding:0;display:flex;align-items:center;justify-content:center;flex:none}
+.wave{display:flex;align-items:center;gap:2px;height:30px;flex:1}
+.wave i{display:block;width:3px;border-radius:2px;background:var(--mut);opacity:.45;transition:opacity .1s,background .1s}
+.wave i.on{background:var(--pri);opacity:1}
+.voice small{font-size:12px;min-width:34px}
+.daygrp{display:flex;flex-direction:column}
+.day{position:sticky;top:6px;z-index:2;align-self:center;font-size:12.5px;font-weight:500;color:#fff;background:rgba(40,50,60,.45);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:999px;padding:2px 12px;margin:10px 0 4px}
+.older{align-self:center;font-size:13.5px;background:var(--surface);box-shadow:var(--shadow);margin:6px 0;padding:7px 16px;border-radius:999px;color:var(--pri)}
+.hello{margin:auto;text-align:center;background:var(--surface);color:var(--mut);border-radius:18px;padding:18px 26px;box-shadow:var(--shadow)}
+.hello .big{font-size:42px;line-height:1.2}
+.jump{position:absolute;right:14px;bottom:12px;width:44px;height:44px;border-radius:50%;background:var(--surface);color:var(--mut);box-shadow:var(--shadow-lg);padding:0;display:flex;align-items:center;justify-content:center;z-index:5}
+.jump .badge{position:absolute;top:-8px;right:-4px;height:20px;line-height:20px;min-width:20px}
+
+/* ---- composer ---- */
+.ctx{display:flex;align-items:center;gap:10px;padding:7px 12px 7px 16px;background:var(--surface);border-top:1px solid var(--line);flex:none}
+.ctx .ic.lead{color:var(--pri)}
+.ctx .grow b{color:var(--pri);font-size:13.5px}
+.ctx .grow small{font-size:13.5px}
+.composer{display:flex;align-items:flex-end;gap:8px;padding:8px max(10px,calc((100% - 780px)/2)) calc(8px + env(safe-area-inset-bottom));flex:none}
+.cwrap{flex:1;display:flex;align-items:flex-end;background:var(--surface);border-radius:23px;box-shadow:var(--shadow);min-width:0;padding:2px 2px}
+.cwrap textarea{border:0;background:transparent;margin:0;padding:10px 4px;max-height:130px;resize:none;border-radius:0;line-height:1.45;min-height:44px}
+.cwrap button.icon{height:44px;width:44px}
+.act{width:46px;height:46px;border-radius:50%;background:var(--pri);color:var(--on-pri);padding:0;display:flex;align-items:center;justify-content:center;flex:none;box-shadow:var(--shadow)}
+.act.rec{background:var(--danger);color:#fff}
+.recbar{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:23px;box-shadow:var(--shadow);padding:0 6px 0 16px;min-height:48px}
+.recdot{width:11px;height:11px;border-radius:50%;background:var(--danger);animation:pulse 1s ease infinite}
+@keyframes pulse{50%{opacity:.25}}
+.blockbar{display:flex;align-items:center;gap:8px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:var(--surface);font-size:14px;flex:none}
+.blockbar button{background:var(--pri-soft);color:var(--pri);font-weight:600}
+
+/* ---- overlays ---- */
+.overlay{position:fixed;inset:0;background:rgba(10,15,20,.5);display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fade .15s ease-out}
+@keyframes fade{from{opacity:0}}
+.panel{background:var(--surface);width:100%;max-width:520px;max-height:88dvh;overflow-y:auto;border-radius:20px 20px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom));animation:up .22s cubic-bezier(.2,.9,.3,1)}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@media (min-width:600px){.overlay{align-items:center}.panel{border-radius:20px;max-width:440px;box-shadow:var(--shadow-lg)}}
+.overlay.dlg{align-items:center}
+.overlay.dlg .panel{border-radius:20px;max-width:360px;margin:0 20px;padding:20px}
+.dlg p{margin:6px 0 14px;color:var(--mut)}
+.dlg .btns{display:flex;gap:8px;justify-content:flex-end}
+.dlg .btns button{flex:0 1 auto;padding:10px 18px;background:transparent;font-weight:600;color:var(--pri)}
+.dlg .btns button.danger{color:var(--danger)}
+.panel-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.panel-h b{font-size:18px}
+.sheet-i{display:flex;align-items:center;gap:14px;width:100%;text-align:left;margin:2px 0;background:transparent;padding:12px 10px}
+.sheet-i:hover{background:var(--hover)}
+.sheet-i .ic{color:var(--mut)}
+.sheet-i.danger .ic{color:var(--danger)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.chip{background:var(--pri-soft);color:var(--pri);border-radius:999px;padding:3px 6px 3px 12px;font-size:14px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.center{text-align:center}.center .av{margin:0 auto}
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:40;display:flex;align-items:center;justify-content:center;animation:fade .15s;cursor:zoom-out}
+.lb img{max-width:96vw;max-height:92dvh;object-fit:contain}
+.lb button{position:absolute;top:calc(12px + env(safe-area-inset-top));right:12px;color:#fff}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(25,30,36,.94);color:#fff;padding:10px 16px;border-radius:12px;z-index:60;max-width:90%;font-size:14px;box-shadow:var(--shadow-lg);animation:fade .2s}
+
+/* ---- auth ---- */
+.authwrap{height:100dvh;overflow-y:auto;display:flex;background:linear-gradient(160deg,var(--pri-soft),transparent 55%),var(--bg)}
+.auth{margin:auto;width:100%;max-width:400px;padding:max(28px,env(safe-area-inset-top)) 22px 28px}
+.logo{width:84px;height:84px;border-radius:26px;background:linear-gradient(145deg,#59b3ff,var(--pri));color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 10px 30px rgba(51,144,236,.4)}
+.auth h1{text-align:center;margin:0 0 4px;font-size:26px}
+.auth .sub{text-align:center;margin:0 0 22px;color:var(--mut)}
+.seg{display:flex;background:var(--field);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px}
+.seg button{flex:1;background:transparent;padding:9px 6px;border-radius:9px;color:var(--mut);font-weight:500}
+.seg button.on{background:var(--surface);color:var(--fg);box-shadow:var(--shadow);font-weight:600}
+.pw{position:relative}.pw input{padding-right:46px}
+.pw button{position:absolute;right:2px;top:5px;height:46px;width:44px;background:transparent;color:var(--mut);padding:0;display:flex;align-items:center;justify-content:center}
+.err{color:var(--danger);min-height:1.5em;font-size:14px;margin:4px 2px 0}
+
+/* ---- profile / forms ---- */
+.pad{padding:14px;overflow-y:auto;flex:1;width:100%;max-width:640px;margin:0 auto}
+.card{background:var(--surface);border-radius:16px;padding:6px;margin:12px 0;box-shadow:var(--shadow)}
+.card.p{padding:14px}
+.card h4{margin:6px 10px 2px;font-size:13px;color:var(--mut);font-weight:600}
+.card .row{margin:0}
+.avedit{position:relative;display:inline-block;cursor:pointer;line-height:0}
+.avedit .cam{position:absolute;right:-2px;bottom:-2px;width:32px;height:32px;border-radius:50%;background:var(--pri);color:var(--on-pri);display:flex;align-items:center;justify-content:center;border:3px solid var(--bg)}
+.sw{appearance:none;-webkit-appearance:none;width:46px!important;height:28px;border-radius:14px;background:var(--line)!important;position:relative;margin:0!important;padding:0!important;border:0!important;flex:none;cursor:pointer;transition:background .2s}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw:checked{background:var(--pri)!important}
+.sw:checked::after{transform:translateX(18px)}
+
+/* ---- privacy mode ---- */
+.wm{position:absolute;inset:0;pointer-events:none;z-index:3}
+.secure .msgs,.secure .bar{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.secure img,.secure video{-webkit-user-drag:none}
+.shield{position:fixed;inset:0;background:var(--bg);z-index:80;display:flex;align-items:center;justify-content:center;color:var(--mut)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
-<div id="login">
-  <form class="lbox" id="lform">
-    <div class="logo"><span class="ic" id="llogo"></span></div>
-    <h1>Layzzchat Admin</h1>
-    <p>ចូលដោយគណនី Admin របស់អ្នក</p>
-    <label for="u">ឈ្មោះអ្នកប្រើ</label>
-    <input id="u" autocomplete="username" autocapitalize="none" spellcheck="false">
-    <label for="p">ពាក្យសម្ងាត់</label>
-    <input id="p" type="password" autocomplete="current-password">
-    <div class="err" id="lerr" role="alert"></div>
-    <button class="btn" id="go" type="submit">ចូល</button>
-  </form>
-</div>
-
-<div id="gate" class="hide">
-  <div class="lbox">
-    <div class="logo"><span class="ic" id="glogo"></span></div>
-    <h1>ស្កេនដើម្បីចូល</h1>
-    <p>ប្រើមុខ ម្រាមដៃ ឬ PIN របស់ទូរស័ព្ទ ដើម្បីបើកផ្ទាំង Admin</p>
-    <div class="err" id="gerr" role="alert"></div>
-    <button class="btn" id="gscan" type="button">ស្កេនឥឡូវនេះ</button>
-    <button class="btn ghost" id="gout" type="button">ចាកចេញ</button>
-  </div>
-</div>
-
-<div id="app" class="hide">
-  <header>
-    <div class="hin">
-      <div class="brand"><i><span class="ic" id="hlogo"></span></i><span>Layzzchat<small>Admin</small></span></div>
-      <a class="iconbtn" href="/" id="toapp"></a>
-      <button class="iconbtn" id="out"></button>
-    </div>
-    <div class="tabs" id="tabs"></div>
-  </header>
-  <main id="view"></main>
-</div>
-
+<div id="app"></div>
 <script>
-const $ = (s) => document.querySelector(s);
-const ICON = {
-  chat: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
-  home: '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
-  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
-  userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
-  msg: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z"/>',
-  group: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/><circle cx="5" cy="9" r="2.3"/><circle cx="19" cy="9" r="2.3"/>',
-  image: '<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/>',
-  ban: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
-  pulse: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
-  search: '<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
-  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
-  out: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
-  face: '<path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 10v1M15 10v1M9.5 15.5a3.5 3.5 0 0 0 5 0"/>',
-  shield: '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1Z"/>',
-  logoff: '<path d="M18.4 6.6a9 9 0 1 1-12.8 0"/><path d="M12 2v10"/>',
-  ext: '<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+'use strict';
+/* ---------- helpers ---------- */
+const app = document.getElementById('app');
+const store = {
+  get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
+  del(k) { try { localStorage.removeItem(k); } catch { /* ignore */ } },
 };
-const ic = (n) => { const s = document.createElement('span'); s.className = 'ic'; s.innerHTML = `<svg viewBox="0 0 24 24">${ICON[n] || ''}</svg>`; return s; };
-function el(tag, props = {}, ...kids) {
+const safeUrl = (u) => (typeof u === 'string' && u.startsWith('https://') ? u : '');
+function h(tag, props, ...kids) {
   const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(props)) { if (v == null) continue; if (k === 'class') n.className = v; else if (k.startsWith('on')) n[k] = v; else n.setAttribute(k, v); }
-  kids.flat().forEach((k) => k != null && n.append(k));
+  for (const [k, v] of Object.entries(props || {})) {
+    if (v == null || v === false) continue;
+    if (k === 'class') n.className = v;
+    else if (k === 'style') n.style.cssText = v;
+    else if (k.startsWith('on')) { if (typeof v === 'function') n.addEventListener(k.slice(2), v); }
+    else if (k === 'value' || k === 'hidden' || k === 'disabled' || k === 'checked') n[k] = v;
+    else n.setAttribute(k, v === true ? '' : v);
+  }
+  kids.flat(Infinity).forEach((c) => { if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(String(c))); });
   return n;
 }
-const T = (s) => document.createTextNode(String(s));
+const mount = (node) => app.replaceChildren(node);
 
-let token = localStorage.getItem('adminToken');
-let tab = 'overview', page = 1, query = '';
-let gen = 0; // ignore responses of an older tab/search
-
-// "pass" = proof that this admin just scanned their face / fingerprint (kept for this browser tab only)
-let pass = ''; try { pass = sessionStorage.getItem('adminPass') || ''; } catch { /* ignore */ }
-function setPass(v) { pass = v || ''; try { v ? sessionStorage.setItem('adminPass', v) : sessionStorage.removeItem('adminPass'); } catch { /* ignore */ } }
-async function api(path, opts = {}) {
-  const headers = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token };
-  if (pass) headers['X-Admin-Pass'] = pass;
-  const r = await fetch('/api/admin' + path, { ...opts, headers });
-  const d = await r.json().catch(() => ({}));
-  if (r.status === 403 && d.code === 'PASSKEY_REQUIRED') { setPass(''); showGate(); throw new Error('gate'); }
-  if (r.status === 401 || r.status === 403) { logout(); throw new Error('auth'); }
-  if (!r.ok) { toast(d.error || 'មានបញ្ហា'); throw new Error(d.error || 'Request failed'); }
-  return d;
+/* ---------- icons (Lucide-style, stroke) ---------- */
+const ICONS = {
+  back: '<path d="m15 18-6-6 6-6"/>',
+  more: '<path d="M12 5h.01M12 12h.01M12 19h.01" stroke-width="3"/>',
+  compose: '<path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4Z"/>',
+  pencil: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+  send: '<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',
+  mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/>',
+  clip: '<path d="m21.4 11-9.2 9.2a6 6 0 0 1-8.5-8.5l8.6-8.6A4 4 0 1 1 18 8.8l-8.6 8.6a2 2 0 0 1-2.8-2.8l8.5-8.5"/>',
+  x: '<path d="M18 6 6 18M6 6l12 12"/>',
+  check: '<path d="M20 6 9 17l-5-5"/>',
+  checks: '<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  alert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  reply: '<path d="M9 17 4 12l5-5"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/>',
+  copy: '<rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  trash: '<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+  userplus: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/>',
+  message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',
+  ban: '<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+  unlock: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+  lock: '<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  down: '<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+  search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  key: '<circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+  devices: '<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
+  shield: '<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.7 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.5 0C14.500 3.800 17 5 19 5a1 1 0 0 1 1 1Z"/>',
+  crown: '<path d="m2 4 3 12h14l3-12-6 7-4-7-4 7Z"/><path d="M5 20h14"/>',
+  plus: '<path d="M5 12h14M12 5v14"/>',
+  play: '<path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5Z" fill="currentColor" stroke="none"/>',
+  pause: '<rect x="6" y="4" width="4.5" height="16" rx="1.2" fill="currentColor" stroke="none"/><rect x="13.500" y="4" width="4.500" height="16" rx="1.2" fill="currentColor" stroke="none"/>',
+  file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+  camera: '<path d="M14.500 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3Z"/><circle cx="12" cy="13" r="3"/>',
+  eye: '<path d="M2 12s3.600-7 10-7 10 7 10 7-3.600 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff: '<path d="M9.900 4.200A10 10 0 0 1 12 5c6.400 0 10 7 10 7a17 17 0 0 1-2.200 3.200M6.600 6.600A17 17 0 0 0 2 12s3.600 7 10 7a9.700 9.700 0 0 0 5.400-1.600"/><path d="m2 2 20 20"/><path d="M9.900 9.900a3 3 0 0 0 4.200 4.200"/>',
+  contacts: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="10" r="3"/><path d="M7 20.7a5 5 0 0 1 10 0"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+  chev: '<path d="m9 18 6-6-6-6"/>',
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+};
+function ic(name, size = 22) {
+  const e = document.createElement('span');
+  e.className = 'ic';
+  e.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
+  return e;
 }
-function logout() { localStorage.removeItem('adminToken'); token = null; setPass(''); $('#app').classList.add('hide'); $('#gate').classList.add('hide'); $('#login').classList.remove('hide'); }
-function toast(text) { const t = el('div', { class: 'toast', role: 'status' }, text); document.body.append(t); setTimeout(() => t.remove(), 2600); }
-function confirmBox(title, text, ok, danger) {
-  return new Promise((res) => {
-    const done = (v) => { ov.remove(); res(v); };
-    const ov = el('div', { class: 'ov', onclick: (e) => { if (e.target === ov) done(false); } },
-      el('div', { class: 'dlg', role: 'dialog' }, el('b', {}, title), el('p', {}, text),
-        el('div', { class: 'row' }, el('button', { onclick: () => done(false) }, 'បោះបង់'), el('button', { class: 'ok' + (danger ? ' danger' : ''), onclick: () => done(true) }, ok))));
-    document.body.append(ov);
+const ibtn = (name, label, onclick, cls = '') => h('button', { class: 'icon ' + cls, 'aria-label': label, title: label, onclick }, ic(name));
+
+/* ---------- theme ---------- */
+function applyTheme() {
+  const t = store.get('theme') || 'auto';
+  if (t === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.dataset.theme = t;
+  const dark = t === 'dark' || (t === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  const m = document.querySelector('meta[name="theme-color"]');
+  if (m) m.content = dark ? '#17212b' : '#3390ec';
+}
+applyTheme();
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyTheme);
+
+/* ---------- time ---------- */
+const sameDay = (a, b) => new Date(a).toDateString() === new Date(b).toDateString();
+const fmtTime = (x) => new Date(x).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const fmtShortDate = (x) => new Date(x).toLocaleDateString([], { day: 'numeric', month: 'short' });
+const fmtFull = (x) => new Date(x).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' });
+function dayLabel(x) {
+  const d = new Date(x), n = new Date();
+  if (sameDay(d, n)) return 'ថ្ងៃនេះ';
+  const y = new Date(n); y.setDate(n.getDate() - 1);
+  if (sameDay(d, y)) return 'ម្សិលមិញ';
+  return d.toLocaleDateString('km-KH', { day: 'numeric', month: 'long', ...(d.getFullYear() !== n.getFullYear() ? { year: 'numeric' } : {}) });
+}
+const fmtDur = (s) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const fmtSize = (b) => (!b ? '' : b < 1024 * 1024 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1) + ' MB');
+const back5 = (iso) => new Date(new Date(iso).getTime() - 5000).toISOString();
+const hueOf = (s) => [...(s || '')].reduce((a, c) => a + c.codePointAt(0), 0) % 360;
+
+/* ---------- toast / avatar / overlays ---------- */
+let toastEl = null, toastTimer = null;
+function toast(msg, ms = 2600) {
+  if (toastEl) toastEl.remove();
+  clearTimeout(toastTimer);
+  const el = h('div', { class: 'toast', role: 'status' }, msg); toastEl = el; document.body.append(el);
+  toastTimer = setTimeout(() => el.remove(), ms);
+}
+const hideToast = () => { if (toastEl) toastEl.remove(); };
+const safe = (fn) => async (...a) => { try { await fn(...a); } catch (e) { toast(e.message || 'Error'); } };
+function avatar(url, name, size = 40) {
+  const s = `width:${size}px;height:${size}px;font-size:${Math.round(size * 0.42)}px`;
+  const u = safeUrl(url);
+  if (u) return h('img', { class: 'av', src: u, style: s, alt: '' });
+  const ch = ([...(name || '?')][0] || '?').toUpperCase();
+  const hue = hueOf(name);
+  return h('div', { class: 'av', style: s + `;background:linear-gradient(145deg,hsl(${hue} 62% 58%),hsl(${(hue + 25) % 360} 60% 44%))` }, ch);
+}
+const avatarOnline = (url, name, size, online) => h('div', { class: 'avw' }, avatar(url, name, size), online ? h('span', { class: 'dot' }) : null);
+
+const overlays = [];
+function modal(title, body, cls = '') {
+  const close = () => { const i = overlays.indexOf(ov); if (i >= 0) overlays.splice(i, 1); ov.remove(); };
+  const ov = h('div', { class: 'overlay ' + cls, onclick: (e) => { if (e.target === ov) close(); } },
+    h('div', { class: 'panel', role: 'dialog', 'aria-modal': 'true' },
+      title ? h('div', { class: 'panel-h' }, h('b', {}, title), ibtn('x', 'Close', close)) : null, body));
+  overlays.push(ov); document.body.append(ov);
+  ov._close = close;
+  return close;
+}
+function closeAllOverlays() { [...overlays].forEach((o) => o._close()); }
+function sheet(title, items) {
+  const list = items.filter(Boolean);
+  if (!list.length) return;
+  const close = modal(title, h('div', {}, list.map((i) => h('button', {
+    class: 'sheet-i' + (i.danger ? ' danger' : ''),
+    onclick: async () => { close(); try { await i.fn(); } catch (e) { toast(e.message || 'Error'); } },
+  }, i.icon ? ic(i.icon) : null, i.label))));
+}
+function confirmDialog({ title, text, ok = 'យល់ព្រម', danger = false }) {
+  return new Promise((resolve) => {
+    let done = false;
+    const end = (v) => { if (done) return; done = true; close(); resolve(v); };
+    const close = modal(null, h('div', {}, h('b', { style: 'font-size:18px' }, title), text ? h('p', {}, text) : h('p', {}),
+      h('div', { class: 'btns' }, h('button', { onclick: () => end(false) }, 'បោះបង់'), h('button', { class: danger ? 'danger' : '', onclick: () => end(true) }, ok))), 'dlg');
+    const ov = overlays[overlays.length - 1];
+    ov.addEventListener('click', (e) => { if (e.target === ov) end(false); });
+    ov._close = () => end(false);
   });
 }
-const initial = (s) => (String(s || '?').trim()[0] || '?').toUpperCase();
-const avatar = (url, name, online) => { const a = el('div', { class: 'av' }, url ? null : initial(name), online ? el('span', { class: 'on' }) : null); if (url) a.style.backgroundImage = `url("${url.replace(/"/g, '%22')}")`; return a; };
-const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-const act = (icon, text, fn, cls = '') => el('button', { class: cls, onclick: fn }, ic(icon), text);
-
-/* ---------- login ---------- */
-$('#glogo').replaceWith(ic('face')); $('#llogo').replaceWith(ic('chat')); $('#hlogo').replaceWith(ic('chat'));
-$('#toapp').append(ic('ext'), ' app'); $('#out').append(ic('out'), 'ចាកចេញ');
-$('#lform').onsubmit = async (e) => {
-  e.preventDefault(); $('#lerr').textContent = ''; $('#go').disabled = true;
-  try {
-    const r = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: $('#u').value, password: $('#p').value }) });
-    const d = await r.json();
-    if (!r.ok) throw new Error(d.error || 'ចូលមិនបាន');
-    if (d.user.role !== 'ADMIN') throw new Error('នេះមិនមែនគណនី Admin ទេ');
-    token = d.token; localStorage.setItem('adminToken', token); $('#p').value = ''; start();
-  } catch (er) { $('#lerr').textContent = er.message === 'Failed to fetch' ? 'មិនមានអ៊ីនធឺណិត' : er.message; }
-  $('#go').disabled = false;
-};
-$('#out').onclick = logout;
-
-/* ---------- tabs ---------- */
-const TABS = [['overview', 'home', 'ទិដ្ឋភាពទូទៅ'], ['users', 'users', 'អ្នកប្រើ'], ['chats', 'group', 'Chat'], ['messages', 'msg', 'សារ']];
-function drawTabs() {
-  $('#tabs').replaceChildren(...TABS.map(([id, icon, label]) => el('button', { class: id === tab ? 'on' : '', onclick: () => { tab = id; page = 1; query = ''; drawTabs(); load(); } }, ic(icon), label)));
+function promptDialog({ title, value = '', placeholder = '', ok = 'រក្សាទុក' }) {
+  return new Promise((resolve) => {
+    let done = false;
+    const end = (v) => { if (done) return; done = true; close(); resolve(v); };
+    const input = h('input', { value, placeholder, maxlength: 80, onkeydown: (e) => { if (e.key === 'Enter') end(input.value); } });
+    const close = modal(null, h('div', {}, h('b', { style: 'font-size:18px' }, title), input,
+      h('div', { class: 'btns', style: 'margin-top:10px' }, h('button', { onclick: () => end(null) }, 'បោះបង់'), h('button', { onclick: () => end(input.value) }, ok))), 'dlg');
+    const ov = overlays[overlays.length - 1];
+    ov.addEventListener('click', (e) => { if (e.target === ov) end(null); });
+    ov._close = () => end(null);
+    setTimeout(() => { input.focus(); input.select(); }, 60);
+  });
 }
+function lightbox(url) {
+  const close = () => { lb.remove(); const i = overlays.indexOf(lb); if (i >= 0) overlays.splice(i, 1); };
+  const lb = h('div', { class: 'lb', onclick: close }, h('img', { src: url, alt: '' }), h('button', { class: 'icon', 'aria-label': 'Close', onclick: close }, ic('x', 26)));
+  lb._close = close; overlays.push(lb); document.body.append(lb);
+}
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && overlays.length) overlays[overlays.length - 1]._close(); });
 
-/* ---------- views ---------- */
-const view = () => $('#view');
-const skeleton = () => view().replaceChildren(el('div', { class: 'list' }, [1, 2, 3, 4].map(() => el('div', { class: 'skel' }))));
-const empty = (t) => el('div', { class: 'empty' }, t);
-function searchBar(placeholder) {
-  const q = el('input', { type: 'search', placeholder, value: query, enterkeyhint: 'search' });
-  const go = () => { query = q.value.trim(); page = 1; load(); };
-  q.onkeydown = (e) => e.key === 'Enter' && go();
-  return el('div', { class: 'bar2' }, q, el('button', { class: 'go', 'aria-label': 'ស្វែងរក', onclick: go }, ic('search')));
+/* ---------- api ---------- */
+let token = store.get('token');
+let me = null;
+async function api(path, { method = 'GET', body, form } = {}) {
+  const headers = {};
+  if (body) headers['Content-Type'] = 'application/json';
+  if (token) headers.Authorization = 'Bearer ' + token;
+  const res = await fetch('/api' + path, { method, headers, body: form || (body ? JSON.stringify(body) : undefined) });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401 && token && data.error === 'Unauthorized') { logout(); throw new Error('សម័យផុតកំណត់ សូមចូលម្ដងទៀត'); }
+  if (!res.ok) throw new Error(data.error || 'Error ' + res.status);
+  return data;
 }
-function pager(p, pages) {
-  if (!pages || pages < 2) return null;
-  return el('div', { class: 'pager' },
-    el('button', { disabled: p <= 1 ? '' : null, onclick: () => { page--; load(); window.scrollTo(0, 0); } }, '‹'), T(`${p} / ${pages}`),
-    el('button', { disabled: p >= pages ? '' : null, onclick: () => { page++; load(); window.scrollTo(0, 0); } }, '›'));
-}
-const stat = (icon, label, value, tone = '') => el('div', { class: 'stat' }, el('div', { class: 'top' }, el('span', { class: 'bub ' + tone }, ic(icon)), label), el('b', {}, value.toLocaleString('en-US')));
-function chart(title, days, key) {
-  const max = Math.max(1, ...days.map((d) => d[key]));
-  return el('div', { class: 'panel' }, el('h3', {}, title),
-    el('div', { class: 'chart' }, days.map((d) => el('div', { class: 'col' }, el('span', { class: 'v' }, d[key]),
-      el('div', { class: 'bar', style: `height:${Math.max(3, (d[key] / max) * 100)}px` }),
-      el('span', { class: 'd' }, new Date(d.to).toLocaleDateString('en-GB', { weekday: 'short' }))))));
+function saveAuth(r) { token = r.token; store.set('token', token); if (r.user) me = r.user; return r; }
+function logout() {
+  token = null; store.del('token'); me = null; stopChatPoll(); stopListPoll(); stopAudio();
+  closeAllOverlays(); shell = null; cur = null; ui = null;
+  mount(authView());
 }
 
-async function load() {
-  const my = ++gen;
-  skeleton();
-  const q = encodeURIComponent(query);
-  try {
-    if (tab === 'overview') {
-      const [s, ser] = await Promise.all([api('/stats'), api('/series')]);
-      if (my !== gen) return;
-      view().replaceChildren(
-        el('div', { class: 'stats' },
-          stat('pulse', 'កំពុងអនឡាញ', s.onlineNow, 'g'), stat('users', 'អ្នកប្រើសរុប', s.users), stat('userplus', 'ថ្មី (24 ម៉ោង)', s.newUsers, 'g'), stat('ban', 'ត្រូវបាន ban', s.banned, 'r'),
-          stat('group', 'Chat សរុប', s.chats), stat('users', 'ក្រុម', s.groups), stat('msg', 'សារសរុប', s.messages), stat('msg', 'សារ (24 ម៉ោង)', s.messagesToday, 'g'), stat('image', 'Media', s.media)),
-        el('div', { class: 'panels' }, chart('អ្នកប្រើថ្មី 7 ថ្ងៃចុងក្រោយ', ser.days, 'users'), chart('សារ 7 ថ្ងៃចុងក្រោយ', ser.days, 'messages')),
-        await securityPanel().catch(() => null));
-    } else if (tab === 'users') {
-      const d = await api(`/users?q=${q}&page=${page}`);
-      if (my !== gen) return;
-      view().replaceChildren(searchBar('ស្វែងរកអ្នកប្រើ…'), el('div', { class: 'meta', style: 'margin:0 4px 10px' }, `${d.total} នាក់`),
-        d.users.length ? el('div', { class: 'list' }, d.users.map(userItem)) : empty('រកមិនឃើញ'), pager(d.page, d.pages));
-    } else if (tab === 'chats') {
-      const { chats } = await api('/chats');
-      if (my !== gen) return;
-      view().replaceChildren(chats.length ? el('div', { class: 'list' }, chats.map((c) => el('div', { class: 'item' },
-        el('div', { class: 'av' }, ic(c.type === 'GROUP' ? 'group' : 'users')),
-        el('div', { class: 'main' }, el('b', {}, c.title || '(chat ឯកជន)', el('span', { class: 'tag gray' }, c.type === 'GROUP' ? 'ក្រុម' : 'ឯកជន')), el('small', {}, `${c._count.members} សមាជិក · ${c._count.messages} សារ`)),
-        el('span', { class: 'meta' }, fmtDate(c.createdAt))))) : empty('មិនទាន់មាន chat'));
-    } else if (tab === 'messages') {
-      const { messages } = await api('/messages?q=' + q);
-      if (my !== gen) return;
-      view().replaceChildren(searchBar('ស្វែងរកក្នុងសារ…'), messages.length ? el('div', { class: 'list' }, messages.map((m) => el('div', { class: 'item' },
-        avatar(m.sender.avatarUrl, m.sender.displayName),
-        el('div', { class: 'main' }, el('b', {}, m.sender.displayName, el('span', { class: 'tag gray' }, m.type)), el('small', {}, new Date(m.createdAt).toLocaleString('en-GB'))),
-        act('trash', 'លុប', async () => { if (await confirmBox('លុបសារនេះ?', 'សារនឹងបាត់ពី chat របស់អ្នកទាំងពីរ។', 'លុប', true)) { await api('/messages/' + m.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger'),
-        el('div', { class: 'msgtxt' }, m.text || m.fileName || `[${m.type}]`)))) : empty('រកមិនឃើញសារ'));
-    }
-  } catch (e) { if (e.message !== 'auth' && e.message !== 'gate' && my === gen) view().replaceChildren(empty('ផ្ទុកមិនបាន — សូមព្យាយាមម្ដងទៀត')); }
+/* ---------- state ---------- */
+let view = 'auth';
+let chats = [], chatsLoaded = false, sideQ = '';
+let cur = null, ui = null;
+let msgs = new Map(), reads = [], typingIds = [], hasMore = false, replyTo = null, editing = null, after = '';
+let loadingMsgs = false, stick = true, newBelow = 0, lastTyping = 0, rec = null;
+let secure = store.get('secure') !== '0'; // privacy mode (default ON)
+const mediaCache = new Map();
+const wide = () => matchMedia('(min-width:860px)').matches;
+
+const isSelf = () => cur && cur.type === 'PRIVATE' && cur.peer && cur.peer.id === me.id;
+function preview(m) {
+  if (!m) return '';
+  if (m.type === 'IMAGE') return '📷 រូបភាព' + (m.text ? ' · ' + m.text : '');
+  if (m.type === 'VIDEO') return '🎬 វីដេអូ';
+  if (m.type === 'VOICE') return '🎤 សំឡេង';
+  if (m.type === 'FILE') return '📎 ' + (m.fileName || 'ឯកសារ');
+  return (m.text || '').slice(0, 80);
 }
 
-function userItem(u) {
-  const patch = async (body, msg) => { await api('/users/' + u.id, { method: 'PATCH', body: JSON.stringify(body) }); toast(msg); load(); };
-  return el('div', { class: 'item' },
-    avatar(u.avatarUrl, u.displayName, u.online),
-    el('div', { class: 'main' }, el('b', {}, u.displayName, u.isBanned ? el('span', { class: 'tag red' }, 'BANNED') : u.role === 'ADMIN' ? el('span', { class: 'tag' }, 'ADMIN') : null),
-      el('small', {}, `@${u.username} · ចូលរួម ${fmtDate(u.createdAt)}`)),
-    el('div', { class: 'acts' },
-      act('ban', u.isBanned ? 'ដោះ ban' : 'Ban', async () => { if (u.isBanned || await confirmBox(`Ban @${u.username}?`, 'គាត់នឹងចូលប្រើមិនបានទៀតទេ។', 'Ban', true)) patch({ isBanned: !u.isBanned }, u.isBanned ? 'បានដោះ ban' : 'បាន ban'); }),
-      act('shield', u.role === 'ADMIN' ? 'ដក Admin' : 'ធ្វើជា Admin', async () => { if (await confirmBox(u.role === 'ADMIN' ? 'ដកសិទ្ធិ Admin?' : 'ផ្ដល់សិទ្ធិ Admin?', `@${u.username}`, 'យល់ព្រម')) patch({ role: u.role === 'ADMIN' ? 'USER' : 'ADMIN' }, 'រួចរាល់'); }),
-      act('logoff', 'Log out', async () => { if (await confirmBox('Log out ពីគ្រប់ឧបករណ៍?', `@${u.username}`, 'Log out')) patch({ revokeSessions: true }, 'បាន log out'); }),
-      act('trash', 'លុប', async () => { if (await confirmBox(`លុប @${u.username}?`, 'គណនី និងសារទាំងអស់របស់គាត់នឹងបាត់ជារៀងរហូត។', 'លុប', true)) { await api('/users/' + u.id, { method: 'DELETE' }); toast('បានលុប'); load(); } }, 'danger')));
-}
-
-/* ---------- face / fingerprint gate (WebAuthn passkeys, checked by the server) ---------- */
-const toBuf = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (s.length % 4)) % 4)), (c) => c.charCodeAt(0)).buffer;
-const fromBuf = (b) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-const canScan = () => !!(window.PublicKeyCredential && navigator.credentials && window.isSecureContext);
-const scanError = (e) => (e && e.name === 'NotAllowedError' ? 'បានបោះបង់ ឬអស់ពេល — សូមព្យាយាមម្ដងទៀត'
-  : e && e.name === 'InvalidStateError' ? 'ឧបករណ៍នេះបានចុះឈ្មោះរួចហើយ' : (e && e.message) || 'ស្កេនមិនបាន');
-
-async function scanIn() {
-  const o = await api('/passkey/login/options', { method: 'POST' });
-  const pk = o.options; pk.challenge = toBuf(pk.challenge); pk.allowCredentials = pk.allowCredentials.map((c) => ({ ...c, id: toBuf(c.id) }));
-  const c = await navigator.credentials.get({ publicKey: pk });
-  const d = await api('/passkey/login/verify', { method: 'POST', body: JSON.stringify({ state: o.state, credential: { id: c.id,
-    response: { clientDataJSON: fromBuf(c.response.clientDataJSON), authenticatorData: fromBuf(c.response.authenticatorData), signature: fromBuf(c.response.signature) } } }) });
-  setPass(d.pass);
-}
-async function enrol(name) {
-  const o = await api('/passkey/register/options', { method: 'POST' });
-  const pk = o.options; pk.challenge = toBuf(pk.challenge); pk.user.id = toBuf(pk.user.id); pk.excludeCredentials = pk.excludeCredentials.map((c) => ({ ...c, id: toBuf(c.id) }));
-  const c = await navigator.credentials.create({ publicKey: pk });
-  const d = await api('/passkey/register/verify', { method: 'POST', body: JSON.stringify({ state: o.state, name, credential: { id: c.id,
-    response: { clientDataJSON: fromBuf(c.response.clientDataJSON), attestationObject: fromBuf(c.response.attestationObject) } } }) });
-  setPass(d.pass);
-}
-function showGate() {
-  $('#app').classList.add('hide'); $('#login').classList.add('hide'); $('#gate').classList.remove('hide');
-  $('#gerr').textContent = canScan() ? '' : 'កម្មវិធី/ឧបករណ៍នេះមិនគាំទ្រការស្កេន។ សូមបើក /admin/ ក្នុង Chrome (HTTPS) លើទូរស័ព្ទដែលបានចុះឈ្មោះ។';
-  $('#gscan').disabled = !canScan();
-}
-$('#gscan').onclick = async () => {
-  $('#gerr').textContent = ''; $('#gscan').disabled = true;
-  try { await scanIn(); $('#gate').classList.add('hide'); start(); } catch (e) { if (e.message !== 'gate') $('#gerr').textContent = scanError(e); }
-  $('#gscan').disabled = !canScan();
-};
-$('#gout').onclick = logout;
-
-async function securityPanel() {
-  const st = await api('/passkey/status');
-  const box = el('div', { class: 'panel', style: 'margin-top:12px' });
-  const draw = (st) => {
-    box.replaceChildren(el('h3', {}, 'សុវត្ថិភាព Admin — ស្កេនមុខ/ម្រាមដៃ'),
-      el('p', { style: 'margin:0 0 10px;color:var(--mut);font-size:14px' }, st.enabled ? 'បើកហើយ៖ ត្រូវស្កេនរាល់ពេលចូលផ្ទាំងនេះ (រយៈពេល ៨ ម៉ោង)។' : 'មិនទាន់បើក៖ អ្នកណាមាន password Admin ក៏ចូលបាន។ ចុះឈ្មោះទូរស័ព្ទនេះដើម្បីបើក។'),
-      ...st.passkeys.map((k) => el('div', { class: 'keyrow' }, ic('face'), el('div', { class: 'main' }, el('b', {}, k.name || 'ឧបករណ៍'), el('small', {}, 'ចុះឈ្មោះ ' + fmtDate(k.createdAt) + (k.lastUsedAt ? ' · ប្រើចុងក្រោយ ' + fmtDate(k.lastUsedAt) : ''))),
-        act('trash', 'លុប', async () => {
-          if (!await confirmBox('លុបឧបករណ៍នេះ?', st.passkeys.length === 1 ? 'នេះជាឧបករណ៍ចុងក្រោយ — ការស្កេននឹងត្រូវបិទ។' : (k.name || 'ឧបករណ៍'), 'លុប', true)) return;
-          await api('/passkey/' + k.id, { method: 'DELETE' }); toast('បានលុប'); draw(await api('/passkey/status'));
-        }))),
-      canScan() ? el('div', { class: 'acts', style: 'margin-top:10px' }, act('face', st.passkeys.length ? 'បន្ថែមឧបករណ៍' : 'បើកការស្កេនលើឧបករណ៍នេះ', async () => {
-        try { await enrol((/Android|iPhone|iPad/.test(navigator.userAgent) ? 'ទូរស័ព្ទ' : 'កុំព្យូទ័រ')); toast('ចុះឈ្មោះរួចរាល់'); draw(await api('/passkey/status')); } catch (e) { if (e.message !== 'gate') toast(scanError(e)); }
-      }))
-        : el('p', { style: 'margin:10px 0 0;color:var(--mut);font-size:14px' }, 'ឧបករណ៍/កម្មវិធីនេះមិនគាំទ្រ — សូមបើកក្នុង Chrome (HTTPS) ដើម្បីចុះឈ្មោះ។'));
+/* ---------- polling ---------- */
+let chatGen = 0, chatTimer = null, listGen = 0, listTimer = null;
+function stopChatPoll() { chatGen++; clearTimeout(chatTimer); }
+function stopListPoll() { listGen++; clearTimeout(listTimer); }
+function startListPoll() {
+  const gen = ++listGen; clearTimeout(listTimer);
+  const tick = async () => {
+    if (gen !== listGen) return;
+    try { const d = await api('/chats'); if (gen !== listGen) return; chats = d.chats; chatsLoaded = true; drawList(); } catch { /* retry */ }
+    if (gen === listGen) listTimer = setTimeout(tick, document.hidden ? 15000 : view !== 'list' && !wide() ? 12000 : 4000);
   };
-  draw(st);
-  return box;
+  tick();
 }
 
-async function start() {
-  $('#login').classList.add('hide');
-  try {
-    const st = await api('/passkey/status');
-    if (st.enabled && !st.verified) return showGate();
-  } catch { return; }
-  $('#gate').classList.add('hide'); $('#app').classList.remove('hide'); drawTabs(); load();
+/* ---------- auth screen ---------- */
+function authView() {
+  view = 'auth';
+  let mode = 'login', showPw = false;
+  const root = h('div', { class: 'auth' });
+  const u = h('input', { placeholder: 'ឈ្មោះអ្នកប្រើ (a-z 0-9 _)', autocomplete: 'username', autocapitalize: 'none', autocorrect: 'off', spellcheck: 'false' });
+  const d = h('input', { placeholder: 'ឈ្មោះបង្ហាញ', autocomplete: 'name' });
+  const p = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ (8+ តួ)' });
+  const err = h('div', { class: 'err', role: 'alert' });
+  const eye = h('button', { type: 'button', 'aria-label': 'បង្ហាញពាក្យសម្ងាត់', onclick: () => { showPw = !showPw; p.type = showPw ? 'text' : 'password'; eye.replaceChildren(ic(showPw ? 'eyeoff' : 'eye', 20)); } }, ic('eye', 20));
+  const go = h('button', { class: 'primary', onclick: submit });
+  const tabs = h('div', { class: 'seg' });
+  async function submit() {
+    err.textContent = ''; go.disabled = true; const label = go.textContent; go.textContent = '…';
+    try {
+      const body = mode === 'login' ? { username: u.value, password: p.value } : { username: u.value, password: p.value, displayName: d.value };
+      saveAuth(await api(mode === 'login' ? '/auth/login' : '/auth/register', { method: 'POST', body }));
+      showList();
+    } catch (e) { err.textContent = e.message; go.disabled = false; go.textContent = label; }
+  }
+  function draw() {
+    p.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+    d.hidden = mode === 'login';
+    go.textContent = mode === 'login' ? 'ចូល' : 'បង្កើតគណនី';
+    tabs.replaceChildren(
+      h('button', { class: mode === 'login' ? 'on' : '', onclick: () => { mode = 'login'; err.textContent = ''; draw(); } }, 'ចូល'),
+      h('button', { class: mode === 'register' ? 'on' : '', onclick: () => { mode = 'register'; err.textContent = ''; draw(); } }, 'ចុះឈ្មោះ'));
+  }
+  [u, d, p].forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
+  draw();
+  root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Chat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
+    tabs, u, d, h('div', { class: 'pw' }, p, eye), err, go);
+  return h('div', { class: 'authwrap' }, root);
 }
-if (token) start();
+
+/* ---------- shell (side pane with bottom tabs + main pane) ---------- */
+let shell = null, sideList = null, contactList = null, main = null, sideBody = null, sideTitle = null, navEl = null, navSig = '', sideTab = 'chats', contactQ = '';
+const TAB_TITLES = { chats: 'Chat', contacts: 'ទំនាក់ទំនង', settings: 'ការកំណត់', profile: 'ប្រវត្តិរូប' };
+function ensureShell() {
+  if (shell && shell.isConnected) return;
+  sideTitle = h('b', { class: 'title' });
+  sideBody = h('div', { class: 'sidebody' });
+  navEl = h('nav', { class: 'nav', 'aria-label': 'Main' });
+  const side = h('aside', { class: 'side' }, h('div', { class: 'bar' }, sideTitle), sideBody, navEl);
+  main = h('main', { class: 'main' });
+  shell = h('div', { class: 'shell', 'data-view': 'list' }, side, main);
+  navSig = '';
+  mount(shell);
+  renderSide();
+}
+function setTab(t) { if (t !== sideTab && t !== 'settings') settingsPage = null; sideTab = t; renderSide(); }
+function searchRow(get, set, redraw) {
+  return h('div', { class: 'searchrow' }, ic('search', 18),
+    h('input', { type: 'search', placeholder: 'ស្វែងរក…', 'aria-label': 'Search', value: get(), oninput: (e) => { set(e.target.value); redraw(); } }));
+}
+function renderSide() {
+  sideTitle.textContent = TAB_TITLES[sideTab];
+  sideList = null; contactList = null;
+  if (sideTab === 'chats') {
+    sideList = h('div', { class: 'list' });
+    sideBody.replaceChildren(searchRow(() => sideQ, (v) => { sideQ = v; }, drawList), sideList,
+      h('button', { class: 'fab', 'aria-label': 'New chat', onclick: newChat }, ic('compose', 24)));
+  } else if (sideTab === 'contacts') {
+    contactList = h('div', { class: 'list' });
+    sideBody.replaceChildren(searchRow(() => contactQ, (v) => { contactQ = v; }, drawList), contactList);
+  } else if (sideTab === 'settings') sideBody.replaceChildren(settingsNode());
+  else sideBody.replaceChildren(profileNode());
+  drawList();
+}
+function drawNav() {
+  if (!navEl || !me) return;
+  const unread = chats.filter((c) => c.unread > 0).length;
+  const sig = [sideTab, unread, me.avatarUrl, me.displayName].join('|');
+  if (sig === navSig) return;
+  navSig = sig;
+  const tab = (k, icon, label) => h('button', { class: 'tab' + (sideTab === k ? ' on' : ''), 'aria-label': label, 'aria-current': sideTab === k ? 'page' : null, onclick: () => setTab(k) },
+    h('span', { class: 'tabic' }, icon, k === 'chats' && unread ? h('span', { class: 'badge' }, unread > 99 ? '99+' : unread) : null), h('span', {}, label));
+  navEl.replaceChildren(tab('chats', ic('message', 25), 'សារ'), tab('contacts', ic('contacts', 25), 'ទំនាក់ទំនង'),
+    tab('settings', ic('settings', 25), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 26), 'ខ្ញុំ'));
+}
+function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildren(node); drawList(); }
+function emptyMain() {
+  return h('div', { class: 'empty-main' }, ic('message', 40), h('p', {}, 'ជ្រើសរើស chat ដើម្បីចាប់ផ្ដើមសន្ទនា'));
+}
+function drawList() { drawNav(); if (sideList) drawChatRows(); else if (contactList) drawContacts(); }
+function drawContacts() {
+  const el = contactList;
+  const seen = new Set();
+  let people = chats.filter((c) => c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && !seen.has(c.peer.id) && seen.add(c.peer.id))
+    .sort((a, b) => a.peer.displayName.localeCompare(b.peer.displayName));
+  const needle = contactQ.trim().toLowerCase();
+  if (needle) people = people.filter((c) => c.peer.displayName.toLowerCase().includes(needle) || c.peer.username.toLowerCase().includes(needle));
+  el.replaceChildren(
+    h('div', { class: 'row', role: 'button', onclick: () => pickUsers({ title: 'ស្វែងរកអ្នកប្រើ', onDone: openPrivate }) },
+      h('span', { class: 'av', style: 'width:46px;height:46px;background:var(--pri-soft);color:var(--pri)' }, ic('userplus', 22)), h('div', { class: 'grow' }, h('b', { style: 'color:var(--pri)' }, 'ស្វែងរកអ្នកប្រើថ្មី'))),
+    ...(people.length ? people.map((c) => h('div', { class: 'row', role: 'button', onclick: () => openChat(c) },
+      avatarOnline(c.peer.avatarUrl, c.peer.displayName, 46, c.peer.online),
+      h('div', { class: 'grow' }, h('b', {}, c.peer.displayName), h('small', { style: c.peer.online ? 'color:var(--pri)' : '' }, c.peer.online ? 'កំពុងអនឡាញ' : 'ចុងក្រោយ ' + fmtFull(c.peer.lastSeen)))))
+      : [h('p', { class: 'muted center', style: 'padding:24px' }, needle ? 'រកមិនឃើញ' : 'មិនទាន់មានទំនាក់ទំនង។ ស្វែងរកអ្នកប្រើដើម្បីចាប់ផ្ដើម')]));
+}
+
+/* ---------- chat list ---------- */
+function showList() {
+  stopChatPoll(); stopAudio(); view = 'list'; cur = null; ui = null;
+  ensureShell();
+  setMain(emptyMain(), 'list');
+  startListPoll();
+}
+function drawChatRows() {
+  if (!sideList) return;
+  const el = sideList;
+  if (!chatsLoaded) {
+    el.replaceChildren(...Array.from({ length: 7 }, (_, i) => h('div', { class: 'row-sk' }, h('div', { class: 'sk', style: 'width:50px;height:50px;border-radius:50%' }),
+      h('div', { style: 'flex:1' }, h('div', { class: 'sk', style: `height:14px;width:${50 + (i * 13) % 35}%;margin-bottom:8px` }), h('div', { class: 'sk', style: `height:12px;width:${65 + (i * 7) % 30}%` })))));
+    return;
+  }
+  const needle = sideQ.trim().toLowerCase();
+  const list = needle ? chats.filter((c) => (c.title || '').toLowerCase().includes(needle) || (c.peer && c.peer.username.toLowerCase().includes(needle))) : chats;
+  if (!list.length) {
+    el.replaceChildren(h('div', { class: 'empty-main' }, ic(needle ? 'search' : 'message', 36),
+      h('p', {}, needle ? 'រកមិនឃើញ chat ត្រូវនឹងការស្វែងរក' : 'មិនទាន់មាន chat ទេ។ ចុចប៊ូតុងខាងក្រោមដើម្បីចាប់ផ្ដើម')));
+    return;
+  }
+  el.replaceChildren(...list.map((c) => {
+    const lm = c.lastMessage;
+    const mine = lm && lm.senderId === me.id;
+    const pre = lm ? (mine ? 'អ្នក: ' : c.type === 'GROUP' && lm.sender ? lm.sender.displayName + ': ' : '') + preview(lm) : 'មិនទាន់មានសារ';
+    const t = lm ? lm.createdAt : c.createdAt;
+    const peerRead = mine && c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id
+      && c.members.some((m) => m.userId === c.peer.id && new Date(m.lastReadAt) >= new Date(lm.createdAt));
+    const showTick = mine && !(c.peer && c.peer.id === me.id);
+    return h('div', { class: 'row' + (cur && cur.id === c.id ? ' active' : ''), role: 'button', tabindex: '0', onclick: () => openChat(c), onkeydown: (e) => { if (e.key === 'Enter') openChat(c); } },
+      avatarOnline(c.avatarUrl, c.title, 52, c.type === 'PRIVATE' && c.peer && c.peer.id !== me.id && c.peer.online),
+      h('div', { class: 'grow' },
+        h('div', { class: 'line1' }, c.type === 'GROUP' ? h('span', { class: 'ic', style: 'opacity:.7' }, ic('users', 16)) : null, h('b', {}, c.title),
+          h('span', { class: 'when' }, showTick ? h('span', { class: 'tick' }, ic(peerRead ? 'checks' : 'check', 16)) : null, sameDay(t, new Date()) ? fmtTime(t) : fmtShortDate(t))),
+        h('div', { class: 'line2' }, h('small', {}, pre), c.unread ? h('span', { class: 'badge' }, c.unread > 99 ? '99+' : c.unread) : null)));
+  }));
+}
+function newChat() {
+  sheet('ថ្មី', [
+    { icon: 'message', label: 'សារថ្មី', fn: () => pickUsers({ title: 'ស្វែងរកអ្នកប្រើ', onDone: openPrivate }) },
+    { icon: 'users', label: 'ក្រុមថ្មី', fn: () => pickUsers({ multi: true, withTitle: true, title: 'បង្កើតក្រុម', onDone: async (us, title) => {
+      const d = await api('/chats/group', { method: 'POST', body: { title, memberIds: us.map((u) => u.id) } });
+      openChat(d.chat);
+    } }) },
+  ]);
+}
+async function openPrivate([u]) {
+  const d = await api('/chats/private', { method: 'POST', body: { userId: u.id } });
+  openChat(d.chat);
+}
+function pickUsers({ multi = false, withTitle = false, title, onDone, exclude = [] }) {
+  const sel = new Map();
+  const res = h('div', {});
+  const chosen = h('div', { class: 'chips' });
+  const q = h('input', { type: 'search', placeholder: 'ស្វែងរកតាមឈ្មោះ (យ៉ាងតិច 2 តួ)' });
+  const gt = withTitle ? h('input', { placeholder: 'ឈ្មោះក្រុម', maxlength: 80 }) : null;
+  let timer;
+  const drawChips = () => chosen.replaceChildren(...[...sel.values()].map((u) => h('span', { class: 'chip', onclick: () => { sel.delete(u.id); drawChips(); } }, u.displayName, ic('x', 14))));
+  const finish = async (users) => {
+    if (withTitle && !gt.value.trim()) return toast('សូមដាក់ឈ្មោះក្រុម');
+    close();
+    try { await onDone(users, gt ? gt.value.trim() : undefined); } catch (e) { toast(e.message); }
+  };
+  const search = async () => {
+    const v = q.value.trim();
+    if (v.length < 2) return res.replaceChildren();
+    try {
+      const d = await api('/users/search?q=' + encodeURIComponent(v));
+      const us = d.users.filter((u) => !exclude.includes(u.id));
+      res.replaceChildren(...(us.length ? us.map((u) => h('div', { class: 'row', style: 'margin:0', onclick: () => { if (multi) { sel.set(u.id, u); drawChips(); } else finish([u]); } },
+        avatar(u.avatarUrl, u.displayName, 42), h('div', { class: 'grow' }, h('b', {}, u.displayName), h('small', {}, '@' + u.username)),
+        multi && sel.has(u.id) ? ic('check', 18) : null)) : [h('p', { class: 'muted center' }, 'រកមិនឃើញ')]));
+    } catch (e) { toast(e.message); }
+  };
+  q.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(search, 350); });
+  const body = h('div', {}, gt, q, chosen, res,
+    multi ? h('button', { class: 'primary', onclick: () => { if (!sel.size) return toast('ជ្រើសរើសយ៉ាងតិច 1 នាក់'); finish([...sel.values()]); } }, 'រួចរាល់') : null);
+  const close = modal(title, body);
+  setTimeout(() => (gt || q).focus(), 80);
+}
+
+/* ---------- chat screen ---------- */
+function buildChat() {
+  const avSlot = h('div', {});
+  const titleEl = h('b', {});
+  const statusEl = h('small', { class: 'status' });
+  const head = h('div', { class: 'bar' },
+    ibtn('back', 'Back', () => history.back(), 'back'),
+    h('div', { class: 'peer', onclick: () => { if (cur.type === 'GROUP') groupInfo(); } }, avSlot, h('div', { class: 'grow' }, titleEl, statusEl)),
+    ibtn('more', 'Menu', chatMenu));
+
+  const box = h('div', { class: 'msgs' });
+  const jumpBadge = h('span', { class: 'badge', hidden: true });
+  const jump = h('button', { class: 'jump', hidden: true, 'aria-label': 'Scroll to latest', onclick: () => { drawMessages('bottom'); } }, ic('down'), jumpBadge);
+  box.addEventListener('scroll', () => {
+    stick = nearBottom();
+    jump.hidden = stick;
+    if (stick && newBelow) { newBelow = 0; jumpBadge.hidden = true; }
+  }, { passive: true });
+  const wrap = h('div', { class: 'msgwrap' }, box, jump, secure ? watermark() : null);
+
+  const ctx = h('div', { class: 'ctx', hidden: true });
+  const blockBar = h('div', { class: 'blockbar', hidden: true }, h('span', { class: 'grow' }, 'អ្នកបាន block អ្នកប្រើនេះ'),
+    h('button', { onclick: safe(() => setBlock(false)) }, 'Unblock'));
+
+  const input = h('textarea', { rows: 1, placeholder: 'សរសេរសារ…', enterkeyhint: 'send', 'aria-label': 'Message' });
+  const fileIn = h('input', { type: 'file', accept: 'image/*,video/*,audio/*', style: 'display:none', onchange: onFile });
+  const attach = ibtn('clip', 'Attach', () => fileIn.click());
+  const cwrap = h('div', { class: 'cwrap' }, attach, fileIn, input);
+  const recTime = h('span', {}, '0:00');
+  const recbar = h('div', { class: 'recbar', hidden: true }, h('span', { class: 'recdot' }), recTime, h('span', { class: 'grow muted' }, 'កំពុងថតសំឡេង…'),
+    ibtn('trash', 'បោះបង់', () => stopRec(false), 'danger'));
+  const act = h('button', { class: 'act', 'aria-label': 'Send', onclick: onAction }, ic('mic'));
+  const composer = h('div', { class: 'composer' }, cwrap, recbar, act);
+
+  input.addEventListener('input', () => { autosize(); refreshAct(); sendTyping(); });
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing && matchMedia('(pointer:fine)').matches) { e.preventDefault(); submit(); }
+    if (e.key === 'Escape') { if (editing) cancelEdit(); else if (replyTo) setReply(null); }
+  });
+  const autosize = () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 130) + 'px'; };
+
+  ui = { head, avSlot, titleEl, statusEl, box, jump, jumpBadge, ctx, blockBar, input, act, cwrap, recbar, recTime, composer, autosize };
+  loadingMsgs = true; stick = true; newBelow = 0;
+  setMain(h('div', { class: 'screen' + (secure ? ' secure' : '') }, head, wrap, ctx, blockBar, composer), 'chat');
+  updateHeader(); refreshAct(); drawMessages('bottom');
+}
+function refreshAct() {
+  if (!ui) return;
+  const has = !!ui.input.value.trim() || !!editing;
+  ui.act.classList.toggle('rec', !!rec);
+  ui.act.replaceChildren(ic(rec || has ? 'send' : 'mic'));
+  ui.act.setAttribute('aria-label', rec || has ? 'Send' : 'Record voice');
+}
+// Faint repeating @username over the chat: a screenshot/photo that leaks can be traced back to its owner
+function watermark() {
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='180' height='120'><text x='10' y='70' transform='rotate(-25 90 60)' font-family='sans-serif' font-size='16' fill='rgba(128,128,128,0.22)'>@${me.username}</text></svg>`;
+  return h('div', { class: 'wm', style: `background-image:url("data:image/svg+xml,${encodeURIComponent(svg)}")` });
+}
+function statusInfo() {
+  const names = typingIds.map((id) => (cur.members.find((m) => m.userId === id) || {}).user).filter(Boolean).map((u) => u.displayName);
+  if (names.length) return { text: names.join(', ') + ' កំពុងវាយ', kind: 'typing typing-dots' };
+  if (cur.type === 'GROUP') return { text: cur.members.length + ' សមាជិក', kind: '' };
+  if (isSelf()) return { text: '', kind: '' };
+  if (cur.peer && cur.peer.online) return { text: 'កំពុងអនឡាញ', kind: 'online' };
+  return { text: cur.peer ? 'ចុងក្រោយ ' + fmtFull(cur.peer.lastSeen) : '', kind: '' };
+}
+function updateHeader() {
+  if (!ui || !cur) return;
+  const s = statusInfo();
+  ui.titleEl.textContent = cur.title || '';
+  ui.statusEl.textContent = s.text;
+  ui.statusEl.className = 'status ' + s.kind;
+  const online = cur.type === 'PRIVATE' && cur.peer && cur.peer.id !== me.id && cur.peer.online;
+  ui.avSlot.replaceChildren(avatarOnline(cur.avatarUrl, cur.title, 42, online));
+  ui.blockBar.hidden = !cur.blockedByMe;
+  ui.composer.hidden = !!cur.blockedByMe;
+}
+function applyChat(c) { cur = { ...c }; updateHeader(); }
+
+async function openChat(chat, push = true) {
+  stopChatPoll(); stopAudio(); cancelRecSilently();
+  cur = chat; replyTo = null; editing = null;
+  msgs = new Map(); reads = []; typingIds = []; hasMore = false; mediaCache.clear();
+  if (push) { if (view === 'list') history.pushState({ v: 'chat' }, ''); else history.replaceState({ v: 'chat' }, ''); }
+  buildChat();
+  const id = chat.id;
+  try {
+    const d = await api(`/chats/${id}/messages`);
+    if (!cur || cur.id !== id) return;
+    d.messages.forEach((m) => msgs.set(m.id, m));
+    reads = d.reads; hasMore = d.hasMore; after = back5(d.serverTime); loadingMsgs = false;
+    drawMessages('bottom'); markRead(); startChatPoll(id);
+    if (wide()) ui.input.focus({ preventScroll: true });
+  } catch (e) { loadingMsgs = false; drawMessages('bottom'); toast(e.message); }
+}
+function markRead() {
+  if (!cur) return;
+  const c = chats.find((x) => x.id === cur.id);
+  if (c && c.unread) { c.unread = 0; drawList(); }
+  api(`/chats/${cur.id}/read`, { method: 'POST', body: {} }).catch(() => {});
+}
+
+function startChatPoll(chatId) {
+  const gen = ++chatGen;
+  let n = 0;
+  const tick = async () => {
+    if (gen !== chatGen) return;
+    let more = false;
+    try {
+      const d = await api(`/chats/${chatId}/messages?after=${encodeURIComponent(after)}`);
+      if (gen !== chatGen) return;
+      let changed = false, incoming = 0;
+      for (const m of d.messages) {
+        const old = msgs.get(m.id);
+        if (m.deleted) { if (old) { msgs.delete(m.id); changed = true; } continue; }
+        if (!old || old.updatedAt !== m.updatedAt) {
+          if (!old && m.senderId !== me.id) incoming++;
+          msgs.set(m.id, m); changed = true;
+        }
+      }
+      const sig = JSON.stringify(reads), tsig = typingIds.join();
+      reads = d.reads; typingIds = d.typing;
+      more = d.hasMore && d.messages.length > 0;
+      // continue a full page from its last row (no overlap → always advances)
+      after = more ? d.messages[d.messages.length - 1].updatedAt : back5(d.serverTime);
+      if (changed || sig !== JSON.stringify(reads)) drawMessages(stick ? 'bottom' : 'keep');
+      if (incoming) {
+        markRead();
+        if (!stick && ui) { newBelow += incoming; ui.jumpBadge.textContent = newBelow; ui.jumpBadge.hidden = false; }
+      }
+      if (++n % 5 === 0) { const c = await api(`/chats/${chatId}`); if (gen === chatGen) applyChat(c.chat); } else if (tsig !== typingIds.join()) updateHeader();
+    } catch { /* retry */ }
+    if (gen === chatGen) chatTimer = setTimeout(tick, more ? 0 : document.hidden ? 8000 : 2000);
+  };
+  chatTimer = setTimeout(tick, 1500);
+}
+const nearBottom = () => ui && ui.box.scrollHeight - ui.box.scrollTop - ui.box.clientHeight < 140;
+const byTime = (a, b) => new Date(a.createdAt) - new Date(b.createdAt);
+
+function drawMessages(mode) {
+  if (!ui || !cur) return;
+  const box = ui.box, prevH = box.scrollHeight, prevT = box.scrollTop;
+  const nodes = [];
+  if (loadingMsgs) {
+    [['l', 55], ['l', 35], ['r', 45], ['l', 62], ['r', 30]].forEach(([s, w]) => nodes.push(h('div', { class: 'msg' + (s === 'r' ? ' mine' : ''), style: 'margin-top:8px' },
+      h('div', { class: 'sk', style: `height:40px;width:${w}%;border-radius:17px` }))));
+    box.replaceChildren(...nodes); return;
+  }
+  const list = [...msgs.values()].sort(byTime);
+  if (hasMore) nodes.push(h('button', { class: 'older', onclick: safe(loadOlder) }, 'ផ្ទុកសារចាស់ៗ'));
+  if (!list.length) nodes.push(h('div', { class: 'hello' }, h('div', { class: 'big' }, '👋'), h('div', {}, 'មិនទាន់មានសារ។ សួស្ដីសិន!')));
+  const near = (a, b) => a && b && a.senderId === b.senderId && sameDay(a.createdAt, b.createdAt) && Math.abs(new Date(b.createdAt) - new Date(a.createdAt)) < 5 * 60000;
+  let grp = null; // one container per day keeps each sticky date chip inside its own day
+  list.forEach((m, i) => {
+    const p = list[i - 1], nx = list[i + 1];
+    if (!p || !sameDay(p.createdAt, m.createdAt)) { grp = h('div', { class: 'daygrp' }, h('div', { class: 'day' }, dayLabel(m.createdAt))); nodes.push(grp); }
+    grp.append(bubble(m, { first: !near(p, m), last: !near(m, nx) }));
+  });
+  box.replaceChildren(...nodes);
+  if (mode === 'bottom') { box.scrollTop = box.scrollHeight; stick = true; ui.jump.hidden = true; newBelow = 0; ui.jumpBadge.hidden = true; }
+  else if (mode === 'older') box.scrollTop = prevT + (box.scrollHeight - prevH);
+  else box.scrollTop = prevT;
+}
+async function loadOlder() {
+  let oldest = null;
+  for (const m of msgs.values()) if (!m.pending && !m.failed && (!oldest || new Date(m.createdAt) < new Date(oldest.createdAt))) oldest = m;
+  if (!oldest) return;
+  const d = await api(`/chats/${cur.id}/messages?before=${encodeURIComponent(oldest.createdAt)}`);
+  d.messages.forEach((m) => msgs.set(m.id, m)); hasMore = d.hasMore;
+  drawMessages('older');
+}
+function jumpTo(id) {
+  const el = ui && ui.box.querySelector(`[data-id="${CSS.escape(id)}"]`);
+  if (!el) return toast('សារនេះនៅឆ្ងាយ · ផ្ទុកសារចាស់ៗជាមុនសិន');
+  el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1200);
+}
+
+/* voice player + media nodes are cached by message so redraws never interrupt playback */
+let curAudio = null;
+function stopAudio() { if (curAudio) { curAudio.pause(); curAudio = null; } }
+function voiceEl(m, url) {
+  const BARS = 30;
+  let seed = [...m.id].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
+  const heights = Array.from({ length: BARS }, () => { seed = (seed * 1664525 + 1013904223) >>> 0; return 6 + (seed % 22); });
+  const a = new Audio(); a.preload = 'none'; a.src = url;
+  const total = () => (isFinite(a.duration) && a.duration > 0 ? a.duration : m.duration || 0);
+  const bars = heights.map((x) => h('i', { style: `height:${x}px` }));
+  const time = h('small', {}, fmtDur(m.duration || 0));
+  const pp = h('button', { class: 'pp', 'aria-label': 'Play' }, ic('play', 20));
+  const paint = () => { const p = total() ? a.currentTime / total() : 0; bars.forEach((b, i) => b.classList.toggle('on', i / BARS < p)); time.textContent = fmtDur(a.paused && !a.currentTime ? total() : a.currentTime); };
+  a.addEventListener('timeupdate', paint);
+  a.addEventListener('play', () => pp.replaceChildren(ic('pause', 20)));
+  a.addEventListener('pause', () => pp.replaceChildren(ic('play', 20)));
+  a.addEventListener('ended', () => { a.currentTime = 0; paint(); });
+  pp.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (a.paused) { if (curAudio && curAudio !== a) curAudio.pause(); curAudio = a; a.play().catch(() => toast('ចាក់សំឡេងមិនបាន')); } else a.pause();
+  });
+  return h('div', { class: 'voice', onclick: (e) => e.stopPropagation() }, pp, h('div', { class: 'wave' }, bars), time);
+}
+function cachedNode(key, make) { let n = mediaCache.get(key); if (!n) { n = make(); mediaCache.set(key, n); } return n; }
+
+function metaEl(m, mine, overlay) {
+  const showTick = mine && !isSelf();
+  const read = showTick && reads.some((r) => r.userId !== me.id && new Date(r.lastReadAt) >= new Date(m.createdAt));
+  let status = null;
+  if (m.failed) status = h('span', { class: 'err' }, ic('alert', 14));
+  else if (m.pending) status = ic('clock', 13);
+  else if (showTick) status = h('span', { class: 'tick' }, ic(read ? 'checks' : 'check', 15));
+  return h('span', { class: 'meta' }, m.editedAt ? 'បានកែ ' : '', fmtTime(m.createdAt), status);
+}
+function bubble(m, g) {
+  const mine = m.senderId === me.id;
+  const group = cur.type === 'GROUP';
+  const parts = [];
+  if (group && !mine && g.first && m.sender) parts.push(h('div', { class: 'who', style: `color:hsl(${hueOf(m.sender.displayName)} 65% 50%)` }, m.sender.displayName));
+  if (m.replyTo) parts.push(h('div', { class: 'quote', onclick: (e) => { e.stopPropagation(); jumpTo(m.replyTo.id); } },
+    h('b', {}, (m.replyTo.sender && m.replyTo.sender.displayName) || ''), h('div', {}, m.replyTo.deletedAt ? 'សារត្រូវបានលុប' : preview(m.replyTo))));
+  const url = safeUrl(m.fileUrl);
+  let metaPlaced = false;
+  if ((m.type === 'IMAGE' || m.type === 'VIDEO') && url) {
+    const media = m.type === 'IMAGE'
+      ? h('img', { src: url, loading: 'lazy', alt: '', onload: () => { if (stick && ui) ui.box.scrollTop = ui.box.scrollHeight; } })
+      : cachedNode(m.id + url, () => h('video', { src: url, controls: true, preload: 'metadata', playsinline: true }));
+    const wrapEl = h('div', { class: 'media', onclick: (e) => { if (m.type === 'IMAGE') { e.stopPropagation(); lightbox(url); } else e.stopPropagation(); } }, media, m.text ? null : metaEl(m, mine));
+    metaPlaced = !m.text; parts.push(wrapEl);
+  } else if (m.type === 'VOICE' && url) parts.push(cachedNode(m.id + url, () => voiceEl(m, url)));
+  else if (m.type === 'FILE' && url) parts.push(h('a', { class: 'file', href: url, target: '_blank', rel: 'noopener', onclick: (e) => e.stopPropagation() },
+    h('span', { class: 'fi' }, ic('file', 22)), h('span', { class: 'grow' }, h('b', {}, m.fileName || 'ឯកសារ'), h('small', {}, fmtSize(m.fileSize)))));
+  if (m.text) { parts.push(h('div', { class: 'txt' }, m.text, metaEl(m, mine))); metaPlaced = true; }
+  if (!metaPlaced) parts.push(h('div', { class: 'blockmeta' }, metaEl(m, mine)));
+
+  const bub = h('div', { class: 'bub' + (m.pending ? ' pending' : '') + (m.failed ? ' failed' : ''), onclick: (e) => { if (!e.target.closest('a,video,.voice')) msgMenu(m); } }, parts);
+  const row = h('div', { class: 'msg' + (mine ? ' mine' : '') + (g.first ? ' first' : '') + (g.last ? ' last' : ''), 'data-id': m.id },
+    group && !mine ? h('div', { class: 'avs' }, g.last && m.sender ? avatar(m.sender.avatarUrl, m.sender.displayName, 32) : null) : null, bub);
+  if (!m.pending && !m.failed) swipeReply(row, bub, m);
+  return row;
+}
+// swipe a bubble to the left to reply (touch screens)
+function swipeReply(row, bub, m) {
+  let x0 = 0, y0 = 0, dx = 0, on = false, locked = false;
+  row.addEventListener('touchstart', (e) => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; dx = 0; on = true; locked = false; }, { passive: true });
+  row.addEventListener('touchmove', (e) => {
+    if (!on) return;
+    const t = e.touches[0], mx = t.clientX - x0, my = t.clientY - y0;
+    if (!locked) { if (Math.abs(my) > 10 && Math.abs(my) > Math.abs(mx)) { on = false; return; } if (mx < -12) { locked = true; bub.style.transition = 'none'; } else return; }
+    dx = Math.max(-84, Math.min(0, mx)); bub.style.transform = `translateX(${dx}px)`;
+  }, { passive: true });
+  const end = () => { if (!on) return; on = false; bub.style.transition = ''; bub.style.transform = ''; if (locked && dx <= -64) { navigator.vibrate?.(8); setReply(m); } };
+  row.addEventListener('touchend', end); row.addEventListener('touchcancel', end);
+}
+function msgMenu(m) {
+  if (m.failed) {
+    return sheet('ផ្ញើមិនបាន', [
+      { icon: 'send', label: 'ផ្ញើម្ដងទៀត', fn: () => { drawMessages('keep'); return deliver(m); } },
+      { icon: 'trash', label: 'លុប', danger: true, fn: () => { msgs.delete(m.id); drawMessages('keep'); } },
+    ]);
+  }
+  if (m.pending) return;
+  const mine = m.senderId === me.id;
+  const mem = cur.members.find((x) => x.userId === me.id);
+  const admin = cur.type === 'GROUP' && mem && mem.isAdmin;
+  const canEdit = mine && m.type === 'TEXT' && Date.now() - new Date(m.createdAt).getTime() < 48 * 3600 * 1000;
+  sheet('សារ', [
+    { icon: 'reply', label: 'ឆ្លើយតប', fn: () => setReply(m) },
+    m.text && !secure && { icon: 'copy', label: 'ចម្លង', fn: async () => { await navigator.clipboard.writeText(m.text); toast('បានចម្លង'); } },
+    canEdit && { icon: 'pencil', label: 'កែ', fn: () => startEdit(m) },
+    (mine || admin) && { icon: 'trash', label: 'លុប', danger: true, fn: async () => {
+      if (!(await confirmDialog({ title: 'លុបសារនេះ?', text: 'សារនេះនឹងត្រូវលុបសម្រាប់មនុស្សគ្រប់គ្នា។', ok: 'លុប', danger: true }))) return;
+      await api(`/chats/${cur.id}/messages/${m.id}`, { method: 'DELETE' });
+      msgs.delete(m.id); drawMessages('keep');
+    } },
+  ]);
+}
+
+/* reply / edit context bar */
+function drawCtx() {
+  if (!ui) return;
+  const m = editing || replyTo;
+  ui.ctx.hidden = !m;
+  if (!m) return;
+  ui.ctx.replaceChildren(h('span', { class: 'lead' }, ic(editing ? 'pencil' : 'reply', 20)),
+    h('div', { class: 'grow' }, h('b', {}, editing ? 'កែសារ' : (m.sender && m.sender.displayName) || ''), h('small', {}, preview(m))),
+    ibtn('x', 'Cancel', () => (editing ? cancelEdit() : setReply(null))));
+}
+function setReply(m) { replyTo = m; editing = null; drawCtx(); refreshAct(); if (m) ui.input.focus(); }
+function startEdit(m) {
+  editing = m; replyTo = null; drawCtx();
+  ui.input.value = m.text || ''; ui.autosize(); refreshAct(); ui.input.focus();
+}
+function cancelEdit() { editing = null; if (ui) { ui.input.value = ''; ui.autosize(); } drawCtx(); refreshAct(); }
+
+/* ---------- sending ---------- */
+function submit() { if (editing) return doEdit(); return sendText(); }
+async function doEdit() {
+  const m = editing, text = ui.input.value.trim();
+  if (!text) return toast('សារទទេមិនបានទេ');
+  if (text === (m.text || '')) return cancelEdit();
+  cancelEdit();
+  try {
+    const d = await api(`/chats/${cur.id}/messages/${m.id}`, { method: 'PATCH', body: { text } });
+    msgs.set(m.id, d.message); drawMessages('keep');
+  } catch (e) { toast(e.message); }
+}
+async function sendMsg(chatId, body) { // used by uploads (not optimistic)
+  const d = await api(`/chats/${chatId}/messages`, { method: 'POST', body: { ...body, replyToId: replyTo ? replyTo.id : undefined } });
+  if (cur && cur.id === chatId) {
+    setReply(null);
+    msgs.set(d.message.id, d.message); drawMessages('bottom');
+    api(`/chats/${chatId}/typing`, { method: 'POST', body: { isTyping: false } }).catch(() => {});
+  }
+}
+async function sendText() {
+  const text = ui.input.value.trim();
+  if (!text) return;
+  const rt = replyTo;
+  ui.input.value = ''; ui.autosize(); setReply(null); refreshAct();
+  const tmp = {
+    id: 'tmp-' + Date.now() + Math.random().toString(36).slice(2, 6), chatId: cur.id, senderId: me.id, sender: me, type: 'TEXT', text,
+    replyTo: rt ? { id: rt.id, text: rt.text, type: rt.type, deletedAt: null, sender: rt.sender } : null,
+    createdAt: new Date().toISOString(), pending: true, _reply: rt && rt.id,
+  };
+  msgs.set(tmp.id, tmp); drawMessages('bottom');
+  await deliver(tmp);
+}
+async function deliver(tmp) {
+  tmp.failed = false; tmp.pending = true;
+  const chatId = tmp.chatId;
+  try {
+    const d = await api(`/chats/${chatId}/messages`, { method: 'POST', body: { type: 'TEXT', text: tmp.text, replyToId: tmp._reply || undefined } });
+    msgs.delete(tmp.id);
+    if (cur && cur.id === chatId) { msgs.set(d.message.id, d.message); drawMessages(stick ? 'bottom' : 'keep'); }
+    api(`/chats/${chatId}/typing`, { method: 'POST', body: { isTyping: false } }).catch(() => {});
+  } catch (e) {
+    tmp.pending = false; tmp.failed = true;
+    if (cur && cur.id === chatId) drawMessages('keep');
+    toast(e.message + ' · ចុចលើសារដើម្បីព្យាយាមម្ដងទៀត');
+  }
+}
+function sendTyping() {
+  const now = Date.now();
+  if (now - lastTyping > 3000 && ui.input.value && !editing) { lastTyping = now; api(`/chats/${cur.id}/typing`, { method: 'POST', body: { isTyping: true } }).catch(() => {}); }
+}
+async function uploadAndSend(chatId, blob, name, extra) {
+  const fd = new FormData(); fd.append('file', blob, name);
+  const up = await api('/upload', { method: 'POST', form: fd });
+  await sendMsg(chatId, { type: extra && extra.type || up.type, fileUrl: up.fileUrl, fileName: up.fileName, fileSize: up.fileSize, duration: extra && extra.duration });
+}
+async function onFile(e) {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  if (f.size > 4 * 1024 * 1024) return toast('ឯកសារធំពេក (អតិបរមា 4MB)');
+  toast('កំពុង upload ' + f.name + '…', 30000);
+  try { await uploadAndSend(cur.id, f, f.name); hideToast(); } catch (err) { toast(err.message); }
+}
+
+/* voice recording */
+function onAction() {
+  if (rec) return stopRec(true);
+  if (ui.input.value.trim() || editing) return submit();
+  startRec();
+}
+async function startRec() {
+  if (!navigator.mediaDevices || !window.MediaRecorder) return toast('Browser មិនគាំទ្រការថតសំឡេង');
+  const cid = cur.id;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mr = new MediaRecorder(stream);
+    const r = { mr, chunks: [], t0: Date.now(), send: true, timer: null, stream };
+    mr.ondataavailable = (e) => { if (e.data.size) r.chunks.push(e.data); };
+    mr.onstop = async () => {
+      clearInterval(r.timer); stream.getTracks().forEach((t) => t.stop());
+      if (rec === r) rec = null;
+      if (ui) { ui.cwrap.hidden = false; ui.recbar.hidden = true; refreshAct(); }
+      if (!r.send) return;
+      const type = mr.mimeType || 'audio/webm';
+      const blob = new Blob(r.chunks, { type });
+      if (blob.size > 4 * 1024 * 1024) return toast('សំឡេងវែងពេក (អតិបរមា 4MB)');
+      const ext = type.includes('mp4') ? 'm4a' : type.includes('ogg') ? 'ogg' : 'webm';
+      try { await uploadAndSend(cid, blob, 'voice.' + ext, { type: 'VOICE', duration: Math.max(1, Math.round((Date.now() - r.t0) / 1000)) }); }
+      catch (err) { toast(err.message); }
+    };
+    mr.start(); rec = r;
+    ui.cwrap.hidden = true; ui.recbar.hidden = false; ui.recTime.textContent = '0:00'; refreshAct();
+    r.timer = setInterval(() => {
+      const s = (Date.now() - r.t0) / 1000;
+      if (ui) ui.recTime.textContent = fmtDur(s);
+      if (s > 300) stopRec(true);
+    }, 250);
+  } catch { toast('មិនអាចប្រើមីក្រូហ្វូន'); }
+}
+function stopRec(send) { if (!rec) return; rec.send = send; if (rec.mr.state !== 'inactive') rec.mr.stop(); }
+function cancelRecSilently() { if (rec) { rec.send = false; try { rec.mr.stop(); } catch { /* ignore */ } } }
+
+/* ---------- chat menu / block / group ---------- */
+function chatMenu() {
+  if (cur.type === 'GROUP') return groupInfo();
+  if (isSelf() || !cur.peer) return;
+  sheet(cur.title, [cur.blockedByMe
+    ? { icon: 'unlock', label: 'Unblock', fn: () => setBlock(false) }
+    : { icon: 'ban', label: 'Block', danger: true, fn: async () => { if (await confirmDialog({ title: 'Block អ្នកប្រើនេះ?', text: 'អ្នកនឹងមិនអាចផ្ញើ ឬទទួលសារពីគ្នាទៀតទេ។', ok: 'Block', danger: true })) await setBlock(true); } }]);
+}
+async function setBlock(on) {
+  await api(`/users/${cur.peer.id}/block`, { method: on ? 'POST' : 'DELETE', body: on ? {} : undefined });
+  cur.blockedByMe = on; updateHeader();
+}
+function groupInfo() {
+  const body = h('div', {});
+  const closeM = modal('ព័ត៌មានក្រុម', body);
+  const redraw = () => {
+    const mem = cur.members.find((m) => m.userId === me.id);
+    const admin = !!(mem && mem.isAdmin);
+    const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => {
+      const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+      const fd = new FormData(); fd.append('file', f, f.name);
+      const d = await api(`/chats/${cur.id}/avatar`, { method: 'POST', form: fd });
+      applyChat(d.chat); redraw();
+    }) });
+    body.replaceChildren(
+      h('div', { class: 'center' }, h('div', { class: admin ? 'avedit' : '', onclick: admin ? () => fileIn.click() : null }, avatar(cur.avatarUrl, cur.title, 84), admin ? h('span', { class: 'cam' }, ic('camera', 16)) : null),
+        fileIn, h('h3', { style: 'margin:10px 0 2px' }, cur.title), h('small', {}, cur.members.length + ' សមាជិក')),
+      admin ? h('div', { class: 'card' },
+        h('button', { class: 'sheet-i', onclick: safe(async () => {
+          const v = await promptDialog({ title: 'ឈ្មោះក្រុមថ្មី', value: cur.title }); if (!v || !v.trim()) return;
+          const d = await api(`/chats/${cur.id}`, { method: 'PATCH', body: { title: v } }); applyChat(d.chat); redraw();
+        }) }, ic('pencil'), 'ប្ដូរឈ្មោះ'),
+        h('button', { class: 'sheet-i', onclick: () => pickUsers({ multi: true, title: 'បន្ថែមសមាជិក', exclude: cur.members.map((m) => m.userId), onDone: async (us) => {
+          const d = await api(`/chats/${cur.id}/members`, { method: 'POST', body: { userIds: us.map((u) => u.id) } }); applyChat(d.chat); redraw();
+        } }) }, ic('userplus'), 'បន្ថែមសមាជិក')) : null,
+      h('div', { class: 'card' }, ...cur.members.map((m) => h('div', { class: 'row', onclick: () => memberMenu(m, redraw) },
+        avatarOnline(m.user.avatarUrl, m.user.displayName, 42, m.user.online),
+        h('div', { class: 'grow' }, h('b', {}, m.user.displayName + (m.userId === me.id ? ' (អ្នក)' : '')), h('small', {}, '@' + m.user.username)),
+        m.userId === cur.ownerId ? h('span', { class: 'tag' }, 'owner') : m.isAdmin ? h('span', { class: 'tag' }, 'admin') : null))),
+      h('button', { class: 'danger sheet-i', onclick: safe(async () => {
+        if (!(await confirmDialog({ title: 'ចាកចេញពីក្រុម?', ok: 'ចាកចេញ', danger: true }))) return;
+        await api(`/chats/${cur.id}/members/me`, { method: 'DELETE' }); closeM(); history.back();
+      }) }, ic('logout'), 'ចាកចេញពីក្រុម'));
+  };
+  redraw();
+}
+function memberMenu(m, redraw) {
+  if (m.userId === me.id) return;
+  const owner = cur.ownerId === me.id;
+  const mem = cur.members.find((x) => x.userId === me.id);
+  const admin = !!(mem && mem.isAdmin);
+  const targetOwner = m.userId === cur.ownerId;
+  const act = (fn) => async () => { const d = await fn(); if (d && d.chat) { applyChat(d.chat); redraw(); } };
+  sheet(m.user.displayName, [
+    owner && !targetOwner && { icon: 'shield', label: m.isAdmin ? 'ដកសិទ្ធិ admin' : 'តែងតាំងជា admin',
+      fn: act(() => api(`/chats/${cur.id}/members/${m.userId}`, { method: 'PATCH', body: { isAdmin: !m.isAdmin } })) },
+    owner && !targetOwner && { icon: 'crown', label: 'ផ្ទេរភាពជាម្ចាស់',
+      fn: act(async () => { if (!(await confirmDialog({ title: 'ផ្ទេរភាពជាម្ចាស់ក្រុម?', text: 'អ្នកនឹងនៅជា admin ប៉ុន្តែមិនមែនជាម្ចាស់ទៀតទេ។' }))) return null; return api(`/chats/${cur.id}/transfer`, { method: 'POST', body: { userId: m.userId } }); }) },
+    admin && !targetOwner && (owner || !m.isAdmin) && { icon: 'ban', label: 'ដកចេញពីក្រុម', danger: true,
+      fn: act(async () => { if (!(await confirmDialog({ title: 'ដក ' + m.user.displayName + ' ចេញ?', ok: 'ដកចេញ', danger: true }))) return null; return api(`/chats/${cur.id}/members/${m.userId}`, { method: 'DELETE' }); }) },
+  ]);
+}
+
+/* ---------- profile + settings (tabs of the side pane) ---------- */
+function editInfo(done) {
+  const name = h('input', { value: me.displayName, placeholder: 'ឈ្មោះបង្ហាញ', maxlength: 60 });
+  const bio = h('textarea', { rows: 3, placeholder: 'ប្រវត្តិរូប (bio)', maxlength: 200 }); bio.value = me.bio || '';
+  const close = modal('កែព័ត៌មាន', h('div', {}, name, bio, h('button', { class: 'primary', onclick: safe(async () => {
+    if (!name.value.trim()) return toast('សូមដាក់ឈ្មោះ');
+    me = (await api('/users/me', { method: 'PATCH', body: { displayName: name.value, bio: bio.value } })).user;
+    close(); drawNav(); if (done) done(); toast('បានរក្សាទុក');
+  }) }, 'រក្សាទុក')));
+  setTimeout(() => name.focus(), 80);
+}
+async function changeAvatar(file, done) {
+  if (!file) return;
+  if (file.size > 4 * 1024 * 1024) return toast('រូបធំពេក (អតិបរមា 4MB)');
+  const fd = new FormData(); fd.append('file', file, file.name);
+  me = (await api('/users/me/avatar', { method: 'POST', form: fd })).user; drawNav(); if (done) done(); toast('បានប្ដូររូប');
+}
+function profileNode() {
+  const head = h('div', { class: 'pfhead' });
+  const info = h('div', { class: 'card' });
+  const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => { const f = e.target.files[0]; e.target.value = ''; await changeAvatar(f, draw); }) });
+  const copy = (v) => async () => { try { await navigator.clipboard.writeText(v); toast('បានចម្លង'); } catch { toast(v); } };
+  function draw() {
+    head.replaceChildren(h('div', { class: 'avedit', onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 124)),
+      h('h2', {}, me.displayName), h('small', { class: 'status online' }, 'កំពុងអនឡាញ'));
+    info.replaceChildren(
+      h('div', { class: 'kv', onclick: copy('@' + me.username) }, h('div', {}, '@' + me.username), h('small', {}, 'ឈ្មោះអ្នកប្រើ')),
+      ...(me.bio ? [h('div', { class: 'kv', onclick: copy(me.bio) }, h('div', { style: 'white-space:pre-wrap' }, me.bio), h('small', {}, 'ប្រវត្តិរូប (bio)'))] : []));
+  }
+  draw();
+  const tile = (icon, label, fn) => h('button', { class: 'tile', onclick: fn }, ic(icon, 26), label);
+  return h('div', { class: 'pad' }, head, fileIn,
+    h('div', { class: 'tiles' }, tile('camera', 'ដាក់រូប', () => fileIn.click()), tile('pencil', 'កែព័ត៌មាន', () => editInfo(draw)), tile('settings', 'ការកំណត់', () => { settingsPage = null; setTab('settings'); })),
+    info);
+}
+
+/* settings: Telegram-style menu with sub-pages */
+let settingsPage = null;
+const THEME_LABEL = { auto: 'ស្វ័យប្រវត្តិ', light: 'ភ្លឺ', dark: 'ងងឹត' };
+const goSettings = (page) => { settingsPage = page; renderSide(); };
+function menuItem(color, icon, title, sub, fn, tag = 'button') {
+  return h(tag, tag === 'a' ? { class: 'mi', href: fn } : { class: 'mi', onclick: fn },
+    h('span', { class: 'sq', style: `background:linear-gradient(145deg,${color[0]},${color[1]})` }, ic(icon, 22)),
+    h('span', { class: 'grow' }, h('b', {}, title), h('small', {}, sub)), h('span', { class: 'chev', style: 'color:var(--mut);opacity:.6;display:inline-flex' }, ic('chev', 18)));
+}
+function subPage(title, ...kids) {
+  return h('div', { class: 'pad' }, h('div', { class: 'subhead' }, ibtn('back', 'Back', () => goSettings(null)), h('b', {}, title)), ...kids);
+}
+function blockedCard() {
+  const blocked = h('div', {});
+  const load = safe(async () => {
+    const d = await api('/users/blocked');
+    blocked.replaceChildren(...(d.users.length ? d.users.map((u) => h('div', { class: 'row', style: 'margin:0;cursor:default' }, avatar(u.avatarUrl, u.displayName, 38),
+      h('div', { class: 'grow' }, h('b', {}, u.displayName)), h('button', { onclick: safe(async () => { await api(`/users/${u.id}/block`, { method: 'DELETE' }); load(); }) }, 'Unblock')))
+      : [h('p', { class: 'muted', style: 'margin:6px 10px' }, 'គ្មាន')]));
+  });
+  load();
+  return h('div', { class: 'card' }, h('h4', {}, 'អ្នកដែលបាន block'), blocked);
+}
+function settingsNode() {
+  if (settingsPage === 'appearance') {
+    const seg = h('div', { class: 'seg', style: 'margin:6px 10px 10px' });
+    const draw = () => { const t = store.get('theme') || 'auto'; seg.replaceChildren(...Object.entries(THEME_LABEL).map(([k, l]) =>
+      h('button', { class: t === k ? 'on' : '', onclick: () => { store.set('theme', k); applyTheme(); draw(); } }, l))); };
+    draw();
+    return subPage('ការកំណត់ chat', h('div', { class: 'card' }, h('h4', {}, 'រូបរាង'), seg));
+  }
+  if (settingsPage === 'privacy') {
+    return subPage('ឯកជនភាព និងសុវត្ថិភាព',
+      h('div', { class: 'card' }, h('label', { class: 'row', style: 'cursor:pointer' }, h('span', { style: 'color:var(--pri)' }, ic('lock', 22)),
+        h('div', { class: 'grow' }, h('b', {}, 'មុខងារការពារ chat'), h('small', { style: 'white-space:normal' }, 'Watermark ឈ្មោះអ្នក · បិទការចម្លង · បាំងអេក្រង់ពេលចេញ។ មិនអាចធ្វើឱ្យ screenshot ខ្មៅបានលើ browser ទេ')),
+        h('input', { type: 'checkbox', class: 'sw', checked: secure, onchange: (e) => { secure = e.target.checked; store.set('secure', secure ? '1' : '0'); } }))),
+      h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: changePassword }, ic('key'), 'ប្ដូរពាក្យសម្ងាត់')),
+      blockedCard());
+  }
+  if (settingsPage === 'devices') {
+    return subPage('ឧបករណ៍',
+      h('div', { class: 'card' }, h('button', { class: 'sheet-i', onclick: safe(async () => {
+        if (!(await confirmDialog({ title: 'ចាកចេញពីឧបករណ៍ទាំងអស់?', text: 'ឧបករណ៍ផ្សេងទៀតនឹងត្រូវចូលម្ដងទៀត។', ok: 'ចាកចេញ' }))) return;
+        saveAuth(await api('/auth/logout-all', { method: 'POST', body: {} })); toast('រួចរាល់');
+      }) }, ic('devices'), 'ចាកចេញពីឧបករណ៍ទាំងអស់')),
+      h('p', { class: 'note' }, 'ឧបករណ៍នេះនៅតែចូលបាន ប៉ុន្តែឧបករណ៍ផ្សេងទៀតទាំងអស់នឹងត្រូវចូលគណនីម្ដងទៀត។'));
+  }
+  const fileIn = h('input', { type: 'file', accept: 'image/*', style: 'display:none', onchange: safe(async (e) => { const f = e.target.files[0]; e.target.value = ''; await changeAvatar(f, renderSide); }) });
+  return h('div', { class: 'pad' },
+    h('div', { class: 'sethead' }, h('div', { class: 'avedit', onclick: () => fileIn.click() }, avatar(me.avatarUrl, me.displayName, 84), h('span', { class: 'cam' }, ic('camera', 16))), fileIn,
+      h('h3', {}, me.displayName), h('small', {}, '@' + me.username)),
+    h('div', { class: 'card' },
+      menuItem(['#4db6ff', '#1a7fe6'], 'contacts', 'គណនី', 'ឈ្មោះ, Username, Bio', () => editInfo(renderSide)),
+      menuItem(['#ffb74d', '#f57c00'], 'message', 'ការកំណត់ chat', 'រូបរាង · ' + THEME_LABEL[store.get('theme') || 'auto'], () => goSettings('appearance')),
+      menuItem(['#66d97a', '#2bab45'], 'key', 'ឯកជនភាព និងសុវត្ថិភាព', 'ការពារ chat, ពាក្យសម្ងាត់, Block', () => goSettings('privacy')),
+      menuItem(['#4dd0e1', '#0097a7'], 'devices', 'ឧបករណ៍', 'គ្រប់គ្រងឧបករណ៍ដែលបានចូល', () => goSettings('devices')),
+      me.role === 'ADMIN' ? menuItem(['#b983f5', '#7c3fe0'], 'shield', 'Admin Dashboard', 'គ្រប់គ្រងអ្នកប្រើ', '/admin/', 'a') : null),
+    h('div', { class: 'card' }, h('button', { class: 'sheet-i danger', onclick: logout }, ic('logout'), 'ចាកចេញ')),
+    h('div', { style: 'height:12px' }));
+}
+function changePassword() {
+  const cp = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់បច្ចុប្បន្ន', autocomplete: 'current-password' });
+  const np = h('input', { type: 'password', placeholder: 'ពាក្យសម្ងាត់ថ្មី (8+ តួ)', autocomplete: 'new-password' });
+  const close = modal('ប្ដូរពាក្យសម្ងាត់', h('div', {}, cp, np, h('button', { class: 'primary', onclick: safe(async () => {
+    saveAuth(await api('/auth/password', { method: 'POST', body: { currentPassword: cp.value, newPassword: np.value } }));
+    close(); toast('បានប្ដូរ · ឧបករណ៍ផ្សេងត្រូវចូលម្ដងទៀត');
+  }) }, 'រក្សាទុក')));
+}
+
+/* ---------- privacy shield ---------- */
+const shield = h('div', { class: 'shield', hidden: true, onclick: () => { shield.hidden = true; } }, ic('lock', 64));
+document.body.append(shield);
+const shieldOn = () => { if (secure && view === 'chat') shield.hidden = false; };
+document.addEventListener('visibilitychange', () => { if (document.hidden) shieldOn(); else shield.hidden = true; });
+window.addEventListener('blur', shieldOn);
+window.addEventListener('pagehide', shieldOn);
+window.addEventListener('focus', () => { shield.hidden = true; });
+document.addEventListener('contextmenu', (e) => { if (secure && view === 'chat' && !e.target.closest('textarea,input')) e.preventDefault(); });
+
+/* ---------- navigation + boot ---------- */
+window.addEventListener('popstate', () => {
+  if (overlays.length) closeAllOverlays();
+  if (me && view !== 'list') showList();
+});
+(async function boot() {
+  if (!token) return mount(authView());
+  try { me = (await api('/auth/me')).user; showList(); }
+  catch (e) { if (token) mount(h('div', { class: 'authwrap' }, h('div', { class: 'auth center' }, h('p', {}, 'មិនអាចភ្ជាប់ server: ' + e.message), h('button', { class: 'primary', onclick: () => location.reload() }, 'ព្យាយាមម្ដងទៀត')))); else mount(authView()); }
+})();
 </script>
 </body>
 </html>
