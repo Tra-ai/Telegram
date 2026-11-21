@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#3390ec">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <title>Layzzchat</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,7 +268,7 @@ html.lowpower *{animation:none!important;transition:none!important;backdrop-filt
 /* ---- auth ---- */
 .authwrap{height:100dvh;overflow-y:auto;display:flex;background:linear-gradient(160deg,var(--pri-soft),transparent 55%),var(--bg)}
 .auth{margin:auto;width:100%;max-width:400px;padding:max(28px,env(safe-area-inset-top)) 22px 28px}
-.logo{width:84px;height:84px;border-radius:26px;background:linear-gradient(145deg,#59b3ff,var(--pri));color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 10px 30px rgba(51,144,236,.4)}
+.logo{display:block;width:96px;height:96px;border-radius:28px;object-fit:cover;margin:0 auto 14px;box-shadow:0 10px 30px rgba(124,58,237,.45)}
 .auth h1{text-align:center;margin:0 0 4px;font-size:26px}
 .auth .sub{text-align:center;margin:0 0 22px;color:var(--mut)}
 .seg{display:flex;background:var(--field);border-radius:12px;padding:3px;gap:3px;margin-bottom:12px}
@@ -451,7 +453,7 @@ html[data-ios] .auth .primary,html[data-ios] .auth .ghost{border-radius:14px;box
 html[data-ios] .auth .seg{border-radius:10px;background:var(--field)}
 html[data-ios] .auth .seg button{border-radius:8px;padding:8px 6px;font-size:15px}
 html[data-ios] .auth input{border-radius:12px}
-html[data-ios] .logo{border-radius:22%;box-shadow:0 8px 24px rgba(0,122,255,.3)}
+html[data-ios] .logo{border-radius:22%;box-shadow:0 8px 24px rgba(124,58,237,.4)}
 html[data-ios] .authwrap::before,html[data-ios] .authwrap::after{display:none}
 
 /* ===== Chat-list polish (soft filters, raised search, clearer hierarchy, floating FAB, stronger tab bar) ===== */
@@ -487,18 +489,23 @@ html:root .tab{color:var(--mut)}
 html:root .tab.on{color:var(--pri)}
 html:root .tabic svg{width:26px;height:26px}
 html:root .tabic{height:28px}
+/* empty chat pane logo */
+.emptylogo{width:84px;height:84px;border-radius:24px;margin-bottom:12px;box-shadow:0 8px 24px rgba(124,58,237,.35)}
 /* ---- bottom navigation: floating glass pill (Telegram-style), same on Android + iOS ---- */
-html:root .nav,html[data-ios] .nav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;gap:4px;border-radius:38px;border:0;
-  background:color-mix(in srgb,var(--surface) 86%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
-  box-shadow:0 10px 32px rgba(16,24,40,.24),0 0 0 1px var(--line)}
-html:root .tab,html[data-ios] .tab{padding:9px 2px 8px;border-radius:32px;gap:3px;color:var(--fg);font-size:13px;font-weight:700;letter-spacing:.1px;transition:background .18s,color .18s}
+html:root .nav,html[data-ios] .nav{left:22px;right:22px;bottom:calc(8px + env(safe-area-inset-bottom));padding:4px;gap:2px;border-radius:30px;border:0;
+  background:color-mix(in srgb,var(--surface) 88%,transparent);-webkit-backdrop-filter:saturate(180%) blur(18px);backdrop-filter:saturate(180%) blur(18px);
+  box-shadow:0 6px 20px rgba(16,24,40,.16),0 0 0 1px var(--line)}
+html:root .tab,html[data-ios] .tab{padding:5px 2px 4px;border-radius:26px;gap:1px;color:var(--mut);font-size:11px;font-weight:600;line-height:1.35;transition:background .18s,color .18s}
 html:root .tab.on,html[data-ios] .tab.on{background:var(--pri-soft);color:var(--pri)}
-html:root .tabic svg{width:28px;height:28px}
-html:root .tabic{height:30px}
-html:root .tabic .badge,html[data-ios] .tabic .badge{top:-9px;left:auto;right:-19px;height:20px;line-height:20px;min-width:20px;font-size:12px;font-weight:700;padding:0 5px;background:var(--pri);color:var(--on-pri);border:2.5px solid var(--surface)}
-html[data-ios] .sidebody .list{padding-bottom:110px}
-html[data-ios] .fab{bottom:calc(98px + env(safe-area-inset-bottom));box-shadow:0 8px 24px rgba(51,144,236,.55),0 2px 6px rgba(51,144,236,.3)}
-html:root .fab{bottom:calc(98px + env(safe-area-inset-bottom))}
+html:root .tabic svg{width:22px;height:22px}
+html:root .tabic{height:24px}
+html:root .tabic .badge,html[data-ios] .tabic .badge{top:-6px;left:auto;right:-14px;height:16px;line-height:16px;min-width:16px;font-size:10.5px;font-weight:700;padding:0 4px;background:var(--pri);color:var(--on-pri);border:2px solid var(--surface)}
+html[data-ios] .sidebody .list{padding-bottom:86px}
+html[data-ios] .sidebody .pad{padding-bottom:96px}
+html:root .sidebody .list{padding-bottom:86px}
+html:root .sidebody .pad{padding-bottom:96px}
+html[data-ios] .fab{bottom:calc(76px + env(safe-area-inset-bottom));box-shadow:0 8px 24px rgba(51,144,236,.55),0 2px 6px rgba(51,144,236,.3)}
+html:root .fab{bottom:calc(76px + env(safe-area-inset-bottom))}
 
 
 </style>
@@ -816,7 +823,7 @@ function authView() {
   }
   [u, d, p].forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') submit(); }));
   draw();
-  root.append(h('div', { class: 'logo' }, ic('message', 42)), h('h1', {}, 'Layzzchat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
+  root.append(h('img', { class: 'logo', src: '/logo-192.png', alt: 'Layzzchat', width: 96, height: 96 }), h('h1', {}, 'Layzzchat'), h('p', { class: 'sub' }, 'សារឯកជន ទំនាក់ទំនងរហ័ស'),
     tabs, lu, u, ld, d, lp, h('div', { class: 'pw' }, p, eye), err, go);
   return h('div', { class: 'authwrap' }, root);
 }
@@ -871,11 +878,11 @@ function drawNav() {
   const tab = (k, icon, label) => h('button', { class: 'tab' + (sideTab === k ? ' on' : ''), 'aria-label': label, 'aria-current': sideTab === k ? 'page' : null, onclick: () => setTab(k) },
     h('span', { class: 'tabic' }, icon, k === 'chats' && unread ? h('span', { class: 'badge' }, unread > 99 ? '99+' : unread) : null), h('span', {}, label));
   navEl.replaceChildren(tab('chats', ic('message', 22), 'សារ'), tab('contacts', ic('contacts', 22), 'ទំនាក់ទំនង'),
-    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 30), 'ខ្ញុំ'));
+    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 24), 'ខ្ញុំ'));
 }
 function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildren(node); drawList(); }
 function emptyMain() {
-  return h('div', { class: 'empty-main' }, ic('message', 40), h('p', {}, 'ជ្រើសរើស chat ដើម្បីចាប់ផ្ដើមសន្ទនា'));
+  return h('div', { class: 'empty-main' }, h('img', { class: 'emptylogo', src: '/logo-192.png', alt: '', width: 84, height: 84 }), h('p', {}, 'ជ្រើសរើស chat ដើម្បីចាប់ផ្ដើមសន្ទនា'));
 }
 function drawFolders() {
   if (!folderBar) return;

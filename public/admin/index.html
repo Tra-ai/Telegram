@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#3390ec">
+<link rel="icon" type="image/png" href="/favicon.png">
 <title>Layzzchat Admin</title>
 <style>
   :root{--bg:#e1e1e1;--card:#fcfcfc;--field:#efefef;--fg:#111;--mut:#6e6e6e;--line:#e4e4e4;--pri:#111;--onpri:#fff;--bar:#3a3a3a;
@@ -22,7 +23,7 @@
   /* login + scan gate (same look: one white card on grey) */
   #login,#gate{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
   .lbox{width:100%;max-width:400px;display:flex;flex-direction:column;gap:12px;background:var(--card);border-radius:32px;padding:32px 28px;box-shadow:var(--shadow)}
-  .lbox .logo{width:64px;height:64px;border-radius:20px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:30px;background:var(--field)}
+  .lbox .logo{width:72px;height:72px;border-radius:22px;margin:0 auto;display:block;object-fit:cover;box-shadow:0 8px 24px rgba(124,58,237,.4)}
   .lbox h1{margin:6px 0 0;text-align:center;font-size:22px;font-weight:600}
   .lbox p{margin:0 0 10px;text-align:center;color:var(--mut);font-size:15px}
   .lbox label{font-size:13px;color:var(--mut);margin:4px 6px -6px}
@@ -40,7 +41,8 @@
   .stage{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px}
   .modal{width:100%;max-width:1040px;height:min(720px,calc(100dvh - 48px));background:var(--card);border-radius:36px;box-shadow:var(--shadow);display:flex;overflow:hidden}
   .side{width:290px;flex:none;border-right:1px solid var(--line);padding:30px 20px 20px;display:flex;flex-direction:column}
-  .stitle{margin:0 0 22px 12px;font-size:22px;font-weight:600}
+  .stitle{margin:0 0 22px 8px;font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px}
+  .stitle img{width:30px;height:30px;border-radius:9px}
   #tabs{display:flex;flex-direction:column;gap:6px}
   #tabs button,.navbtn{height:44px;width:100%;border-radius:14px;padding:0 14px;display:flex;align-items:center;gap:14px;font-size:16px;text-align:left}
   #tabs button.on{background:var(--field)}
@@ -118,7 +120,7 @@
 <body>
 <div id="login">
   <form class="lbox" id="lform">
-    <div class="logo"><span class="ic" id="llogo"></span></div>
+    <img class="logo" src="/logo-192.png" alt="Layzzchat" width="72" height="72">
     <h1>Layzzchat Admin</h1>
     <p>ចូលដោយគណនី Admin របស់អ្នក</p>
     <label for="u">ឈ្មោះអ្នកប្រើ</label>
@@ -132,7 +134,7 @@
 
 <div id="gate" class="hide">
   <div class="lbox">
-    <div class="logo"><span class="ic" id="glogo"></span></div>
+    <img class="logo" src="/logo-192.png" alt="Layzzchat" width="72" height="72">
     <h1>ស្កេនដើម្បីចូល</h1>
     <p>ប្រើមុខ ម្រាមដៃ ឬ PIN របស់ទូរស័ព្ទ ដើម្បីបើកផ្ទាំង Admin</p>
     <div class="err" id="gerr" role="alert"></div>
@@ -145,7 +147,7 @@
   <div class="stage">
     <div class="modal">
       <aside class="side">
-        <h1 class="stitle">Admin</h1>
+        <h1 class="stitle"><img src="/logo-192.png" alt="" width="30" height="30">Admin</h1>
         <nav id="tabs"></nav>
         <button class="navbtn bottom" id="out" title="ចាកចេញ"></button>
       </aside>
@@ -224,7 +226,6 @@ const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric',
 const act = (icon, text, fn, cls = '') => el('button', { class: cls, onclick: fn }, ic(icon), text);
 
 /* ---------- login ---------- */
-$('#glogo').replaceWith(ic('face')); $('#llogo').replaceWith(ic('chat'));
 $('#toapp').append(ic('close')); $('#out').append(ic('out'), el('span', { class: 'lbl' }, 'ចាកចេញ'));
 $('#lform').onsubmit = async (e) => {
   e.preventDefault(); $('#lerr').textContent = ''; $('#go').disabled = true;
