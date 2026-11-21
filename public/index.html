@@ -508,6 +508,15 @@ html[data-ios] .fab{bottom:calc(76px + env(safe-area-inset-bottom));box-shadow:0
 html:root .fab{bottom:calc(76px + env(safe-area-inset-bottom))}
 
 
+/* ---- default chat wallpaper: physics doodles (tiled, theme-aware) ---- */
+html:root[data-wall="default"]{--chat-bg:url(/bg-doodle-light.png) 0 0/488px auto repeat,#e9eef3}
+html[data-ios]:root[data-wall="default"]{--chat-bg:url(/bg-doodle-light.png) 0 0/488px auto repeat,#fff}
+@media (prefers-color-scheme:dark){
+  html:root[data-wall="default"]:not([data-theme="light"]){--chat-bg:url(/bg-doodle-dark.png) 0 0/488px auto repeat,#0e1621}
+  html[data-ios]:root[data-wall="default"]:not([data-theme="light"]){--chat-bg:url(/bg-doodle-dark.png) 0 0/488px auto repeat,#000}
+}
+html:root[data-theme="dark"][data-wall="default"]{--chat-bg:url(/bg-doodle-dark.png) 0 0/488px auto repeat,#0e1621}
+html[data-ios]:root[data-theme="dark"][data-wall="default"]{--chat-bg:url(/bg-doodle-dark.png) 0 0/488px auto repeat,#000}
 </style>
 </head>
 <body>

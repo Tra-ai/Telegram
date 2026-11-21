@@ -51,14 +51,14 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Object() {
             @JavascriptInterface
             public void setSecure(final boolean on) {
-                runOnUiThread(() -> {
+                runOnUiThread(new Runnable() { @Override public void run() {
                     getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SECURE); // always allow screenshots
-                });
+                }});
             }
             // The page passes its header colour (#rrggbb) so the system bars match the theme / iOS style
             @JavascriptInterface
             public void setBars(final String hex) {
-                runOnUiThread(() -> {
+                runOnUiThread(new Runnable() { @Override public void run() {
                     try {
                         int c = Color.parseColor(hex);
                         getWindow().setStatusBarColor(c);
@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
                         int mask = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | (android.os.Build.VERSION.SDK_INT >= 26 ? View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR : 0);
                         d.setSystemUiVisibility(light ? (f | mask) : (f & ~mask));
                     } catch (Exception ignored) { }
-                });
+                }});
             }
         }, "LayzzAndroid");
 
@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPermissionRequest(final PermissionRequest request) {
-                runOnUiThread(() -> {
+                runOnUiThread(new Runnable() { @Override public void run() {
                     boolean wantsAudio = false;
                     for (String r : request.getResources()) {
                         if (PermissionRequest.RESOURCE_AUDIO_CAPTURE.equals(r)) wantsAudio = true;
@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
                         pendingMic = request;
                         requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_MIC);
                     }
-                });
+                }});
             }
         });
 
