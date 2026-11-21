@@ -487,8 +487,18 @@ html:root .tab{color:var(--mut)}
 html:root .tab.on{color:var(--pri)}
 html:root .tabic svg{width:26px;height:26px}
 html:root .tabic{height:28px}
-html[data-ios] .nav{box-shadow:0 -1px 0 var(--line)}
-html:root:not([data-ios]) .nav{border-top:1px solid var(--line)}
+/* ---- bottom navigation: floating glass pill (Telegram-style), same on Android + iOS ---- */
+html:root .nav,html[data-ios] .nav{left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));padding:6px;gap:4px;border-radius:38px;border:0;
+  background:color-mix(in srgb,var(--surface) 86%,transparent);-webkit-backdrop-filter:saturate(180%) blur(22px);backdrop-filter:saturate(180%) blur(22px);
+  box-shadow:0 10px 32px rgba(16,24,40,.24),0 0 0 1px var(--line)}
+html:root .tab,html[data-ios] .tab{padding:9px 2px 8px;border-radius:32px;gap:3px;color:var(--fg);font-size:13px;font-weight:700;letter-spacing:.1px;transition:background .18s,color .18s}
+html:root .tab.on,html[data-ios] .tab.on{background:var(--pri-soft);color:var(--pri)}
+html:root .tabic svg{width:28px;height:28px}
+html:root .tabic{height:30px}
+html:root .tabic .badge,html[data-ios] .tabic .badge{top:-9px;left:auto;right:-19px;height:20px;line-height:20px;min-width:20px;font-size:12px;font-weight:700;padding:0 5px;background:var(--pri);color:var(--on-pri);border:2.5px solid var(--surface)}
+html[data-ios] .sidebody .list{padding-bottom:110px}
+html[data-ios] .fab{bottom:calc(98px + env(safe-area-inset-bottom));box-shadow:0 8px 24px rgba(51,144,236,.55),0 2px 6px rgba(51,144,236,.3)}
+html:root .fab{bottom:calc(98px + env(safe-area-inset-bottom))}
 
 
 </style>
@@ -861,7 +871,7 @@ function drawNav() {
   const tab = (k, icon, label) => h('button', { class: 'tab' + (sideTab === k ? ' on' : ''), 'aria-label': label, 'aria-current': sideTab === k ? 'page' : null, onclick: () => setTab(k) },
     h('span', { class: 'tabic' }, icon, k === 'chats' && unread ? h('span', { class: 'badge' }, unread > 99 ? '99+' : unread) : null), h('span', {}, label));
   navEl.replaceChildren(tab('chats', ic('message', 22), 'សារ'), tab('contacts', ic('contacts', 22), 'ទំនាក់ទំនង'),
-    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 26), 'ខ្ញុំ'));
+    tab('settings', ic('settings', 22), 'ការកំណត់'), tab('profile', avatar(me.avatarUrl, me.displayName, 30), 'ខ្ញុំ'));
 }
 function setMain(node, v) { view = v; shell.dataset.view = v; main.replaceChildren(node); drawList(); }
 function emptyMain() {
